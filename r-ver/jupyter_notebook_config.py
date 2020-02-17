@@ -21,11 +21,11 @@ def _codeserver_command(port):
     full_path = shutil.which("code-server")
     if not full_path:
         raise FileNotFoundError("Can not find code-server in $PATH")
-    working_dir = os.getenv("CODE_WORKINGDIR", None)
-    if working_dir is None:
-        working_dir = os.getenv("JUPYTER_SERVER_ROOT", ".")
-    elif os.path.isdir(working_dir) is False:
-        os.mkdir(working_dir)
+    work_dir = os.getenv("CODE_WORKDIR", None)
+    if work_dir is None:
+        work_dir = os.getenv("JUPYTER_SERVER_ROOT", ".")
+    elif os.path.isdir(work_dir) is False:
+        os.mkdir(work_dir)
     data_dir = os.getenv("CODE_USER_DATA_DIR", "")
     if data_dir != "":
         data_dir = "--user-data-dir=" + str(data_dir)
@@ -46,16 +46,16 @@ def _codeserver_command(port):
         data_dir,
         extensions_dir,
         builtin_extensions_dir,
-        working_dir,
+        work_dir,
     ]
 
 c.ServerProxy.servers = {
-    "vscode": {
+    "code-server": {
         "command": _codeserver_command,
         "timeout": 20,
         "launcher_entry": {
-            "title": "VS Code",
-            "icon_path": "/usr/local/lib/code-server/vscode.svg",
+            "title": "Code Server",
+            "icon_path": "/opt/code-server/vscode.svg",
         },
     },
 }

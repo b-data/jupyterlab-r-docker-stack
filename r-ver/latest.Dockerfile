@@ -1,7 +1,7 @@
 FROM registry.gitlab.b-data.ch/r/r-ver:3.6.2
 
 LABEL org.label-schema.license="MIT" \
-      org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/code-server/r-ver" \
+      org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r-ver" \
       maintainer="Olivier Benz <olivier.benz@b-data.ch>"
 
 ARG NB_USER
@@ -11,7 +11,7 @@ ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_SERVER_RELEASE
 ARG VS_CODE_VERSION
-ARG CODE_WORKINGDIR
+ARG CODE_WORKDIR
 ARG PANDOC_VERSION
 
 ENV NB_USER=${NB_USER:-jovyan} \
@@ -21,7 +21,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-2.1698} \
     VS_CODE_VERSION=${VS_CODE_VERSION:-1.41.1} \
-    CODE_BUILTIN_EXTENSIONS_DIR=/usr/local/lib/code-server/extensions \
+    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
 USER root
@@ -63,11 +63,13 @@ RUN apt-get update \
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 
 ## Install code-server
-RUN cd /usr/local/bin \
+RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
+  && cd /opt/code-server \
   && curl -sL https://github.com/cdr/code-server/releases/download/${CODE_SERVER_RELEASE}/code-server${CODE_SERVER_RELEASE}-vsc${VS_CODE_VERSION}-linux-x86_64.tar.gz | tar zxvf - --strip-components=1 \
-  && mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
-  && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o /usr/local/lib/code-server/vscode.svg \
+  && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   && cd /
+
+ENV PATH=/opt/code-server:$PATH
 
 ## Install JupyterLab
 RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
@@ -109,7 +111,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && gunzip christian-kohler.path-intellisense-1.4.2.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense-1.4.2.vsix \
   ## Needed to get R LSP to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /usr/local/lib/code-server/extensions/reditorsupport.r-lsp-0.1.4/ \
+  && cd /opt/code-server/extensions/reditorsupport.r-lsp-0.1.4/ \
   && npm install \
   && cd / \
   ## Clean up (Node.js)
@@ -140,7 +142,7 @@ RUN curl -sL https://github.com/krallin/tini/releases/download/v0.18.0/tini -o /
 USER ${NB_USER}
 
 ENV HOME=/home/${NB_USER} \
-    CODE_WORKINGDIR=${CODE_WORKINGDIR:-/home/${NB_USER}/projects} \
+    CODE_WORKDIR=${CODE_WORKDIR:-/home/${NB_USER}/projects} \
     SHELL=/bin/bash
 
 WORKDIR ${HOME}
