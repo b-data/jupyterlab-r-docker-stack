@@ -42,6 +42,7 @@ RUN apt-get update \
     python3-venv \
     python3-virtualenv \
     ssh \
+    sudo \
     vim \
     wget \
     ## Current ZeroMQ library for R pbdZMQ
@@ -150,7 +151,6 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && mkdir -p `Rscript -e 'cat(path.expand(Sys.getenv("R_LIBS_USER")))'` \
   && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.rterm.linux": "/usr/local/bin/R",\n    "r.sessionWatcher": true,\n    "r.rterm.option": [\n        "--no-save",\n        "--no-restore"\n    ],\n}' > .local/share/code-server/User/settings.json
 
 ## Copy local files as late as possible to avoid cache busting
@@ -161,4 +161,4 @@ EXPOSE 8888
 
 ## Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
-CMD ["start-notebook.sh"]
+CMD ["init-notebook.sh"]
