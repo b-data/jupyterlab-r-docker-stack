@@ -101,15 +101,17 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.9.1/vspackage -o alefragnani.project-manager-10.9.1.vsix.gz \
   && gunzip alefragnani.project-manager-10.9.1.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.9.1.vsix \
   && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/christian-kohler/vsextensions/path-intellisense/1.4.2/vspackage -o christian-kohler.path-intellisense-1.4.2.vsix.gz \
   && gunzip christian-kohler.path-intellisense-1.4.2.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense-1.4.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.2/vspackage -o Ikuyadeu.r-1.2.2.vsix.gz \
+  && gunzip Ikuyadeu.r-1.2.2.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
   ## Needed to get R LSP to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
   && cd /opt/code-server/extensions/reditorsupport.r-lsp-0.1.4/ \
   && npm install \
@@ -149,7 +151,6 @@ WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
   && mkdir -p `Rscript -e 'cat(path.expand(Sys.getenv("R_LIBS_USER")))'` \
-  && echo 'source(file.path(Sys.getenv(if (.Platform$OS.type == "windows") "USERPROFILE" else "HOME"), ".vscode-R", "init.R"))' > .Rprofile \
   && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.rterm.linux": "/usr/local/bin/R",\n    "r.sessionWatcher": true,\n    "r.rterm.option": [\n        "--no-save",\n        "--no-restore"\n    ],\n}' > .local/share/code-server/User/settings.json
 
 ## Copy local files as late as possible to avoid cache busting
