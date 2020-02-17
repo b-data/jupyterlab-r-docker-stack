@@ -1,5 +1,7 @@
 FROM registry.gitlab.b-data.ch/jupyterlab/r-ver:3.6.2
 
+USER root
+
 RUN apt-get update -qq && apt-get -y --no-install-recommends install \
   #libxml2-dev \
   libcairo2-dev \
@@ -20,3 +22,6 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     selectr \
     caTools \
     BiocManager
+
+## Switch back to ${NB_USER} to avoid accidental container runs as root
+USER ${NB_USER}
