@@ -35,6 +35,7 @@ RUN apt-get update \
     less \
     libclang-dev \
     lsb-release \
+    man-db \
     multiarch-support \
     nano \
     procps \
