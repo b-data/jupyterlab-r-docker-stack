@@ -2,7 +2,8 @@ FROM registry.gitlab.b-data.ch/jupyterlab/r-ver:3.6.2
 
 USER root
 
-RUN apt-get update -qq && apt-get -y --no-install-recommends install \
+RUN apt-get update \
+  && apt-get -y install --no-install-recommends \
   #libxml2-dev \
   libcairo2-dev \
   libsqlite3-dev \
@@ -21,7 +22,10 @@ RUN apt-get update -qq && apt-get -y --no-install-recommends install \
     #remotes \
     selectr \
     caTools \
-    BiocManager
+    BiocManager \
+  ## Clean up
+  && rm -rf /tmp/* \
+  && rm -rf /var/lib/apt/lists/*
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
