@@ -80,7 +80,33 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && install2.r --error PKI \
   ## And some nice R packages for publishing-related stuff
   && install2.r --error --deps TRUE \
-    bookdown rticles rmdshower rJava
+    bookdown rticles rmdshower rJava \
+  ## Install Node.js
+  && curl -sL https://deb.nodesource.com/setup_12.x | bash \
+  && DEPS="libpython-stdlib \
+    libpython2-stdlib \
+    libpython2.7-minimal \
+    libpython2.7-stdlib \
+    python \
+    python-minimal \
+    python2 python2-minimal \
+    python2.7 \
+    python2.7-minimal" \
+  && apt-get install -y --no-install-recommends nodejs $DEPS \
+  ## Install code-server extensions
+  && cd /tmp \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/James-Yu/vsextensions/latex-workshop/8.7.2/vspackage -o James-Yu.latex-workshop-8.7.2.vsix.gz \
+  && gunzip James-Yu.latex-workshop-8.7.2.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.7.2.vsix \
+  ## Needed to get LaTeX Workshop to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
+  && cd /opt/code-server/extensions/james-yu.latex-workshop-8.7.2 \
+  && npm install \
+  ## Clean up (Node.js)
+  && rm -rf /tmp/* \
+  && apt-get remove --purge -y nodejs $DEPS \
+  && apt-get autoremove -y \
+  && apt-get autoclean -y \
+  && rm -rf /var/lib/apt/lists/*
 #
 ## Consider including:
 # - yihui/printr R package (when released to CRAN)
