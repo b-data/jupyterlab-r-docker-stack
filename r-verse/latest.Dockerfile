@@ -106,7 +106,11 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && apt-get remove --purge -y nodejs $DEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+    /root/.cache \
+    /root/.config \
+    /root/.local \
+    /root/.npm
 #
 ## Consider including:
 # - yihui/printr R package (when released to CRAN)
