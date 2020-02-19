@@ -154,7 +154,7 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.rterm.linux": "/usr/local/bin/R",\n    "r.sessionWatcher": true,\n    "r.rterm.option": [\n        "--no-save",\n        "--no-restore"\n    ],\n}' > .local/share/code-server/User/settings.json
+  && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.rterm.linux": "/usr/local/bin/R",\n    "r.rterm.option": [\n        "--no-save",\n        "--no-restore"\n    ],\n    "r.sessionWatcher": true,\n}' > .local/share/code-server/User/settings.json
 
 ## Copy local files as late as possible to avoid cache busting
 COPY *.sh /usr/local/bin/
