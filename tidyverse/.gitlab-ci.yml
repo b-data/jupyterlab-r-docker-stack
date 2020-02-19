@@ -8,13 +8,13 @@ variables:
 
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - export VERSION_MAJ_MIN_PAT=`cat r-tidyverse/latest.Dockerfile | head -n1 | sed 's/.*\([0-9].[0-9].[0-9]\)/\1/'`
+  - export VERSION_MAJ_MIN_PAT=`cat tidyverse/latest.Dockerfile | head -n1 | sed 's/.*\([0-9].[0-9].[0-9]\)/\1/'`
   - export VERSION_MAJ_MIN=`echo "${VERSION_MAJ_MIN_PAT:0:3}"`
   - export VERSION_MAJ=`echo "${VERSION_MAJ_MIN_PAT:0:1}"`
 
 build:
   script:
-    - cd r-tidyverse && docker build --pull -t $CI_REGISTRY_IMAGE:latest -f latest.Dockerfile .
+    - cd tidyverse && docker build --pull -t $CI_REGISTRY_IMAGE:latest -f latest.Dockerfile .
     - docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN_PAT
     - docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$VERSION_MAJ
@@ -26,4 +26,4 @@ build:
     refs:
       - master
     changes:
-      - r-tidyverse/latest.Dockerfile
+      - tidyverse/latest.Dockerfile

@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r-tidyverse:3.6.2
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:3.6.2
 
 # Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
 # TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
