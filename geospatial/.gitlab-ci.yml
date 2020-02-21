@@ -12,7 +12,8 @@ before_script:
   - export VERSION_MAJ_MIN=`echo "${VERSION_MAJ_MIN_PAT:0:3}"`
   - export VERSION_MAJ=`echo "${VERSION_MAJ_MIN_PAT:0:1}"`
 
-build:
+build-latest:
+  stage: build
   script:
     - cd geospatial && docker build --pull -t $CI_REGISTRY_IMAGE:latest -f latest.Dockerfile .
     - docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN_PAT

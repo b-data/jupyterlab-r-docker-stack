@@ -12,7 +12,8 @@ before_script:
   - export VERSION_MAJ_MIN=`echo "${VERSION_MAJ_MIN_PAT:0:3}"`
   - export VERSION_MAJ=`echo "${VERSION_MAJ_MIN_PAT:0:1}"`
 
-build:
+build-latest:
+  stage: build
   script:
     - cd r-ver && docker build --pull -t $CI_REGISTRY_IMAGE:latest -f latest.Dockerfile .
     - docker tag $CI_REGISTRY_IMAGE:latest $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN_PAT
@@ -22,6 +23,19 @@ build:
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN_PAT
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
+  only:
+    refs:
+      - master
+    changes:
+      - r-ver/latest.Dockerfile
+
+trigger_build:
+  stage: deploy
+  before_script:
+    - apk add --update curl
+    - rm -rf /var/cache/apk/*
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=master https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
   only:
     refs:
       - master
