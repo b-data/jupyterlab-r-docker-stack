@@ -5,6 +5,7 @@ services:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
+  R_VERSION_UPDATE: "false"
 
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -28,3 +29,6 @@ build-latest:
       - master
     changes:
       - geospatial/latest.Dockerfile
+  except:
+    variables:
+      - $R_VERSION_UPDATE == "true"

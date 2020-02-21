@@ -29,7 +29,7 @@ build-latest:
     changes:
       - r-ver/latest.Dockerfile
 
-trigger_build:
+trigger-build:
   stage: deploy
   before_script:
     - apk add --update curl
