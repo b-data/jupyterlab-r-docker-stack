@@ -117,7 +117,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.2.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
   ## Needed to get R LSP to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /opt/code-server/extensions/reditorsupport.r-lsp-0.1.4/ \
+  && cd /opt/code-server/extensions/reditorsupport.r-lsp-*/ \
   && npm install \
   && cd / \
   ## Clean up (Node.js)
