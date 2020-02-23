@@ -82,6 +82,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
     notebook==6.0.3 \
+    radian \
   ## Install Node.js
   && curl -sL https://deb.nodesource.com/setup_12.x | bash \
   && DEPS="libpython-stdlib \
@@ -154,7 +155,9 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.rterm.linux": "/usr/local/bin/R",\n    "r.rterm.option": [\n        "--no-save",\n        "--no-restore"\n    ],\n    "r.sessionWatcher": true,\n}' > .local/share/code-server/User/settings.json
+  && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n}' > .local/share/code-server/User/settings.json \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/bin" ] ; then\n    PATH="\$HOME/bin:\$PATH"\nfi" >> .bashrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" >> .bashrc
 
 ## Copy local files as late as possible to avoid cache busting
 COPY *.sh /usr/local/bin/
