@@ -46,6 +46,7 @@ RUN apt-get update \
     sudo \
     vim \
     wget \
+    zsh \
     ## Current ZeroMQ library for R pbdZMQ
     libzmq3-dev \
     pkg-config \    
@@ -55,6 +56,13 @@ RUN apt-get update \
     libxml2-dev \
   ## Clean up
   && rm -rf /var/lib/apt/lists/* \
+  ## Install font MesloLGS NF
+  && mkdir -p /usr/share/fonts/truetype/meslo \
+  && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Regular.ttf \
+  && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold.ttf \
+  && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Italic.ttf \
+  && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
+  && fc-cache -fv \
   ## Install pandoc
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-amd64.deb \
@@ -82,6 +90,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
     notebook==6.0.3 \
+    radian \
   ## Install Node.js
   && curl -sL https://deb.nodesource.com/setup_12.x | bash \
   && DEPS="libpython-stdlib \
@@ -112,6 +121,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.2/vspackage -o Ikuyadeu.r-1.2.2.vsix.gz \
   && gunzip Ikuyadeu.r-1.2.2.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.2.vsix \
@@ -149,16 +159,25 @@ USER ${NB_USER}
 
 ENV HOME=/home/${NB_USER} \
     CODE_WORKDIR=${CODE_WORKDIR:-/home/${NB_USER}/projects} \
-    SHELL=/bin/bash
+    SHELL=/usr/bin/zsh \
+    TERM=xterm-256color
 
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.rterm.linux": "/usr/local/bin/R",\n    "r.rterm.option": [\n        "--no-save",\n        "--no-restore"\n    ],\n    "r.sessionWatcher": true,\n}' > .local/share/code-server/User/settings.json
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n}' > .local/share/code-server/User/settings.json \
+  && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
+  && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
+  #&& sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' .zshrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/bin" ] ; then\n    PATH="\$HOME/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
+  && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
+  && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc
 
 ## Copy local files as late as possible to avoid cache busting
 COPY *.sh /usr/local/bin/
 COPY jupyter_notebook_config.py /etc/jupyter/
+COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
 
 EXPOSE 8888
 
