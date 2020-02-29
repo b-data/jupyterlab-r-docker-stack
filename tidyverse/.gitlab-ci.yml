@@ -5,7 +5,7 @@ services:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
-  R_VERSION_UPDATE: "false"
+  R_VERSION_UPDATE: "true"
 
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -33,7 +33,21 @@ build-latest:
     variables:
       - $R_VERSION_UPDATE == "true"
 
-trigger-build:
+build-version:
+  stage: build
+  script:
+    - cd tidyverse && docker build --pull -t $CI_REGISTRY_IMAGE:3.6.2 -f 3.6.2.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:3.6.2
+  only:
+    refs:
+      - freeze-version
+    changes:
+      - tidyverse/3.6.2.Dockerfile
+  except:
+    variables:
+      - $R_VERSION_UPDATE == "true"
+
+trigger-latest-build:
   stage: deploy
   before_script:
     - apk add --update curl
@@ -45,6 +59,22 @@ trigger-build:
       - master
     changes:
       - tidyverse/latest.Dockerfile
+  except:
+    variables:
+      - $R_VERSION_UPDATE == "true"
+
+trigger-version-build:
+  stage: deploy
+  before_script:
+    - apk add --update curl
+    - rm -rf /var/cache/apk/*
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_R_VERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/168/trigger/pipeline
+  only:
+    refs:
+      - freeze-version
+    changes:
+      - tidyverse/3.6.2.Dockerfile
   except:
     variables:
       - $R_VERSION_UPDATE == "true"
