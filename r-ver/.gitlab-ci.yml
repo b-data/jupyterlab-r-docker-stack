@@ -29,7 +29,18 @@ build-latest:
     changes:
       - r-ver/latest.Dockerfile
 
-trigger-build:
+build-version:
+  stage: build
+  script:
+    - cd r-ver && docker build --pull -t $CI_REGISTRY_IMAGE:3.6.2 -f 3.6.2.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:3.6.2
+  only:
+    refs:
+      - freeze-version
+    changes:
+      - r-ver/3.6.2.Dockerfile
+
+trigger-latest-build:
   stage: deploy
   before_script:
     - apk add --update curl
@@ -41,3 +52,16 @@ trigger-build:
       - master
     changes:
       - r-ver/latest.Dockerfile
+
+trigger-version-build:
+  stage: deploy
+  before_script:
+    - apk add --update curl
+    - rm -rf /var/cache/apk/*
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
+  only:
+    refs:
+      - freeze-version
+    changes:
+      - r-ver/3.6.2.Dockerfile

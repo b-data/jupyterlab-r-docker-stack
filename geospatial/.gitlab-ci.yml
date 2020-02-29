@@ -32,3 +32,17 @@ build-latest:
   except:
     variables:
       - $R_VERSION_UPDATE == "true"
+
+build-version:
+  stage: build
+  script:
+    - cd geospatial && docker build --pull -t $CI_REGISTRY_IMAGE:3.6.2 -f 3.6.2.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:3.6.2
+  only:
+    refs:
+      - freeze-version
+    changes:
+      - geospatial/3.6.2.Dockerfile
+  except:
+    variables:
+      - $R_VERSION_UPDATE == "true"
