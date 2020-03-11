@@ -10,7 +10,6 @@ ARG NB_GID
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_SERVER_RELEASE
-ARG VS_CODE_VERSION
 ARG CODE_WORKDIR
 ARG PANDOC_VERSION
 
@@ -19,8 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-2.1698} \
-    VS_CODE_VERSION=${VS_CODE_VERSION:-1.41.1} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.0.0} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -75,7 +73,7 @@ RUN apt-get update \
 ## Install code-server
 RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /opt/code-server \
-  && curl -sL https://github.com/cdr/code-server/releases/download/${CODE_SERVER_RELEASE}/code-server${CODE_SERVER_RELEASE}-vsc${VS_CODE_VERSION}-linux-x86_64.tar.gz | tar zxvf - --strip-components=1 \
+  && curl -sL https://github.com/cdr/code-server/releases/download/${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-x86_64.tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   && cd /
 
@@ -89,6 +87,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && pip3 install \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
+    nbdime==1.1.0 \
     notebook==6.0.3 \
     radian \
   ## Install Node.js
@@ -115,20 +114,18 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.9.1/vspackage -o alefragnani.project-manager-10.9.1.vsix.gz \
   && gunzip alefragnani.project-manager-10.9.1.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.9.1.vsix \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/christian-kohler/vsextensions/path-intellisense/1.4.2/vspackage -o christian-kohler.path-intellisense-1.4.2.vsix.gz \
-  && gunzip christian-kohler.path-intellisense-1.4.2.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense-1.4.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.2/vspackage -o Ikuyadeu.r-1.2.2.vsix.gz \
-  && gunzip Ikuyadeu.r-1.2.2.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.2.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.7/vspackage -o Ikuyadeu.r-1.2.7.vsix.gz \
+  && gunzip Ikuyadeu.r-1.2.7.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.7.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
   ## Needed to get R LSP to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /opt/code-server/extensions/reditorsupport.r-lsp-*/ \
-  && npm install \
+  #&& cd /opt/code-server/extensions/reditorsupport.r-lsp-*/ \
+  #&& npm install \
   && cd / \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
