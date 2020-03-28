@@ -112,9 +112,9 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.9.1/vspackage -o alefragnani.project-manager-10.9.1.vsix.gz \
-  && gunzip alefragnani.project-manager-10.9.1.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.9.1.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.11.0/vspackage -o alefragnani.project-manager-10.11.0.vsix.gz \
+  && gunzip alefragnani.project-manager-10.11.0.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.11.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
