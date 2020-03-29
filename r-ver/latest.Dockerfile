@@ -18,7 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.0.0} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.0.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -104,7 +104,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     python2.7-minimal" \
   && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install JupyterLab extensions
-  && pip3 install jupyter-server-proxy jupyterlab-git \
+  && pip3 install jupyter-server-proxy==1.2.0 jupyterlab-git \
   && jupyter serverextension enable --py jupyter_server_proxy --sys-prefix \
   && jupyter labextension install @jupyterlab/server-proxy --no-build \
   && jupyter labextension install @jupyterlab/git --no-build \
