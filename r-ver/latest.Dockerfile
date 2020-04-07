@@ -90,6 +90,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     jupyterlab==${JUPYTERLAB_VERSION} \
     nbdime==1.1.0 \
     notebook==6.0.3 \
+    nbconvert \
     radian \
   ## Install Node.js
   && curl -sL https://deb.nodesource.com/setup_12.x | bash \
@@ -114,6 +115,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && cd /tmp \
   && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.11.0/vspackage -o alefragnani.project-manager-10.11.0.vsix.gz \
   && gunzip alefragnani.project-manager-10.11.0.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.11.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
@@ -163,7 +165,7 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3"\n}' > .local/share/code-server/User/settings.json \
   && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
