@@ -18,7 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.0.2} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.1.0} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -41,8 +41,10 @@ RUN apt-get update \
     psmisc \
     python3-venv \
     python3-virtualenv \
+    screen \
     ssh \
     sudo \
+    tmux \
     vim \
     wget \
     zsh \
@@ -115,8 +117,11 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && cd /tmp \
   && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.11.0/vspackage -o alefragnani.project-manager-10.11.0.vsix.gz \
   && gunzip alefragnani.project-manager-10.11.0.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.11.0.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/fabiospampinato/vsextensions/vscode-terminals/1.12.9/vspackage -o fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
+  && gunzip fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
@@ -126,9 +131,6 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && gunzip Ikuyadeu.r-1.2.7.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.7.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
-  ## Needed to get R LSP to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  #&& cd /opt/code-server/extensions/reditorsupport.r-lsp-*/ \
-  #&& npm install \
   && cd / \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
