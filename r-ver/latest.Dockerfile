@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:3.6.3
+FROM registry.gitlab.b-data.ch/r/r-ver:4.0.0
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -127,9 +127,9 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.7/vspackage -o Ikuyadeu.r-1.2.7.vsix.gz \
-  && gunzip Ikuyadeu.r-1.2.7.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.7.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.8/vspackage -o Ikuyadeu.r-1.2.8.vsix.gz \
+  && gunzip Ikuyadeu.r-1.2.8.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.8.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
   && cd / \
   ## Clean up (Node.js)
