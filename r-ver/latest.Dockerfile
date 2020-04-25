@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:3.6.2
+FROM registry.gitlab.b-data.ch/r/r-ver:3.6.3
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -10,7 +10,6 @@ ARG NB_GID
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_SERVER_RELEASE
-ARG VS_CODE_VERSION
 ARG CODE_WORKDIR
 ARG PANDOC_VERSION
 
@@ -19,8 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-2.1698} \
-    VS_CODE_VERSION=${VS_CODE_VERSION:-1.41.1} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.1.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -32,6 +30,7 @@ RUN apt-get update \
     file \
     git \
     gnupg \
+    jq \
     less \
     libclang-dev \
     lsb-release \
@@ -42,8 +41,10 @@ RUN apt-get update \
     psmisc \
     python3-venv \
     python3-virtualenv \
+    screen \
     ssh \
     sudo \
+    tmux \
     vim \
     wget \
     zsh \
@@ -75,7 +76,7 @@ RUN apt-get update \
 ## Install code-server
 RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /opt/code-server \
-  && curl -sL https://github.com/cdr/code-server/releases/download/${CODE_SERVER_RELEASE}/code-server${CODE_SERVER_RELEASE}-vsc${VS_CODE_VERSION}-linux-x86_64.tar.gz | tar zxvf - --strip-components=1 \
+  && curl -sL https://github.com/cdr/code-server/releases/download/${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-x86_64.tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   && cd /
 
@@ -89,7 +90,9 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && pip3 install \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
+    nbdime==1.1.0 \
     notebook==6.0.3 \
+    nbconvert \
     radian \
   ## Install Node.js
   && curl -sL https://deb.nodesource.com/setup_12.x | bash \
@@ -112,23 +115,22 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.9.1/vspackage -o alefragnani.project-manager-10.9.1.vsix.gz \
-  && gunzip alefragnani.project-manager-10.9.1.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.9.1.vsix \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/christian-kohler/vsextensions/path-intellisense/1.4.2/vspackage -o christian-kohler.path-intellisense-1.4.2.vsix.gz \
-  && gunzip christian-kohler.path-intellisense-1.4.2.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense-1.4.2.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.11.0/vspackage -o alefragnani.project-manager-10.11.0.vsix.gz \
+  && gunzip alefragnani.project-manager-10.11.0.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.11.0.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/fabiospampinato/vsextensions/vscode-terminals/1.12.9/vspackage -o fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
+  && gunzip fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.2/vspackage -o Ikuyadeu.r-1.2.2.vsix.gz \
-  && gunzip Ikuyadeu.r-1.2.2.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.2.vsix \
+  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.7/vspackage -o Ikuyadeu.r-1.2.7.vsix.gz \
+  && gunzip Ikuyadeu.r-1.2.7.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.7.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
-  ## Needed to get R LSP to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /opt/code-server/extensions/reditorsupport.r-lsp-*/ \
-  && npm install \
   && cd / \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
@@ -165,7 +167,8 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3"\n}' > .local/share/code-server/User/settings.json \
+  && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
   #&& sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' .zshrc \

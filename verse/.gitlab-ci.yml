@@ -74,7 +74,7 @@ trigger-version-build:
     refs:
       - freeze-version
     changes:
-      - verse/latest.Dockerfile
+      - verse/3.6.2.Dockerfile
   except:
     variables:
       - $R_VERSION_UPDATE == "true"
