@@ -36,13 +36,17 @@ build-latest:
 build-version:
   stage: build
   script:
-    - cd verse && docker build --pull -t $CI_REGISTRY_IMAGE:3.6.2 -f 3.6.2.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:3.6.2
+    - cd verse && docker build --pull -t $CI_REGISTRY_IMAGE:3.6.3 -f 3.6.3.Dockerfile .
+    - docker tag $CI_REGISTRY_IMAGE:3.6.3 $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
+    - docker tag $CI_REGISTRY_IMAGE:3.6.3 $CI_REGISTRY_IMAGE:$VERSION_MAJ
+    - docker push $CI_REGISTRY_IMAGE:3.6.3
+    - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
+    - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
   only:
     refs:
       - freeze-version
     changes:
-      - verse/3.6.2.Dockerfile
+      - verse/3.6.3.Dockerfile
   except:
     variables:
       - $R_VERSION_UPDATE == "true"
@@ -74,7 +78,7 @@ trigger-version-build:
     refs:
       - freeze-version
     changes:
-      - verse/3.6.2.Dockerfile
+      - verse/3.6.3.Dockerfile
   except:
     variables:
       - $R_VERSION_UPDATE == "true"
