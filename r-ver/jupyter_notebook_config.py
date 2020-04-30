@@ -38,7 +38,7 @@ def _codeserver_command(port):
 
     return [
         full_path,
-        "--port=" + str(port),
+        "--bind-addr=0.0.0.0:" + str(port),
         "--auth",
         "none",
         data_dir,
