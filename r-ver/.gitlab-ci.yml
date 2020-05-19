@@ -23,11 +23,10 @@ build-latest:
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN_PAT
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
-  only:
-    refs:
-      - master
-    changes:
-      - r-ver/latest.Dockerfile
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      changes:
+        - r-ver/latest.Dockerfile
 
 build-version:
   stage: build
@@ -38,11 +37,10 @@ build-version:
     - docker push $CI_REGISTRY_IMAGE:3.6.3
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
-  only:
-    refs:
-      - freeze-version
-    changes:
-      - r-ver/3.6.3.Dockerfile
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'freeze-version'
+      changes:
+        - r-ver/3.6.3.Dockerfile
 
 trigger-latest-build:
   stage: deploy
@@ -51,11 +49,10 @@ trigger-latest-build:
     - rm -rf /var/cache/apk/*
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=master https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
-  only:
-    refs:
-      - master
-    changes:
-      - r-ver/latest.Dockerfile
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      changes:
+        - r-ver/latest.Dockerfile
 
 trigger-version-build:
   stage: deploy
@@ -64,8 +61,7 @@ trigger-version-build:
     - rm -rf /var/cache/apk/*
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
-  only:
-    refs:
-      - freeze-version
-    changes:
-      - r-ver/3.6.3.Dockerfile
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'freeze-version'
+      changes:
+        - r-ver/3.6.3.Dockerfile
