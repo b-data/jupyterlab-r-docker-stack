@@ -24,14 +24,10 @@ build-latest:
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN_PAT
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
-  only:
-    refs:
-      - master
-    changes:
-      - tidyverse/latest.Dockerfile
-  except:
-    variables:
-      - $R_VERSION_UPDATE == "true"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" && $R_VERSION_UPDATE != "true"
+      changes:
+        - tidyverse/latest.Dockerfile
 
 build-version:
   stage: build
@@ -42,14 +38,10 @@ build-version:
     - docker push $CI_REGISTRY_IMAGE:3.6.3
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
-  only:
-    refs:
-      - freeze-version
-    changes:
-      - tidyverse/3.6.3.Dockerfile
-  except:
-    variables:
-      - $R_VERSION_UPDATE == "true"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
+      changes:
+        - tidyverse/3.6.3.Dockerfile
 
 trigger-latest-build:
   stage: deploy
@@ -58,14 +50,10 @@ trigger-latest-build:
     - rm -rf /var/cache/apk/*
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_VERSE -F ref=master https://gitlab.b-data.ch/api/v4/projects/168/trigger/pipeline
-  only:
-    refs:
-      - master
-    changes:
-      - tidyverse/latest.Dockerfile
-  except:
-    variables:
-      - $R_VERSION_UPDATE == "true"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master" && $R_VERSION_UPDATE != "true"
+      changes:
+        - tidyverse/latest.Dockerfile
 
 trigger-version-build:
   stage: deploy
@@ -74,11 +62,7 @@ trigger-version-build:
     - rm -rf /var/cache/apk/*
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_VERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/168/trigger/pipeline
-  only:
-    refs:
-      - freeze-version
-    changes:
-      - tidyverse/3.6.3.Dockerfile
-  except:
-    variables:
-      - $R_VERSION_UPDATE == "true"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
+      changes:
+        - tidyverse/3.6.3.Dockerfile
