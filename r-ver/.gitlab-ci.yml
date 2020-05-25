@@ -24,7 +24,7 @@ build-latest:
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_REF_NAME == "master"
       changes:
         - r-ver/latest.Dockerfile
 
@@ -38,7 +38,7 @@ build-version:
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
     - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
+    - if: $CI_COMMIT_REF_NAME == "freeze-version"
       changes:
         - r-ver/3.6.3.Dockerfile
 
@@ -50,7 +50,7 @@ trigger-latest-build:
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=master https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_COMMIT_REF_NAME == "master"
       changes:
         - r-ver/latest.Dockerfile
 
@@ -62,6 +62,6 @@ trigger-version-build:
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
+    - if: $CI_COMMIT_REF_NAME == "freeze-version"
       changes:
         - r-ver/3.6.3.Dockerfile

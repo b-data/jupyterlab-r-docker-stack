@@ -18,7 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.2.0} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.3.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -76,11 +76,12 @@ RUN apt-get update \
 ## Install code-server
 RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /opt/code-server \
-  && curl -sL https://github.com/cdr/code-server/releases/download/${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-x86_64.tar.gz | tar zxf - --strip-components=1 \
+  && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-amd64.tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   && cd /
 
-ENV PATH=/opt/code-server:$PATH
+ENV PATH=/opt/code-server/bin:$PATH
+COPY vsix/* /tmp/
 
 ## Install JupyterLab
 RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
@@ -90,6 +91,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && pip3 install \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
+    jupyterlab-git==0.10.1 \
     nbdime==1.1.0 \
     notebook==6.0.3 \
     nbconvert \
@@ -115,11 +117,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/alefragnani/vsextensions/project-manager/10.11.0/vspackage -o alefragnani.project-manager-10.11.0.vsix.gz \
-  && gunzip alefragnani.project-manager-10.11.0.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-10.11.0.vsix \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/fabiospampinato/vsextensions/vscode-terminals/1.12.9/vspackage -o fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
-  && gunzip fabiospampinato.vscode-terminals-1.12.9.vsix.gz \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-11.0.1.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
@@ -127,9 +125,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/Ikuyadeu/vsextensions/r/1.2.8/vspackage -o Ikuyadeu.r-1.2.8.vsix.gz \
-  && gunzip Ikuyadeu.r-1.2.8.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.2.8.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
   && cd / \
   ## Clean up (Node.js)

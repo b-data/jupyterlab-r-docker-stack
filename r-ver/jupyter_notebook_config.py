@@ -53,9 +53,10 @@ c.ServerProxy.servers = {
         "timeout": 20,
         "launcher_entry": {
             "title": "Code Server",
-            "icon_path": "/opt/code-server/vscode.svg",
+            "icon_path": "/opt/code-server/vscode.svg"
         },
-    },
+        "new_browser_tab": True
+    }
 }
 
 # Generate a self-signed certificate
