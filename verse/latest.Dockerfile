@@ -11,6 +11,7 @@ USER root
 
 ENV PATH=$PATH:/opt/TinyTeX/bin/x86_64-linux/ \
     HOME=/root
+COPY vsix/* /tmp/
 
 WORKDIR ${HOME}
 
@@ -96,8 +97,6 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/James-Yu/vsextensions/latex-workshop/8.9.0/vspackage -o James-Yu.latex-workshop-8.9.0.vsix.gz \
-  && gunzip James-Yu.latex-workshop-8.9.0.vsix.gz \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.9.0.vsix \
   ## Needed to get LaTeX Workshop to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
   && cd /opt/code-server/extensions/james-yu.latex-workshop-8.9.0 \
