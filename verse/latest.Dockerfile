@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:3.6.3
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.0
 
 # Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
 # TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
@@ -11,6 +11,7 @@ USER root
 
 ENV PATH=$PATH:/opt/TinyTeX/bin/x86_64-linux/ \
     HOME=/root
+COPY vsix/* /tmp/
 
 WORKDIR ${HOME}
 
@@ -28,8 +29,9 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     ghostscript \
     ## used to build rJava and other packages
     libbz2-dev \
-    #libicu-dev \
+    libicu-dev \
     liblzma-dev \
+    libpcre2-dev \
     ## system dependency of hunspell (devtools)
     libhunspell-dev \
     ## system dependency of hadley/pkgdown
@@ -95,11 +97,9 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sL https://marketplace.visualstudio.com/_apis/public/gallery/publishers/James-Yu/vsextensions/latex-workshop/8.7.2/vspackage -o James-Yu.latex-workshop-8.7.2.vsix.gz \
-  && gunzip James-Yu.latex-workshop-8.7.2.vsix.gz \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.7.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.9.0.vsix \
   ## Needed to get LaTeX Workshop to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /opt/code-server/extensions/james-yu.latex-workshop-8.7.2 \
+  && cd /opt/code-server/extensions/james-yu.latex-workshop-8.9.0 \
   && npm install \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \

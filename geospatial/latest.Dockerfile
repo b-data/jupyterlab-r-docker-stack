@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:3.6.3
+FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.0.0
 
 USER root
 
@@ -26,10 +26,9 @@ RUN apt-get update \
     postgis \
     protobuf-compiler \
     sqlite3 \
-    tk-dev
+    tk-dev \
     #unixodbc-dev
-
-RUN install2.r --error \
+  && install2.r --error \
     #RColorBrewer \
     RandomFields \
     RNetCDF \
