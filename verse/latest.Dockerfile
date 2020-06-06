@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.0
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.1
 
 # Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
 # TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
@@ -97,9 +97,9 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install code-server extensions
   && cd /tmp \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.9.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.10.0.vsix \
   ## Needed to get LaTeX Workshop to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /opt/code-server/extensions/james-yu.latex-workshop-8.9.0 \
+  && cd /opt/code-server/extensions/james-yu.latex-workshop-8.10.0 \
   && npm install \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
