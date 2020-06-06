@@ -5,7 +5,7 @@ services:
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_TLS_CERTDIR: "/certs"
-  R_VERSION_UPDATE: "false"
+  R_VERSION_UPDATE: "true"
 
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -32,16 +32,12 @@ build-latest:
 build-version:
   stage: build
   script:
-    - cd verse && docker build --pull -t $CI_REGISTRY_IMAGE:3.6.3 -f 3.6.3.Dockerfile .
-    - docker tag $CI_REGISTRY_IMAGE:3.6.3 $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
-    - docker tag $CI_REGISTRY_IMAGE:3.6.3 $CI_REGISTRY_IMAGE:$VERSION_MAJ
-    - docker push $CI_REGISTRY_IMAGE:3.6.3
-    - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ_MIN
-    - docker push $CI_REGISTRY_IMAGE:$VERSION_MAJ
+    - cd verse && docker build --pull -t $CI_REGISTRY_IMAGE:4.0.0 -f 4.0.0.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:4.0.0
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
       changes:
-        - verse/3.6.3.Dockerfile
+        - verse/4.0.0.Dockerfile
 
 trigger-latest-build:
   stage: deploy
@@ -65,4 +61,4 @@ trigger-version-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
       changes:
-        - verse/3.6.3.Dockerfile
+        - verse/4.0.0.Dockerfile
