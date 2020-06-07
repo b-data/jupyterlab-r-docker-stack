@@ -138,7 +138,9 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     /root/.config \
     /root/.local \
     /root/.npm \
-    /usr/local/share/.cache
+    /usr/local/share/.cache \
+    /etc/apt/sources.list.d/nodesource* \
+  && apt-key del 0A1C1655A0AB68576280
 
 ## Install the R kernel for JupyterLab
 RUN install2.r --error --deps TRUE \
