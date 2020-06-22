@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.0
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.1
 
 # Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
 # TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
@@ -39,7 +39,7 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     ## rdf, for redland / linked data
     librdf0-dev \
     ## for V8-based javascript wrappers
-    libv8-dev \
+    libnode-dev \
     ## R CMD Check wants qpdf to check pdf sizes, or throws a Warning
     qpdf \
     ## For building PDF manuals
@@ -83,34 +83,11 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   ## And some nice R packages for publishing-related stuff
   && install2.r --error --deps TRUE \
     bookdown rticles rmdshower rJava \
-  ## Install Node.js
-  && curl -sL https://deb.nodesource.com/setup_12.x | bash \
-  && DEPS="libpython-stdlib \
-    libpython2-stdlib \
-    libpython2.7-minimal \
-    libpython2.7-stdlib \
-    python \
-    python-minimal \
-    python2 python2-minimal \
-    python2.7 \
-    python2.7-minimal" \
-  && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install code-server extensions
   && cd /tmp \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.9.0.vsix \
-  ## Needed to get LaTeX Workshop to work (Broken extension? https://github.com/cdr/code-server/issues/1187)
-  && cd /opt/code-server/extensions/james-yu.latex-workshop-8.9.0 \
-  && npm install \
-  ## Clean up (Node.js)
-  && rm -rf /tmp/* \
-  && apt-get remove --purge -y nodejs $DEPS \
-  && apt-get autoremove -y \
-  && apt-get autoclean -y \
-  && rm -rf /var/lib/apt/lists/* \
-    /root/.cache \
-    /root/.config \
-    /root/.local \
-    /root/.npm
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.10.0.vsix \
+  ## Clean up
+  && rm -rf /tmp/*
 #
 ## Consider including:
 # - yihui/printr R package (when released to CRAN)

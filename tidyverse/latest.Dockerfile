@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.0
+FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.1
 
 USER root
 
@@ -13,6 +13,7 @@ RUN apt-get update \
   libssh2-1-dev \
   unixodbc-dev \
   libsasl2-dev \
+  && install2.r --error BiocManager \
   && install2.r --error \
     --deps TRUE \
     tidyverse \
@@ -22,7 +23,6 @@ RUN apt-get update \
     #remotes \
     selectr \
     caTools \
-    BiocManager \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
