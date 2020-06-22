@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.1
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.2
 
 # Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
 # TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
@@ -11,7 +11,6 @@ USER root
 
 ENV PATH=$PATH:/opt/TinyTeX/bin/x86_64-linux/ \
     HOME=/root
-COPY vsix/* /tmp/
 
 WORKDIR ${HOME}
 
@@ -36,6 +35,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     libhunspell-dev \
     ## system dependency of hadley/pkgdown
     libmagick++-dev \
+    ## system dependency of pdftools
+    libpoppler-cpp-dev \
     ## rdf, for redland / linked data
     librdf0-dev \
     ## for V8-based javascript wrappers
@@ -85,6 +86,7 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     bookdown rticles rmdshower rJava \
   ## Install code-server extensions
   && cd /tmp \
+  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.10.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.10.0.vsix \
   ## Clean up
   && rm -rf /tmp/*
