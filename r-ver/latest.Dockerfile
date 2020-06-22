@@ -128,7 +128,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-1.4.2.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.4.2.vsix \
-  && curl -sLO ttps://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.6.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.6.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.6.vsix \
   && cd / \
   ## Clean up (Node.js)
