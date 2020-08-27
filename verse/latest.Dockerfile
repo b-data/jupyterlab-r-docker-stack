@@ -73,7 +73,21 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
       && rm -r /tmp/install-tl-*; \
     fi \
   && /opt/TinyTeX/bin/*/tlmgr path add \
-  && tlmgr install ae inconsolata listings metafont mfware parskip pdfcrop tex xcolor \
+  && tlmgr install \
+    ae \
+    graphics \
+    graphics-def \
+    ifluatex \
+    ifxetex \
+    inconsolata \
+    listings \
+    metafont \
+    mfware \
+    oberdiek \
+    parskip \
+    pdfcrop \
+    tex \
+    xcolor \
   && tlmgr path add \
   && Rscript -e "tinytex::r_texmf()" \
   && chown -R root:users /opt/TinyTeX \
