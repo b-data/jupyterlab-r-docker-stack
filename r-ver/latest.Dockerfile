@@ -130,6 +130,7 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.4.4.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.10.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.10.vsix \
+  && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
@@ -179,7 +180,8 @@ RUN mkdir -p .local/share/code-server/User \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc
 
 ## Copy local files as late as possible to avoid cache busting
-COPY *.sh /usr/local/bin/
+COPY start*.sh /usr/local/bin/
+COPY init.sh /usr/local/bin//before-notebook.d/
 COPY jupyter_notebook_config.py /etc/jupyter/
 COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
 
@@ -187,4 +189,4 @@ EXPOSE 8888
 
 ## Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
-CMD ["init-notebook.sh"]
+CMD ["start-notebook.sh"]
