@@ -31,5 +31,8 @@ else
       .local/share/code-server/User/settings.json
 fi
 
+# Change file mode of .p10k.zsh.sample
+chmod 644 .p10k.zsh.sample
+
 # Remove old .zcompdump files
 rm -f .zcompdump*
