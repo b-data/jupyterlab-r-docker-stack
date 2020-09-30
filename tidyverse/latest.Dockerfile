@@ -13,6 +13,7 @@ RUN apt-get update \
   libssh2-1-dev \
   unixodbc-dev \
   libsasl2-dev \
+  libtiff-dev \
   && install2.r --error BiocManager \
   && install2.r --error \
     --deps TRUE \
