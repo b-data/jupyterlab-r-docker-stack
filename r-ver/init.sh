@@ -32,7 +32,9 @@ else
 fi
 
 # Change file mode of .p10k.zsh.sample
-chmod 644 .p10k.zsh.sample
+if [ -e .p10k.zsh.sample ] ; then
+    chmod 644 .p10k.zsh.sample
+fi
 
 # Remove old .zcompdump files
 rm -f .zcompdump*
