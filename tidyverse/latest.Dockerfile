@@ -6,6 +6,8 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends \
   #libxml2-dev \
   libcairo2-dev \
+  libfribidi-dev \
+  libharfbuzz-dev \
   libsqlite3-dev \
   libmariadbd-dev \
   libmariadbclient-dev \
