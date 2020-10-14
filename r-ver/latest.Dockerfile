@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:4.0.1
+FROM registry.gitlab.b-data.ch/r/r-ver:4.0.2
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -17,8 +17,8 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-1.2.6} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.4.1} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-2.2.8} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.5.0} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -81,7 +81,6 @@ RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /
 
 ENV PATH=/opt/code-server/bin:$PATH
-COPY vsix/* /tmp/
 
 ## Install JupyterLab
 RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
@@ -91,8 +90,6 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && pip3 install \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
-    jupyterlab-git==0.10.1 \
-    nbdime==1.1.0 \
     notebook==6.0.3 \
     nbconvert \
     radian \
@@ -117,16 +114,24 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-11.0.1.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-11.3.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-11.3.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
+  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.3.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.3.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python@2020.5.86806 \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp \
+  && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-1.4.4.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.4.4.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.10.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.10.vsix \
+  && mkdir -p /usr/local/bin/start-notebook.d \
+  && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
   ## Clean up (Node.js)
   && rm -rf /tmp/* \
@@ -165,23 +170,26 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3"\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n    "python.dataScience.jupyterServerURI": "http://localhost:8888${env:JUPYTERHUB_SERVICE_PREFIX}?token=${env:JUPYTERHUB_API_TOKEN}",\n    "python.pythonPath": "/usr/bin/python3",\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
   && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
+  && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' .zshrc \
   #&& sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' .zshrc \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/bin" ] ; then\n    PATH="\$HOME/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d "\$HOME/.local/bin" ] ; then\n    PATH="\$HOME/.local/bin:\$PATH"\nfi" | tee -a .bashrc .zshrc \
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
-  && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc
+  && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc \
+  && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
-COPY *.sh /usr/local/bin/
+COPY start*.sh /usr/local/bin/
+COPY populate.sh /usr/local/bin/start-notebook.d/
+COPY init.sh /usr/local/bin/before-notebook.d/
 COPY jupyter_notebook_config.py /etc/jupyter/
-COPY --chown=$NB_UID:$NB_GID .p10k.zsh.sample .
 
 EXPOSE 8888
 
 ## Configure container startup
 ENTRYPOINT ["tini", "-g", "--"]
-CMD ["init-notebook.sh"]
+CMD ["start-notebook.sh"]

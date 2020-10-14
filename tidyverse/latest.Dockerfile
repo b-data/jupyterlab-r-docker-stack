@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.1
+FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.2
 
 USER root
 
@@ -6,6 +6,8 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends \
   #libxml2-dev \
   libcairo2-dev \
+  libfribidi-dev \
+  libharfbuzz-dev \
   libsqlite3-dev \
   libmariadbd-dev \
   libmariadbclient-dev \
@@ -13,6 +15,7 @@ RUN apt-get update \
   libssh2-1-dev \
   unixodbc-dev \
   libsasl2-dev \
+  libtiff-dev \
   && install2.r --error BiocManager \
   && install2.r --error \
     --deps TRUE \
