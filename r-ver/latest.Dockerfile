@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:4.0.2
+FROM registry.gitlab.b-data.ch/r/r-ver:4.0.3
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -18,7 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.0.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-2.2.8} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.5.0} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.6.0} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.9}
 
@@ -126,10 +126,10 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-1.4.4.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.4.4.vsix \
-  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.10.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.10.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-1.4.6.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.4.6.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.11.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.11.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \

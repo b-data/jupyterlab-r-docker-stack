@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.2
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.3
 
 # Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
 # TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
@@ -100,8 +100,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     bookdown rticles rmdshower rJava \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.11.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.11.1.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.13.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.13.2.vsix \
   ## Clean up
   && rm -rf /tmp/*
 #
