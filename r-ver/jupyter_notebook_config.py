@@ -52,7 +52,7 @@ c.ServerProxy.servers = {
         "command": _codeserver_command,
         "timeout": 20,
         "launcher_entry": {
-            "title": "Code Server",
+            "title": "code-server",
             "icon_path": "/opt/code-server/vscode.svg"
         },
         "new_browser_tab": True
