@@ -32,12 +32,12 @@ build-latest:
 build-version:
   stage: build
   script:
-    - cd tidyverse && docker build --pull -t $CI_REGISTRY_IMAGE:4.0.1 -f 4.0.1.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:4.0.1
+    - cd tidyverse && docker build --pull -t $CI_REGISTRY_IMAGE:4.0.2 -f 4.0.2.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:4.0.2
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
       changes:
-        - tidyverse/4.0.1.Dockerfile
+        - tidyverse/4.0.2.Dockerfile
 
 trigger-latest-build:
   stage: deploy
@@ -61,4 +61,4 @@ trigger-version-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
       changes:
-        - tidyverse/4.0.1.Dockerfile
+        - tidyverse/4.0.2.Dockerfile
