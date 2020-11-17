@@ -4,7 +4,6 @@ USER root
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
-    lbzip2 \
     libfftw3-dev \
     libgdal-dev \
     libgeos-dev \
