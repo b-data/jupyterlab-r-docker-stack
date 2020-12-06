@@ -120,6 +120,8 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix || true \
   && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.6.2.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.6.2.vsix || true \
+  && curl -sLO https://dl.b-data.ch/vsix/ms-toolsai.jupyter-2020.11.399280825.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2020.11.399280825.vsix || true \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
