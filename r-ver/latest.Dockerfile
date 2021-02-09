@@ -18,7 +18,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.3.0} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-2.2.9} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.8.0} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.8.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.10.1}
 
@@ -118,8 +118,8 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.0.1.vsix || true \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix || true \
-  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.9.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.9.0.vsix || true \
+  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.11.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.11.2.vsix || true \
   && curl -sLO https://dl.b-data.ch/vsix/ms-toolsai.jupyter-2020.11.399280825.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2020.11.399280825.vsix || true \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
