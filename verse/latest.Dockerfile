@@ -1,15 +1,11 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.2
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.3
 
-# Version-stable CTAN repo from the tlnet archive at texlive.info, used in the
-# TinyTeX installation: chosen as the frozen snapshot of the TeXLive release
-# shipped for the base Debian image of a given rocker/r-ver tag.
-# Debian buster => TeXLive 2018, frozen release snapshot 2019/02/27
-ARG CTAN_REPO=${CTAN_REPO:-https://www.texlive.info/tlnet-archive/2019/02/27/tlnet}
+ARG CTAN_REPO=${CTAN_REPO:-http://mirror.ctan.org/systems/texlive/tlnet}
 ENV CTAN_REPO=${CTAN_REPO}
 
 USER root
 
-ENV PATH=$PATH:/opt/TinyTeX/bin/x86_64-linux/ \
+ENV PATH=/opt/TinyTeX/bin/x86_64-linux:$PATH \
     HOME=/root
 
 WORKDIR ${HOME}
@@ -26,6 +22,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     fonts-roboto \
     ## used by some base R plots
     ghostscript \
+    ## used to install PhantomJS
+    lbzip2 \
     ## used to build rJava and other packages
     libbz2-dev \
     libicu-dev \
@@ -37,7 +35,7 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     libmagick++-dev \
     ## system dependency of pdftools
     libpoppler-cpp-dev \
-    ## rdf, for redland / linked data
+    ## rdf, for redland / linked data (depends on libcurl4-gnutls-dev)
     librdf0-dev \
     ## for V8-based javascript wrappers
     libnode-dev \
@@ -53,41 +51,33 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     ## parallelization
     #libzmq3-dev \
     libopenmpi-dev \
+  ## Install R package redland
+  && install2.r --error --skipinstalled redland \
+  ## Explicitly install runtime library sub-deps of librdf0-dev
+  && apt-get install -y \
+	  libcurl4-openssl-dev \
+	  libxslt-dev \
+	  librdf0 \
+	  redland-utils \
+	  rasqal-utils \
+	  raptor2-utils \
+  ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
+	&& apt-get -y autoremove \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
-  ## Use tinytex for LaTeX installation
-  #&& install2.r --error tinytex \
   ## Admin-based install of TinyTeX:
-  && wget -qO- \
-    "https://github.com/yihui/tinytex/raw/master/tools/install-unx.sh" | \
-    sh -s - --admin --no-path \
+  && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
+    | sh -s - --admin --no-path \
   && mv ~/.TinyTeX /opt/TinyTeX \
-  && if /opt/TinyTeX/bin/*/tex -v | grep -q 'TeX Live 2018'; then \
-      ## Patch the Perl modules in the frozen TeX Live 2018 snapshot with the newer
-      ## version available for the installer in tlnet/tlpkg/TeXLive, to include the
-      ## fix described in https://github.com/yihui/tinytex/issues/77#issuecomment-466584510
-      ## as discussed in https://www.preining.info/blog/2019/09/tex-services-at-texlive-info/#comments
-      wget -P /tmp/ ${CTAN_REPO}/install-tl-unx.tar.gz \
-      && tar -xzf /tmp/install-tl-unx.tar.gz -C /tmp/ \
-      && cp -Tr /tmp/install-tl-*/tlpkg/TeXLive /opt/TinyTeX/tlpkg/TeXLive \
-      && rm -r /tmp/install-tl-*; \
-    fi \
   && /opt/TinyTeX/bin/*/tlmgr path add \
+  && tlmgr update --self \
   && tlmgr install \
     ae \
-    graphics \
-    graphics-def \
-    ifluatex \
-    ifxetex \
-    inconsolata \
+    context \
     listings \
-    metafont \
-    mfware \
-    oberdiek \
+    makeindex \
     parskip \
     pdfcrop \
-    tex \
-    xcolor \
   && tlmgr path add \
   && Rscript -e "tinytex::r_texmf()" \
   && chown -R root:users /opt/TinyTeX \
@@ -97,17 +87,13 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && install2.r --error PKI \
   ## And some nice R packages for publishing-related stuff
   && install2.r --error --deps TRUE \
-    bookdown rticles rmdshower rJava \
+    blogdown bookdown rticles rmdshower rJava xaringan \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.11.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.11.1.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.15.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.15.0.vsix || true \
   ## Clean up
   && rm -rf /tmp/*
-#
-## Consider including:
-# - yihui/printr R package (when released to CRAN)
-# - libgsl0-dev (GSL math library dependencies)
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}

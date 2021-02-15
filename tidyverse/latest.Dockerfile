@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.2
+FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.3
 
 USER root
 
@@ -7,6 +7,7 @@ RUN apt-get update \
   #libxml2-dev \
   libcairo2-dev \
   libfribidi-dev \
+  libgit2-dev \
   libharfbuzz-dev \
   libsqlite3-dev \
   libmariadbd-dev \
