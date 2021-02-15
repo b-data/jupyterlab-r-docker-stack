@@ -32,12 +32,12 @@ build-latest:
 build-version:
   stage: build
   script:
-    - cd verse && docker build --pull -t $CI_REGISTRY_IMAGE:4.0.2 -f 4.0.2.Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:4.0.2
+    - cd verse && docker build --pull -t $CI_REGISTRY_IMAGE:4.0.3 -f 4.0.3.Dockerfile .
+    - docker push $CI_REGISTRY_IMAGE:4.0.3
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
       changes:
-        - verse/4.0.2.Dockerfile
+        - verse/4.0.3.Dockerfile
 
 trigger-latest-build:
   stage: deploy
@@ -61,4 +61,4 @@ trigger-version-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $R_VERSION_UPDATE != "true"
       changes:
-        - verse/4.0.2.Dockerfile
+        - verse/4.0.3.Dockerfile
