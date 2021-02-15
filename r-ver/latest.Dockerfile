@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:4.0.3
+FROM registry.gitlab.b-data.ch/r/r-ver:4.0.4
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
