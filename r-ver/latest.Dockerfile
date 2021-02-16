@@ -17,7 +17,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.3.0} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-2.2.9} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.7} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.9.0} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.10.1}
@@ -88,8 +88,10 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && rm get-pip.py \
   ## Install Python packages
   && pip3 install \
+    jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
+    jupyterlab-git==0.30.0b2 \
     notebook \
     nbconvert \
     radian \
@@ -106,8 +108,6 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     python2.7-minimal" \
   && apt-get install -y --no-install-recommends nodejs $DEPS \
   ## Install JupyterLab extensions
-  && pip3 install jupyter-server-proxy jupyterlab-git \
-  && jupyter serverextension enable --py jupyter_server_proxy --sys-prefix \
   && jupyter labextension install @jupyterlab/server-proxy --no-build \
   && jupyter labextension install @jupyterlab/git --no-build \
   && jupyter lab build \
