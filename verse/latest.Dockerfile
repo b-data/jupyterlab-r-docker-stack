@@ -90,8 +90,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     blogdown bookdown rticles rmdshower rJava xaringan \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.15.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.15.0.vsix || true \
+  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.16.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.16.0.vsix || true \
   ## Clean up
   && rm -rf /tmp/*
 
