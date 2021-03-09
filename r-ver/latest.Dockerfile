@@ -17,8 +17,8 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.3.0} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.7} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.9.0} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.9} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.9.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.10.1}
 
@@ -115,13 +115,13 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   ## Install code-server extensions
   && cd /tmp \
   && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.0.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.0.1.vsix || true \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.0.1.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix || true \
-  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.12.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.12.0.vsix || true \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/GitLab.gitlab-workflow-3.14.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.14.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/ms-toolsai.jupyter-2020.11.399280825.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2020.11.399280825.vsix || true \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2020.11.399280825.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
@@ -129,9 +129,9 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-1.6.4.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.6.4.vsix || true \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.6.4.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-lsp-0.1.14.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.14.vsix || true \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.14.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
