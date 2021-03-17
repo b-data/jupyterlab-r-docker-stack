@@ -73,7 +73,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && tlmgr update --self \
   && tlmgr install \
     ae \
-    context \
+    ## context fails to install on aarch64 with no output
+    #context \
     listings \
     makeindex \
     parskip \

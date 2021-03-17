@@ -17,7 +17,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.3.0} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.9} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.10} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.9.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.10.1}
@@ -65,9 +65,9 @@ RUN apt-get update \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
   && fc-cache -fv \
   ## Install pandoc
-  && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb \
-  && dpkg -i pandoc-${PANDOC_VERSION}-1-amd64.deb \
-  && rm pandoc-${PANDOC_VERSION}-1-amd64.deb \
+  && curl -sLO https://dl.b-data.ch/pandoc/releases/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   ## configure git not to request password each time
   && git config --system credential.helper "cache --timeout=3600" \
   ## Add user
@@ -76,16 +76,24 @@ RUN apt-get update \
 ## Install code-server
 RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
   && cd /opt/code-server \
-  && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-amd64.tar.gz | tar zxf - --strip-components=1 \
+  && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   && cd /
 
 ENV PATH=/opt/code-server/bin:$PATH
 
 ## Install JupyterLab
-RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
+RUN dpkgArch="$(dpkg --print-architecture)" \
+  && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \
+  ## Install python3-dev to build argon2-cffi on aarch64
+  ## https://github.com/hynek/argon2-cffi/issues/73
+  && if [ "$dpkgArch" = "arm64" ]; then \
+    DEPS=python3-dev; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends $DEPS; \
+  fi \
   ## Install Python packages
   && pip3 install \
     jupyter-server-proxy \
@@ -95,6 +103,10 @@ RUN curl -sLO https://bootstrap.pypa.io/get-pip.py \
     notebook \
     nbconvert \
     radian \
+  ## Remove python3-dev
+  && if [ "$dpkgArch" = "arm64" ]; then \
+    apt-get remove --purge -y $DEPS; \
+  fi \
   ## Install Node.js
   && curl -sL https://deb.nodesource.com/setup_12.x | bash \
   && DEPS="libpython-stdlib \
@@ -158,7 +170,7 @@ RUN install2.r --error --deps TRUE \
     /root/.local
 
 ## Install Tini
-RUN curl -sL https://github.com/krallin/tini/releases/download/v0.18.0/tini -o /usr/local/bin/tini \
+RUN curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$(dpkg --print-architecture) -o /usr/local/bin/tini \
   && chmod +x /usr/local/bin/tini
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
