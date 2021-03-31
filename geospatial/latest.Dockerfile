@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.0.3
+FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.0.4
 
 USER root
 
@@ -53,6 +53,7 @@ RUN apt-get update \
     geoR \
     geosphere \
     ## from bioconductor
+    ## ‘rhdf5’ and ‘rhdf5filters’ have non-zero exit status on aarch64
     && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE)" \
     ## Clean up
     && rm -rf /tmp/* \

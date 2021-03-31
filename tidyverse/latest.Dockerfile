@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.3
+FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.4
 
 USER root
 
@@ -17,9 +17,18 @@ RUN apt-get update \
   unixodbc-dev \
   libsasl2-dev \
   libtiff-dev \
+  ## Install patched version or RPostgreSQL
+  ## Source: https://gitlab.b-data.ch/benz0li/rpostgresql
+  && install2.r --error DBI \
+  && curl -sSL https://gitlab.b-data.ch/benz0li/rpostgresql/-/package_files/6/download \
+    -o RPostgreSQL_0.6-2.tar.gz \
+  && R CMD INSTALL RPostgreSQL_0.6-2.tar.gz \
+  && rm RPostgreSQL_0.6-2.tar.gz \
+  ## Install other packages in regular fashion
   && install2.r --error BiocManager \
   && install2.r --error \
     --deps TRUE \
+    --skipinstalled \
     tidyverse \
     dplyr \
     devtools \

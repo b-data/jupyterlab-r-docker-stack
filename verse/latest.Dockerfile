@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.3
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.4
 
 ARG CTAN_REPO=${CTAN_REPO:-http://mirror.ctan.org/systems/texlive/tlnet}
 ENV CTAN_REPO=${CTAN_REPO}
@@ -73,7 +73,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && tlmgr update --self \
   && tlmgr install \
     ae \
-    context \
+    ## context fails to install on aarch64 with no output
+    #context \
     listings \
     makeindex \
     parskip \
@@ -90,8 +91,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     blogdown bookdown rticles rmdshower rJava xaringan \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/James-Yu.latex-workshop-8.15.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.15.0.vsix || true \
+  && curl -sLO https://open-vsx.org/api/James-Yu/latex-workshop/8.16.1/file/James-Yu.latex-workshop-8.16.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.16.1.vsix \
   ## Clean up
   && rm -rf /tmp/*
 
