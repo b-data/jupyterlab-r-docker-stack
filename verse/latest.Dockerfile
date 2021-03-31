@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.4
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.5
 
 ARG CTAN_REPO=${CTAN_REPO:-http://mirror.ctan.org/systems/texlive/tlnet}
 ENV CTAN_REPO=${CTAN_REPO}

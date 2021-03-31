@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.4
+FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.0.5
 
 USER root
 
