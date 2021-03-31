@@ -9,7 +9,7 @@
     if [[ $CI_COMMIT_BRANCH == "master" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-latest}
     elif [[ $CI_COMMIT_BRANCH == "freeze-version" ]]; then
-      export CI_APP_TAG=${CI_APP_TAG:-4.0.3}
+      export CI_APP_TAG=${CI_APP_TAG:-4.0.4}
     else
       export CI_APP_TAG=${CI_APP_TAG:-$CI_COMMIT_SHA}
     fi
@@ -87,7 +87,7 @@ build:version-linux-amd64:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - r-ver/4.0.3.Dockerfile
+        - r-ver/4.0.4.Dockerfile
 
 build:version-linux-arm64v8:
   extends: .build
@@ -102,7 +102,7 @@ build:version-linux-arm64v8:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - r-ver/4.0.3.Dockerfile
+        - r-ver/4.0.4.Dockerfile
 
 build-manifest:latest-linux-multiarch:
   extends: .build
@@ -143,7 +143,7 @@ build-manifest:version-linux-multiarch:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
-        - r-ver/4.0.3.Dockerfile
+        - r-ver/4.0.4.Dockerfile
 
 trigger-latest-build:
   extends: .build
@@ -167,4 +167,4 @@ trigger-version-build:
   rules:
     - if: $CI_COMMIT_REF_NAME == "freeze-version"
       changes:
-        - r-ver/4.0.3.Dockerfile
+        - r-ver/4.0.4.Dockerfile
