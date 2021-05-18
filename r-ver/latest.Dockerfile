@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:4.0.5
+FROM registry.gitlab.b-data.ch/r/r-ver:4.1.0
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -16,11 +16,11 @@ ARG PANDOC_VERSION
 ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
-    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.0} \
+    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.1} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.15} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.0} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.1} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.10.1}
+    PANDOC_VERSION=${PANDOC_VERSION:-2.13}
 
 USER root
 
@@ -65,7 +65,7 @@ RUN apt-get update \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
   && fc-cache -fv \
   ## Install pandoc
-  && curl -sLO https://dl.b-data.ch/pandoc/releases/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   ## configure git not to request password each time
