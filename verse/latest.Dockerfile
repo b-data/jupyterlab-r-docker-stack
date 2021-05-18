@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.4
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.0.5
 
 ARG CTAN_REPO=${CTAN_REPO:-http://mirror.ctan.org/systems/texlive/tlnet}
 ENV CTAN_REPO=${CTAN_REPO}
@@ -91,8 +91,8 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     blogdown bookdown rticles rmdshower rJava xaringan \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://open-vsx.org/api/James-Yu/latex-workshop/8.16.1/file/James-Yu.latex-workshop-8.16.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.16.1.vsix \
+  && curl -sLO https://open-vsx.org/api/James-Yu/latex-workshop/8.17.0/file/James-Yu.latex-workshop-8.17.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.17.0.vsix \
   ## Clean up
   && rm -rf /tmp/*
 
