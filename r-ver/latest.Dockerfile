@@ -17,8 +17,8 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.1} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.15} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.1} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.16} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.13}
 
@@ -130,8 +130,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.1.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.20.0/file/GitLab.gitlab-workflow-3.20.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.20.0.vsix \
+  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.20.1/file/GitLab.gitlab-workflow-3.20.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.20.1.vsix \
   && curl -sLO https://open-vsx.org/api/ms-python/python/2020.10.332292344/file/ms-python.python-2020.10.332292344.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python-2020.10.332292344.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
