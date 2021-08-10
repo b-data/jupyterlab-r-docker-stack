@@ -1,8 +1,10 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:4.1.0
+FROM registry.gitlab.b-data.ch/r/r-ver:4.1.1
 
 LABEL org.label-schema.license="MIT" \
       org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
       maintainer="Olivier Benz <olivier.benz@b-data.ch>"
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 ARG NB_USER
 ARG NB_UID
@@ -17,7 +19,7 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.2} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.16} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.17} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     PANDOC_VERSION=${PANDOC_VERSION:-2.14.1}
@@ -130,8 +132,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.3.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.26.0/file/GitLab.gitlab-workflow-3.26.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.26.0.vsix \
+  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.27.1/file/GitLab.gitlab-workflow-3.27.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.27.1.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \

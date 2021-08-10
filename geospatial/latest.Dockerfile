@@ -1,4 +1,6 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.0
+FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.1
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 USER root
 
