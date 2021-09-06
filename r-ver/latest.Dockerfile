@@ -19,10 +19,10 @@ ENV NB_USER=${NB_USER:-jovyan} \
     NB_UID=${NB_UID:-1000} \
     NB_GID=${NB_GID:-100} \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.2} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.17} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.1.10} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.14.1}
+    PANDOC_VERSION=${PANDOC_VERSION:-2.14.2}
 
 USER root
 
@@ -37,14 +37,13 @@ RUN apt-get update \
     libclang-dev \
     lsb-release \
     man-db \
-    multiarch-support \
     nano \
+    openssh-client \
     procps \
     psmisc \
     python3-venv \
     python3-virtualenv \
     screen \
-    ssh \
     sudo \
     tmux \
     vim \
@@ -70,8 +69,12 @@ RUN apt-get update \
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  ## configure git not to request password each time
+  ## Set default branch name to main
+  && git config --system init.defaultBranch main \
+  ## Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
+  ## Merge the default branch from the default remote when "git pull" is run
+  && git config --system pull.rebase false \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 
@@ -110,17 +113,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     apt-get remove --purge -y $DEPS; \
   fi \
   ## Install Node.js
-  && curl -sL https://deb.nodesource.com/setup_12.x | bash \
-  && DEPS="libpython-stdlib \
-    libpython2-stdlib \
-    libpython2.7-minimal \
-    libpython2.7-stdlib \
-    python \
-    python-minimal \
-    python2 python2-minimal \
-    python2.7 \
-    python2.7-minimal" \
-  && apt-get install -y --no-install-recommends nodejs $DEPS \
+  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
+  && apt-get install -y --no-install-recommends nodejs \
   ## Install JupyterLab extensions
   && jupyter labextension install @jupyterlab/server-proxy --no-build \
   && jupyter labextension install @jupyterlab/git --no-build \
@@ -132,8 +126,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.3.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.27.1/file/GitLab.gitlab-workflow-3.27.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.27.1.vsix \
+  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.29.1/file/GitLab.gitlab-workflow-3.29.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.29.1.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
@@ -147,9 +141,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
-  ## Clean up (Node.js)
+  ## Clean up
   && rm -rf /tmp/* \
-  && apt-get remove --purge -y nodejs $DEPS \
   && apt-get autoremove -y \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
@@ -157,9 +150,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     /root/.config \
     /root/.local \
     /root/.npm \
-    /usr/local/share/.cache \
-    /etc/apt/sources.list.d/nodesource* \
-  && apt-key del 0A1C1655A0AB68576280
+    /usr/local/share/.cache
 
 ## Install the R kernel for JupyterLab
 RUN install2.r --error --deps TRUE \

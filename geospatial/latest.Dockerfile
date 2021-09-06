@@ -15,7 +15,6 @@ RUN apt-get update \
     libhdf4-alt-dev \
     libhdf5-dev \
     libjq-dev \
-    liblwgeom-dev \
     #libpq-dev \
     libproj-dev \
     libprotobuf-dev \
@@ -55,7 +54,6 @@ RUN apt-get update \
     geoR \
     geosphere \
     ## from bioconductor
-    ## ‘rhdf5’ and ‘rhdf5filters’ have non-zero exit status on aarch64
     && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE)" \
     ## Clean up
     && rm -rf /tmp/* \
