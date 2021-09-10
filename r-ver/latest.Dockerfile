@@ -1,28 +1,38 @@
+ARG BASE_IMAGE=debian:bullseye
+ARG GIT_VERSION=2.32.0
+
+FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
+
 FROM registry.gitlab.b-data.ch/r/r-ver:4.1.1
 
-LABEL org.label-schema.license="MIT" \
-      org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
-      maintainer="Olivier Benz <olivier.benz@b-data.ch>"
+LABEL org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
+      org.opencontainers.image.vendor="b-data GmbH" \
+      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG NB_USER
-ARG NB_UID
-ARG NB_GID
-ARG JUPYTERHUB_VERSION
-ARG JUPYTERLAB_VERSION
-ARG CODE_SERVER_RELEASE
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ARG NB_GID=100
+ARG JUPYTERHUB_VERSION=1.4.2
+ARG JUPYTERLAB_VERSION=3.1.11
+ARG CODE_SERVER_RELEASE=3.10.2
+ARG GIT_VERSION=2.32.0
+ARG PANDOC_VERSION=2.14.2
 ARG CODE_WORKDIR
-ARG PANDOC_VERSION
 
-ENV NB_USER=${NB_USER:-jovyan} \
-    NB_UID=${NB_UID:-1000} \
-    NB_GID=${NB_GID:-100} \
-    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.2} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.1.10} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
-    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.14.2}
+ENV NB_USER=${NB_USER} \
+    NB_UID=${NB_UID} \
+    NB_GID=${NB_GID} \
+    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
+    GIT_VERSION=${GIT_VERSION} \
+    PANDOC_VERSION=${PANDOC_VERSION} \
+    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions
+
+COPY --from=gsi /usr/local /usr/local
 
 USER root
 
@@ -32,13 +42,12 @@ RUN apt-get update \
     file \
     git \
     gnupg \
+    info \
     jq \
-    less \
     libclang-dev \
     lsb-release \
     man-db \
     nano \
-    openssh-client \
     procps \
     psmisc \
     python3-venv \
@@ -49,9 +58,14 @@ RUN apt-get update \
     vim \
     wget \
     zsh \
+    ## Additional git runtime dependencies
+    libcurl3-gnutls \
+    liberror-perl \
+    ## Additional git runtime recommendations
+    less \
+    ssh-client \
     ## Current ZeroMQ library for R pbdZMQ
     libzmq3-dev \
-    pkg-config \    
     ## Required for R languageserver
     libcurl4-openssl-dev \
     libssl-dev \
@@ -69,6 +83,13 @@ RUN apt-get update \
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  ## Install pandoc templates
+  && git clone --recursive --branch ${PANDOC_VERSION} https://github.com/jgm/pandoc-templates \
+  && rm -rf /opt/pandoc/templates \
+  && mkdir -p /opt/pandoc/templates \
+  && cp -r pandoc-templates*/* /opt/pandoc/templates && rm -rf pandoc-templates* \
+  && rm -rf /root/.pandoc \
+  && mkdir /root/.pandoc && ln -s /opt/pandoc/templates /root/.pandoc/templates \
   ## Set default branch name to main
   && git config --system init.defaultBranch main \
   ## Store passwords for one hour in memory
@@ -122,12 +143,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.3.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.3.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.4.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.4.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.29.1/file/GitLab.gitlab-workflow-3.29.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.29.1.vsix \
+  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.30.0/file/GitLab.gitlab-workflow-3.30.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.30.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
