@@ -30,7 +30,9 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     libmagick++-dev \
     libpoppler-cpp-dev \
     librdf0-dev \
-    libnode-dev \
+    ## Installing libnode-dev uninstalls nodejs
+    ## https://github.com/jeroen/V8/issues/100
+    #libnode-dev \
     qpdf \
     texinfo \
     libopenmpi-dev \

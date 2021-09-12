@@ -32,6 +32,10 @@ ENV NB_USER=${NB_USER} \
     PANDOC_VERSION=${PANDOC_VERSION} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions
 
+## Installing V8 on Linux, the alternative way
+## https://ropensci.org/blog/2020/11/12/installing-v8
+ENV DOWNLOAD_STATIC_LIBV8=1
+
 COPY --from=gsi /usr/local /usr/local
 
 USER root
