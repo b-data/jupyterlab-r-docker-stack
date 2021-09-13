@@ -87,14 +87,6 @@ RUN apt-get update \
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  ## Install pandoc templates
-  && curl -sL https://github.com/jgm/pandoc-templates/archive/${PANDOC_VERSION}.tar.gz -o pandoc-templates.tar.gz \
-  && rm -rf /opt/pandoc/templates \
-  && mkdir -p /opt/pandoc/templates \
-  && tar zxf pandoc-templates.tar.gz \
-  && cp -r pandoc-templates*/* /opt/pandoc/templates && rm -rf pandoc-templates* \
-  && rm -rf /root/.pandoc \
-  && mkdir /root/.pandoc && ln -s /opt/pandoc/templates /root/.pandoc/templates \
   ## Set default branch name to main
   && git config --system init.defaultBranch main \
   ## Store passwords for one hour in memory
