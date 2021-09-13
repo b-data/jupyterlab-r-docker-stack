@@ -88,9 +88,10 @@ RUN apt-get update \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   ## Install pandoc templates
-  && git clone --recursive --branch ${PANDOC_VERSION} https://github.com/jgm/pandoc-templates \
+  && curl -sL https://github.com/jgm/pandoc-templates/archive/${PANDOC_VERSION}.tar.gz -o pandoc-templates.tar.gz \
   && rm -rf /opt/pandoc/templates \
   && mkdir -p /opt/pandoc/templates \
+  && tar zxf pandoc-templates.tar.gz \
   && cp -r pandoc-templates*/* /opt/pandoc/templates && rm -rf pandoc-templates* \
   && rm -rf /root/.pandoc \
   && mkdir /root/.pandoc && ln -s /opt/pandoc/templates /root/.pandoc/templates \
@@ -137,13 +138,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && if [ "$dpkgArch" = "arm64" ]; then \
     apt-get remove --purge -y $DEPS; \
   fi \
-  ## Install Node.js
-  && curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
-  && apt-get install -y --no-install-recommends nodejs \
-  ## Install JupyterLab extensions
-  && jupyter labextension install @jupyterlab/server-proxy --no-build \
-  && jupyter labextension install @jupyterlab/git --no-build \
-  && jupyter lab build \
+  ## Set JupyterLab Dark theme
+  && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
@@ -172,10 +168,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get autoclean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
-    /root/.config \
-    /root/.local \
-    /root/.npm \
-    /usr/local/share/.cache
+    /root/.config
 
 ## Install the R kernel for JupyterLab
 RUN install2.r --error --deps TRUE \
