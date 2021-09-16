@@ -16,8 +16,8 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
-ARG JUPYTERLAB_VERSION=3.1.11
-ARG CODE_SERVER_RELEASE=3.10.2
+ARG JUPYTERLAB_VERSION=3.1.12
+ARG CODE_SERVER_RELEASE=3.12.0
 ARG GIT_VERSION=2.32.0
 ARG PANDOC_VERSION=2.14.2
 ARG CODE_WORKDIR
@@ -70,8 +70,9 @@ RUN apt-get update \
     ssh-client \
     ## Current ZeroMQ library for R pbdZMQ
     libzmq3-dev \
-    ## Required for R languageserver
+    ## Required for R extension
     libcurl4-openssl-dev \
+    libfontconfig1-dev \
     libssl-dev \
     libxml2-dev \
   ## Clean up
@@ -137,20 +138,19 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && cd /tmp \
   && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.4.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.4.0.vsix \
-  && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
   && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.30.0/file/GitLab.gitlab-workflow-3.30.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.30.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
+  && curl -sLO https://open-vsx.org/api/ms-toolsai/jupyter/2021.8.12/file/ms-toolsai.jupyter-2021.8.12.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2021.8.12.vsix \
+  && curl -sLO https://open-vsx.org/api/ms-python/python/2021.9.1218897484/file/ms-python.python-2021.9.1218897484.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python-2021.9.1218897484.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sLO https://open-vsx.org/api/Ikuyadeu/r/1.6.8/file/Ikuyadeu.r-1.6.8.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.6.8.vsix \
-  && curl -sLO https://open-vsx.org/api/REditorSupport/r-lsp/0.1.14/file/REditorSupport.r-lsp-0.1.14.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.14.vsix \
+  && curl -sLO https://open-vsx.org/api/Ikuyadeu/r/2.2.0/file/Ikuyadeu.r-2.2.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-2.2.0.vsix \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
@@ -166,6 +166,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
 RUN install2.r --error --deps TRUE \
     IRkernel \
     languageserver \
+    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
   && rm -rf /tmp/* \
     /root/.local
