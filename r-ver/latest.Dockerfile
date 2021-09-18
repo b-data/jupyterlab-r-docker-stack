@@ -30,7 +30,9 @@ ENV NB_USER=${NB_USER} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
     GIT_VERSION=${GIT_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
-    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions
+    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
+    SERVICE_URL=https://open-vsx.org/vscode/gallery \
+    ITEM_URL=https://open-vsx.org/vscode/item
 
 ## Installing V8 on Linux, the alternative way
 ## https://ropensci.org/blog/2020/11/12/installing-v8
@@ -138,19 +140,15 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && cd /tmp \
   && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.4.0.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.4.0.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.30.0/file/GitLab.gitlab-workflow-3.30.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.30.0.vsix \
-  && curl -sLO https://open-vsx.org/api/ms-toolsai/jupyter/2021.8.12/file/ms-toolsai.jupyter-2021.8.12.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter-2021.8.12.vsix \
-  && curl -sLO https://open-vsx.org/api/ms-python/python/2021.9.1218897484/file/ms-python.python-2021.9.1218897484.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python-2021.9.1218897484.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sLO https://open-vsx.org/api/Ikuyadeu/r/2.2.0/file/Ikuyadeu.r-2.2.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-2.2.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.2.0 \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
