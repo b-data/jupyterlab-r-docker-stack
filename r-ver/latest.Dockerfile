@@ -16,7 +16,7 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
-ARG JUPYTERLAB_VERSION=3.1.13
+ARG JUPYTERLAB_VERSION=3.1.14
 ARG CODE_SERVER_RELEASE=3.12.0
 ARG GIT_VERSION=2.33.0
 ARG PANDOC_VERSION=2.14.2
@@ -184,8 +184,9 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.plot.useHttpgd": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.workspaceViewer.showObjectSize": true,\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
   && cp .local/share/code-server/User/settings.json /var/tmp \
+  && echo 'options(vsc.helpPanel = FALSE)' >> /usr/local/lib/R/etc/Rprofile.site \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
   && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' .zshrc \
