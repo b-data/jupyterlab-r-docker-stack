@@ -56,6 +56,10 @@ if [ "$(id -u)" == 0 ] ; then
             echo "Copying home dir to /home/${NB_USER}"
             mkdir "/home/${NB_USER}"
             cp -a /home/jovyan/. "/home/${NB_USER}/" || ln -s /home/jovyan "/home/${NB_USER}"
+        # (it could be mounted, and we should populate it if it is empty)
+        elif [[ "$(ls -A "/home/${NB_USER}" 2> /dev/null)" == "" ]]; then
+            echo "Populating home dir /home/${NB_USER}"
+            cp -a /home/jovyan/. "/home/${NB_USER}/" || ln -s /home/jovyan "/home/${NB_USER}"
         fi
         # if workdir is in /home/jovyan, cd to /home/${NB_USER}
         if [[ "${PWD}/" == "/home/jovyan/"* ]]; then

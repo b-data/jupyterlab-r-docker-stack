@@ -4,7 +4,6 @@
 
 set -e
 
-if [ "$(ls -A "/home/${NB_USER}" 2> /dev/null)" == "" ]; then
-    echo "Copying home dir to /home/${NB_USER}"
-    cp -a /var/tmp/jovyan/. /home/${NB_USER}
+if [ "$(ls -A "/home/jovyan" 2> /dev/null)" == "" ]; then
+    cp -a /var/tmp/jovyan/. /home/jovyan
 fi
