@@ -46,7 +46,6 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends \
     curl \
     file \
-    git \
     gnupg \
     info \
     jq \
@@ -73,6 +72,7 @@ RUN apt-get update \
     ## Current ZeroMQ library for R pbdZMQ
     libzmq3-dev \
     ## Required for R extension
+    libcairo2-dev \
     libcurl4-openssl-dev \
     libfontconfig1-dev \
     libssl-dev \
@@ -157,7 +157,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Clean up
   && rm -rf /tmp/* \
   && apt-get autoremove -y \
-  && apt-get autoclean -y \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
     /root/.config
@@ -199,10 +199,7 @@ RUN mkdir -p .local/share/code-server/User \
   && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
-COPY start*.sh /usr/local/bin/
-COPY populate.sh /usr/local/bin/start-notebook.d/
-COPY init.sh /usr/local/bin/before-notebook.d/
-COPY jupyter_notebook_config.py /etc/jupyter/
+COPY scripts/. /
 
 EXPOSE 8888
 

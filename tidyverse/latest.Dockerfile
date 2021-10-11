@@ -7,7 +7,7 @@ USER root
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
   #libxml2-dev \
-  libcairo2-dev \
+  #libcairo2-dev \
   libfribidi-dev \
   libgit2-dev \
   libharfbuzz-dev \
