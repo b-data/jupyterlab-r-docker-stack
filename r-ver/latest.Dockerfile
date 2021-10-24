@@ -16,10 +16,10 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
-ARG JUPYTERLAB_VERSION=3.2.0
+ARG JUPYTERLAB_VERSION=3.2.1
 ARG CODE_SERVER_RELEASE=3.12.0
 ARG GIT_VERSION=2.33.1
-ARG PANDOC_VERSION=2.14.2
+ARG PANDOC_VERSION=2.15
 ARG CODE_WORKDIR
 
 ENV NB_USER=${NB_USER} \
@@ -148,7 +148,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.3.1 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.3.2 \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
