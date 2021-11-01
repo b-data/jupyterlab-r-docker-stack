@@ -1,26 +1,44 @@
-FROM registry.gitlab.b-data.ch/r/r-ver:4.1.0
+ARG BASE_IMAGE=debian:bullseye
+ARG GIT_VERSION=2.33.1
 
-LABEL org.label-schema.license="MIT" \
-      org.label-schema.vcs-url="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
-      maintainer="Olivier Benz <olivier.benz@b-data.ch>"
+FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-ARG NB_USER
-ARG NB_UID
-ARG NB_GID
-ARG JUPYTERHUB_VERSION
-ARG JUPYTERLAB_VERSION
-ARG CODE_SERVER_RELEASE
+FROM registry.gitlab.b-data.ch/r/r-ver:4.1.1
+
+LABEL org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
+      org.opencontainers.image.vendor="b-data GmbH" \
+      org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ARG NB_USER=jovyan
+ARG NB_UID=1000
+ARG NB_GID=100
+ARG JUPYTERHUB_VERSION=1.4.2
+ARG JUPYTERLAB_VERSION=3.2.1
+ARG CODE_SERVER_RELEASE=3.12.0
+ARG GIT_VERSION=2.33.1
+ARG PANDOC_VERSION=2.15
 ARG CODE_WORKDIR
-ARG PANDOC_VERSION
 
-ENV NB_USER=${NB_USER:-jovyan} \
-    NB_UID=${NB_UID:-1000} \
-    NB_GID=${NB_GID:-100} \
-    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION:-1.4.2} \
-    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION:-3.0.16} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE:-3.10.2} \
+ENV NB_USER=${NB_USER} \
+    NB_UID=${NB_UID} \
+    NB_GID=${NB_GID} \
+    JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
+    JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
+    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
+    GIT_VERSION=${GIT_VERSION} \
+    PANDOC_VERSION=${PANDOC_VERSION} \
     CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
-    PANDOC_VERSION=${PANDOC_VERSION:-2.14.1}
+    SERVICE_URL=https://open-vsx.org/vscode/gallery \
+    ITEM_URL=https://open-vsx.org/vscode/item
+
+## Installing V8 on Linux, the alternative way
+## https://ropensci.org/blog/2020/11/12/installing-v8
+ENV DOWNLOAD_STATIC_LIBV8=1
+
+COPY --from=gsi /usr/local /usr/local
 
 USER root
 
@@ -28,31 +46,35 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends \
     curl \
     file \
-    git \
     gnupg \
+    info \
     jq \
-    less \
     libclang-dev \
     lsb-release \
     man-db \
-    multiarch-support \
     nano \
     procps \
     psmisc \
     python3-venv \
     python3-virtualenv \
     screen \
-    ssh \
     sudo \
     tmux \
     vim \
     wget \
     zsh \
+    ## Additional git runtime dependencies
+    libcurl3-gnutls \
+    liberror-perl \
+    ## Additional git runtime recommendations
+    less \
+    ssh-client \
     ## Current ZeroMQ library for R pbdZMQ
     libzmq3-dev \
-    pkg-config \    
-    ## Required for R languageserver
+    ## Required for R extension
+    libcairo2-dev \
     libcurl4-openssl-dev \
+    libfontconfig1-dev \
     libssl-dev \
     libxml2-dev \
   ## Clean up
@@ -68,8 +90,12 @@ RUN apt-get update \
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  ## configure git not to request password each time
+  ## Set default branch name to main
+  && git config --system init.defaultBranch main \
+  ## Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
+  ## Merge the default branch from the default remote when "git pull" is run
+  && git config --system pull.rebase false \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 
@@ -107,62 +133,40 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && if [ "$dpkgArch" = "arm64" ]; then \
     apt-get remove --purge -y $DEPS; \
   fi \
-  ## Install Node.js
-  && curl -sL https://deb.nodesource.com/setup_12.x | bash \
-  && DEPS="libpython-stdlib \
-    libpython2-stdlib \
-    libpython2.7-minimal \
-    libpython2.7-stdlib \
-    python \
-    python-minimal \
-    python2 python2-minimal \
-    python2.7 \
-    python2.7-minimal" \
-  && apt-get install -y --no-install-recommends nodejs $DEPS \
-  ## Install JupyterLab extensions
-  && jupyter labextension install @jupyterlab/server-proxy --no-build \
-  && jupyter labextension install @jupyterlab/git --no-build \
-  && jupyter lab build \
+  ## Set JupyterLab Dark theme
+  && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Install code-server extensions
   && cd /tmp \
-  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.3.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.3.0.vsix \
-  && curl -sLO https://dl.b-data.ch/vsix/fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension fabiospampinato.vscode-terminals-1.12.9.vsix \
-  && curl -sLO https://open-vsx.org/api/GitLab/gitlab-workflow/3.26.0/file/GitLab.gitlab-workflow-3.26.0.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow-3.26.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.4.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.4.0.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && curl -sLO https://open-vsx.org/api/Ikuyadeu/r/1.6.8/file/Ikuyadeu.r-1.6.8.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-1.6.8.vsix \
-  && curl -sLO https://open-vsx.org/api/REditorSupport/r-lsp/0.1.14/file/REditorSupport.r-lsp-0.1.14.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-lsp-0.1.14.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.3.2 \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
-  ## Clean up (Node.js)
+  ## Disable help panel and revert to old behaviour
+  && echo 'options(vsc.helpPanel = FALSE)' >> /usr/local/lib/R/etc/Rprofile.site \
+  ## Clean up
   && rm -rf /tmp/* \
-  && apt-get remove --purge -y nodejs $DEPS \
   && apt-get autoremove -y \
-  && apt-get autoclean -y \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
-    /root/.config \
-    /root/.local \
-    /root/.npm \
-    /usr/local/share/.cache \
-    /etc/apt/sources.list.d/nodesource* \
-  && apt-key del 0A1C1655A0AB68576280
+    /root/.config
 
 ## Install the R kernel for JupyterLab
 RUN install2.r --error --deps TRUE \
     IRkernel \
     languageserver \
+    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
   && rm -rf /tmp/* \
     /root/.local
@@ -182,7 +186,7 @@ ENV HOME=/home/${NB_USER} \
 WORKDIR ${HOME}
 
 RUN mkdir -p .local/share/code-server/User \
-  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.sessionWatcher": true,\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
+  && echo '{\n    "editor.tabSize": 2,\n    "telemetry.enableTelemetry": false,\n    "gitlens.advanced.telemetry.enabled": false,\n    "r.bracketedPaste": true,\n    "r.plot.useHttpgd": true,\n    "r.rterm.linux": "/usr/local/bin/radian",\n    "r.rterm.option": [],\n    "r.workspaceViewer.showObjectSize": true,\n    "workbench.colorTheme": "Default Dark+"\n}' > .local/share/code-server/User/settings.json \
   && cp .local/share/code-server/User/settings.json /var/tmp \
   && sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" --unattended \
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git .oh-my-zsh/custom/themes/powerlevel10k \
@@ -195,10 +199,7 @@ RUN mkdir -p .local/share/code-server/User \
   && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
-COPY start*.sh /usr/local/bin/
-COPY populate.sh /usr/local/bin/start-notebook.d/
-COPY init.sh /usr/local/bin/before-notebook.d/
-COPY jupyter_notebook_config.py /etc/jupyter/
+COPY scripts/. /
 
 EXPOSE 8888
 

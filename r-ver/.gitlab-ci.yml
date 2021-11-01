@@ -49,8 +49,12 @@ build:latest-linux-amd64:
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
       -f $CI_APP_TAG.Dockerfile .
     - |
-      docker push $CI_APP_REPO:$CI_APP_TAG-linux-amd64
-      docker push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
+      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 \
+      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-amd64 -<<EOF
+      FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      USER root
+      EOF
+    - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "master" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
@@ -67,8 +71,12 @@ build:latest-linux-arm64v8:
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
       -f $CI_APP_TAG.Dockerfile .
     - |
-      docker push $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-      docker push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
+      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 \
+      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-arm64v8 -<<EOF
+      FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      USER root
+      EOF
+    - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "master" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
@@ -83,7 +91,14 @@ build:version-linux-amd64:
     - >
       cd r-ver && docker build --pull -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f $CI_APP_TAG.Dockerfile .
-    - docker push $CI_APP_REPO:$CI_APP_TAG-linux-amd64
+    - |
+      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 -<<EOF
+      FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      USER root
+      EOF
+    - |
+      docker push $CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      docker push $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
@@ -98,7 +113,14 @@ build:version-linux-arm64v8:
     - >
       cd r-ver && docker build --pull -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f $CI_APP_TAG.Dockerfile .
-    - docker push $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+    - |
+      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 -<<EOF
+      FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      USER root
+      EOF
+    - |
+      docker push $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      docker push $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
@@ -111,35 +133,52 @@ build-manifest:latest-linux-multiarch:
     - |
       for i in $OS_ARCH; do
         export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO:$CI_APP_TAG-$i"
+        export CI_MANIFEST_LIST_ROOT="$CI_MANIFEST_LIST_ROOT $CI_APP_REPO:$CI_APP_TAG-root-$i"
       done
     - |
       docker manifest create $CI_APP_REPO:$CI_APP_TAG $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:$CI_APP_TAG-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
         docker manifest annotate --variant v8 $CI_APP_REPO:$CI_APP_TAG \
           $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO:$CI_APP_TAG-root \
+          $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       fi
       docker manifest push $CI_APP_REPO:$CI_APP_TAG
+      docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
     - |
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN_PAT $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
         docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN_PAT \
           $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root \
+          $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       fi
       docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT
+      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root
     - |
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
         docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN \
           $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-root \
+          $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       fi
       docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN
+      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-root
     - |
       docker manifest create $CI_APP_REPO:$VERSION_MAJ $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:$VERSION_MAJ-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
         docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ \
           $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ-root \
+          $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       fi
       docker manifest push $CI_APP_REPO:$VERSION_MAJ
+      docker manifest push $CI_APP_REPO:$VERSION_MAJ-root
   rules:
     - if: $CI_COMMIT_BRANCH == "master"
       changes:
@@ -152,14 +191,19 @@ build-manifest:version-linux-multiarch:
     - |
       for i in $OS_ARCH; do
         export CI_MANIFEST_LIST="$CI_MANIFEST_LIST $CI_APP_REPO:$CI_APP_TAG-$i"
+        export CI_MANIFEST_LIST_ROOT="$CI_MANIFEST_LIST_ROOT $CI_APP_REPO:$CI_APP_TAG-root-$i"
       done
     - |
       docker manifest create $CI_APP_REPO:$CI_APP_TAG $CI_MANIFEST_LIST
+      docker manifest create $CI_APP_REPO:$CI_APP_TAG-root $CI_MANIFEST_LIST_ROOT
       if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
         docker manifest annotate --variant v8 $CI_APP_REPO:$CI_APP_TAG \
           $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+        docker manifest annotate --variant v8 $CI_APP_REPO:$CI_APP_TAG-root \
+          $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       fi
       docker manifest push $CI_APP_REPO:$CI_APP_TAG
+      docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
