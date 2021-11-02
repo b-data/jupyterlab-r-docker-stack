@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.1
+FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.2
 
 ARG DEBIAN_FRONTEND=noninteractive
 
