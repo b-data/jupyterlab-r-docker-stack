@@ -16,7 +16,7 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
-ARG JUPYTERLAB_VERSION=3.2.2
+ARG JUPYTERLAB_VERSION=3.2.3
 ARG CODE_SERVER_RELEASE=3.12.0
 ARG GIT_VERSION=2.33.1
 ARG PANDOC_VERSION=2.16.1
@@ -30,7 +30,6 @@ ENV NB_USER=${NB_USER} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
     GIT_VERSION=${GIT_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
-    CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/extensions \
     SERVICE_URL=https://open-vsx.org/vscode/gallery \
     ITEM_URL=https://open-vsx.org/vscode/item
 
@@ -100,7 +99,7 @@ RUN apt-get update \
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
 
 ## Install code-server
-RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
+RUN mkdir /opt/code-server \
   && cd /opt/code-server \
   && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
@@ -109,7 +108,8 @@ RUN mkdir -p ${CODE_BUILTIN_EXTENSIONS_DIR} \
 ENV PATH=/opt/code-server/bin:$PATH
 
 ## Install JupyterLab
-RUN dpkgArch="$(dpkg --print-architecture)" \
+RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-dev/extensions \
+  && dpkgArch="$(dpkg --print-architecture)" \
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \

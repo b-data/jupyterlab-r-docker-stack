@@ -30,11 +30,6 @@ def _codeserver_command(port):
     extensions_dir = os.getenv("CODE_EXTENSIONS_DIR", "")
     if extensions_dir != "":
         extensions_dir = "--extensions-dir=" + str(extensions_dir)
-    builtin_extensions_dir = os.getenv("CODE_BUILTIN_EXTENSIONS_DIR", "")
-    if builtin_extensions_dir != "":
-        builtin_extensions_dir = "--extra-builtin-extensions-dir=" + str(
-            builtin_extensions_dir
-        )
 
     return [
         full_path,
@@ -43,7 +38,6 @@ def _codeserver_command(port):
         "none",
         data_dir,
         extensions_dir,
-        builtin_extensions_dir,
         work_dir,
     ]
 
