@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG GIT_VERSION=2.34.0
+ARG GIT_VERSION=2.34.1
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
@@ -18,8 +18,8 @@ ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.4.2
 ARG JUPYTERLAB_VERSION=3.2.4
 ARG CODE_SERVER_RELEASE=3.12.0
-ARG GIT_VERSION=2.34.0
-ARG PANDOC_VERSION=2.16.1
+ARG GIT_VERSION=2.34.1
+ARG PANDOC_VERSION=2.16.2
 ARG CODE_WORKDIR
 
 ENV NB_USER=${NB_USER} \
@@ -148,7 +148,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.3.2 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r \
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
