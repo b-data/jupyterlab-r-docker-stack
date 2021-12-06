@@ -103,6 +103,8 @@ RUN mkdir /opt/code-server \
   && cd /opt/code-server \
   && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
+  ## Include custom fonts
+  && sed -i 's|</head>|  <link rel="stylesheet" type="text/css" href="{{CS_STATIC_BASE}}/src/browser/assets/css/fonts.css">\n  </head>|g' /opt/code-server/src/browser/pages/vscode.html \
   && cd /
 
 ENV PATH=/opt/code-server/bin:$PATH
@@ -136,6 +138,8 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   ## Set JupyterLab Dark theme
   && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
+  ## Include custom fonts
+  && sed -i 's|</head>|<link rel="stylesheet" type="text/css" href="{{page_config.fullStaticUrl}}/assets/css/fonts.css"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   ## Install code-server extensions
   && cd /tmp \
   && curl -sLO https://dl.b-data.ch/vsix/alefragnani.project-manager-12.4.0.vsix \
@@ -199,6 +203,8 @@ RUN mkdir -p .local/share/code-server/User \
   && cp -a $HOME /var/tmp
 
 ## Copy local files as late as possible to avoid cache busting
+COPY assets /opt/code-server/src/browser/assets
+COPY assets /usr/local/share/jupyter/lab/static/assets
 COPY scripts/. /
 
 EXPOSE 8888
