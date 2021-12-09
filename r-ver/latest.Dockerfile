@@ -119,13 +119,17 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \
-  ## Install python3-dev to build argon2-cffi on aarch64
-  ## https://github.com/hynek/argon2-cffi/issues/73
-  && if [ "$dpkgArch" = "arm64" ]; then \
-    DEPS=python3-dev; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends $DEPS; \
-  fi \
+  ## Install python3-dev and dependencies to build wheels
+  && DEPS="libjs-jquery \
+    libjs-sphinxdoc \
+    libjs-underscore \
+    libpython3-dev \
+    libpython3.9 \
+    libpython3.9-dev \
+    python3-dev \
+    python3.9-dev" \
+  && apt-get update \
+  && apt-get install -y --no-install-recommends $DEPS \
   ## Install Python packages
   && pip3 install \
     jupyter-server-proxy \
@@ -135,10 +139,8 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     notebook \
     nbconvert \
     radian \
-  ## Remove python3-dev
-  && if [ "$dpkgArch" = "arm64" ]; then \
-    apt-get remove --purge -y $DEPS; \
-  fi \
+  ## Remove python3-dev and dependencies
+  && apt-get remove --purge -y $DEPS \
   ## Set JupyterLab Dark theme
   && mkdir -p /usr/local/share/jupyter/lab/settings \
   && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
