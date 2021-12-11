@@ -119,15 +119,8 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \
-  ## Install python3-dev and dependencies to build wheels
-  && DEPS="libjs-jquery \
-    libjs-sphinxdoc \
-    libjs-underscore \
-    libpython3-dev \
-    libpython3.9 \
-    libpython3.9-dev \
-    python3-dev \
-    python3.9-dev" \
+  ## Install python3-dev to build wheels
+  && DEPS="python3-dev" \
   && apt-get update \
   && apt-get install -y --no-install-recommends $DEPS \
   ## Install Python packages
@@ -139,7 +132,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     notebook \
     nbconvert \
     radian \
-  ## Remove python3-dev and dependencies
+  ## Remove python3-dev
   && apt-get remove --purge -y $DEPS \
   ## Set JupyterLab Dark theme
   && mkdir -p /usr/local/share/jupyter/lab/settings \
