@@ -17,7 +17,7 @@ ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.5.0
 ARG JUPYTERLAB_VERSION=3.2.5
-ARG CODE_SERVER_RELEASE=3.12.0
+ARG CODE_SERVER_RELEASE=4.0.1
 ARG GIT_VERSION=2.34.1
 ARG PANDOC_VERSION=2.16.2
 ARG CODE_WORKDIR
@@ -29,9 +29,7 @@ ENV NB_USER=${NB_USER} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
     GIT_VERSION=${GIT_VERSION} \
-    PANDOC_VERSION=${PANDOC_VERSION} \
-    SERVICE_URL=https://open-vsx.org/vscode/gallery \
-    ITEM_URL=https://open-vsx.org/vscode/item
+    PANDOC_VERSION=${PANDOC_VERSION}
 
 ## Installing V8 on Linux, the alternative way
 ## https://ropensci.org/blog/2020/11/12/installing-v8
@@ -104,11 +102,11 @@ RUN mkdir /opt/code-server \
   && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   ## Include custom fonts
-  && sed -i 's|</head>|  <link rel="preload" href="{{CS_STATIC_BASE}}/src/browser/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n  </head>|g' /opt/code-server/src/browser/pages/vscode.html \
-  && sed -i 's|</head>|  <link rel="preload" href="{{CS_STATIC_BASE}}/src/browser/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n  </head>|g' /opt/code-server/src/browser/pages/vscode.html \
-  && sed -i 's|</head>|  <link rel="preload" href="{{CS_STATIC_BASE}}/src/browser/assets/fonts/MesloLGS-NF-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n  </head>|g' /opt/code-server/src/browser/pages/vscode.html \
-  && sed -i 's|</head>|  <link rel="preload" href="{{CS_STATIC_BASE}}/src/browser/assets/fonts/MesloLGS-NF-Bold-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n  </head>|g' /opt/code-server/src/browser/pages/vscode.html \
-  && sed -i 's|</head>|  <link rel="stylesheet" type="text/css" href="{{CS_STATIC_BASE}}/src/browser/assets/css/fonts.css">\n  </head>|g' /opt/code-server/src/browser/pages/vscode.html \
+  && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
+  && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
+  && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
+  && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Bold-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
+  && sed -i 's|</head>|	<link rel="stylesheet" type="text/css" href="{{BASE}}/static/resources/server/css/fonts.css">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
   && cd /
 
 ENV PATH=/opt/code-server/bin:$PATH
@@ -156,6 +154,10 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.3.5 \
+  ## Create tmp folder for Jupyter extension
+  && cd /opt/code-server/vendor/modules/code-oss-dev/extensions/ms-toolsai.jupyter-* \
+  && mkdir -m 1777 tmp \
+  ## Create folders for JupyterLab hook scripts
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   && cd / \
