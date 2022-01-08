@@ -16,9 +16,10 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=1.5.0
-ARG JUPYTERLAB_VERSION=3.2.5
+ARG JUPYTERLAB_VERSION=3.2.6
 ARG CODE_SERVER_RELEASE=4.0.1
 ARG GIT_VERSION=2.34.1
+ARG GIT_LFS_VERSION=3.0.2
 ARG PANDOC_VERSION=2.16.2
 ARG CODE_WORKDIR
 
@@ -29,6 +30,7 @@ ENV NB_USER=${NB_USER} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
     GIT_VERSION=${GIT_VERSION} \
+    GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION}
 
 ## Installing V8 on Linux, the alternative way
@@ -74,8 +76,6 @@ RUN apt-get update \
     libfontconfig1-dev \
     libssl-dev \
     libxml2-dev \
-  ## Clean up
-  && rm -rf /var/lib/apt/lists/* \
   ## Install font MesloLGS NF
   && mkdir -p /usr/share/fonts/truetype/meslo \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Regular.ttf \
@@ -83,18 +83,47 @@ RUN apt-get update \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Italic.ttf \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
   && fc-cache -fv \
-  ## Install pandoc
-  && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   ## Set default branch name to main
   && git config --system init.defaultBranch main \
   ## Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
   ## Merge the default branch from the default remote when "git pull" is run
   && git config --system pull.rebase false \
+  ## Install Git LFS
+  && cd /tmp \
+  && curl -sSLO https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-$(dpkg --print-architecture)-v${GIT_LFS_VERSION}.tar.gz \
+  && tar xfz git-lfs-linux-$(dpkg --print-architecture)-v${GIT_LFS_VERSION}.tar.gz --no-same-owner --one-top-level \
+  && cd git-lfs-linux-$(dpkg --print-architecture)-v${GIT_LFS_VERSION} \
+  && sed -i "s/git lfs install/#git lfs install/g" install.sh \
+  && echo '\n\
+    mkdir -p $prefix/share/man/man1\n\
+    rm -rf $prefix/share/man/man1/git-lfs*\n\
+    \n\
+    pushd "$( dirname "${BASH_SOURCE[0]}" )/man" > /dev/null\n\
+      for g in *.1; do\n\
+        install -m0644 $g "$prefix/share/man/man1/$g"\n\
+      done\n\
+    popd > /dev/null\n\
+    \n\
+    mkdir -p $prefix/share/man/man5\n\
+    rm -rf $prefix/share/man/man5/git-lfs*\n\
+    \n\
+    pushd "$( dirname "${BASH_SOURCE[0]}" )/man" > /dev/null\n\
+      for g in *.5; do\n\
+        install -m0644 $g "$prefix/share/man/man5/$g"\n\
+      done\n\
+    popd > /dev/null' >> install.sh \
+  && ./install.sh \
+  ## Install pandoc
+  && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
   ## Add user
-  && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER}
+  && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+  ## Clean up
+  && cd / \
+  && rm -rf /tmp/* \
+  && rm -rf /var/lib/apt/lists/*
 
 ## Install code-server
 RUN mkdir /opt/code-server \
