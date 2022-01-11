@@ -59,12 +59,12 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && tlmgr update --self \
   && tlmgr install \
     ae \
-    ## context fails to install on aarch64 with no output
-    #context \
     listings \
     makeindex \
     parskip \
     pdfcrop \
+  ## context installs on aarch64 but returns non-zero exit code
+  && tlmgr install context || true \
   && tlmgr path add \
   && Rscript -e "tinytex::r_texmf()" \
   && chown -R root:users /opt/TinyTeX \
@@ -76,9 +76,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && install2.r --error --deps TRUE \
     blogdown bookdown rticles rmdshower rJava xaringan \
   ## Install code-server extensions
-  && cd /tmp \
-  && curl -sLO https://open-vsx.org/api/James-Yu/latex-workshop/8.19.2/file/James-Yu.latex-workshop-8.19.2.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop-8.19.2.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Clean up
   && rm -rf /tmp/*
 
