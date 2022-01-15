@@ -20,7 +20,7 @@ ARG JUPYTERLAB_VERSION=3.2.8
 ARG CODE_SERVER_RELEASE=4.0.1
 ARG GIT_VERSION=2.34.1
 ARG GIT_LFS_VERSION=3.0.2
-ARG PANDOC_VERSION=2.17
+ARG PANDOC_VERSION=2.17.0.1
 ARG CODE_WORKDIR
 
 ENV NB_USER=${NB_USER} \
@@ -128,7 +128,7 @@ RUN apt-get update \
 ## Install code-server
 RUN mkdir /opt/code-server \
   && cd /opt/code-server \
-  && curl -sL https://github.com/cdr/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
+  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   ## Include custom fonts
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
