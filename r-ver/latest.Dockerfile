@@ -135,8 +135,7 @@ RUN mkdir /opt/code-server \
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Bold.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/static/resources/server/fonts/MesloLGS-NF-Bold-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
-  && sed -i 's|</head>|	<link rel="stylesheet" type="text/css" href="{{BASE}}/static/resources/server/css/fonts.css">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html \
-  && cd /
+  && sed -i 's|</head>|	<link rel="stylesheet" type="text/css" href="{{BASE}}/static/resources/server/css/fonts.css">\n	</head>|g' /opt/code-server/vendor/modules/code-oss-dev/out/vs/code/browser/workbench/workbench.html
 
 ENV PATH=/opt/code-server/bin:$PATH
 
@@ -190,13 +189,11 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   ## Create folders for JupyterLab hook scripts
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
-  && cd / \
   ## Disable help panel and revert to old behaviour
   && echo 'options(vsc.helpPanel = FALSE)' >> /usr/local/lib/R/etc/Rprofile.site \
   ## Clean up
   && rm -rf /tmp/* \
   && apt-get autoremove -y \
-  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/* \
     /root/.cache \
     /root/.config
