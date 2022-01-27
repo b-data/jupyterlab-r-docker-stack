@@ -6,29 +6,31 @@ USER root
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
+  cmake \
   #libxml2-dev \
   #libcairo2-dev \
   libfribidi-dev \
   libgit2-dev \
   libharfbuzz-dev \
-  libsqlite3-dev \
-  libmariadbd-dev \
+  libmariadb-dev \
   libpq-dev \
-  libssh2-1-dev \
-  unixodbc-dev \
   libsasl2-dev \
+  libsqlite3-dev \
+  libssh2-1-dev \
   libtiff-dev \
+  libxtst6 \
+  unixodbc-dev \
   && install2.r --error BiocManager \
-  && install2.r --error \
-    --deps TRUE \
-    --skipinstalled \
+  && install2.r --error --deps TRUE --skipinstalled \
     tidyverse \
     dplyr \
     devtools \
     formatR \
-    #remotes \
-    selectr \
-    caTools \
+  ## dplyr database backends
+  && install2.r --error --skipinstalled \
+    arrow \
+    duckdb \
+    fst \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*

@@ -2,7 +2,7 @@ FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.1.2
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG CTAN_REPO=${CTAN_REPO:-http://mirror.ctan.org/systems/texlive/tlnet}
+ARG CTAN_REPO=${CTAN_REPO:-https://mirror.ctan.org/systems/texlive/tlnet}
 ENV CTAN_REPO=${CTAN_REPO}
 
 USER root
@@ -22,13 +22,19 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     default-jdk \
     fonts-roboto \
     ghostscript \
+    hugo \
     lbzip2 \
     libbz2-dev \
+    libglpk-dev \
+    libgmp3-dev \
+    libgl1-mesa-dev \
+    libglu1-mesa-dev \
+    libhunspell-dev \
     libicu-dev \
     liblzma-dev \
-    libpcre2-dev \
-    libhunspell-dev \
+    #libpcre2-dev \
     libmagick++-dev \
+    libopenmpi-dev \
     libpoppler-cpp-dev \
     librdf0-dev \
     ## Installing libnode-dev uninstalls nodejs
@@ -36,7 +42,6 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     #libnode-dev \
     qpdf \
     texinfo \
-    libopenmpi-dev \
   ## Install R package redland
   && install2.r --error --skipinstalled redland \
   ## Explicitly install runtime library sub-deps of librdf0-dev
@@ -49,7 +54,6 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
 	  raptor2-utils \
   ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
 	&& apt-get -y autoremove \
-  && apt-get clean \
   && rm -rf /var/lib/apt/lists/* \
   ## Admin-based install of TinyTeX:
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
@@ -71,10 +75,16 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
   && echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron \
-  && install2.r --error PKI \
+  && install2.r --error --skipinstalled PKI \
   ## And some nice R packages for publishing-related stuff
-  && install2.r --error --deps TRUE \
-    blogdown bookdown rticles rmdshower rJava xaringan \
+  && install2.r --error --deps TRUE  --skipinstalled \
+    blogdown \
+    bookdown \
+    distill \
+    rticles \
+    rmdshower \
+    rJava \
+    xaringan \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Clean up
