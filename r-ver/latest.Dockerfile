@@ -195,6 +195,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && rm -rf /tmp/* \
   && apt-get autoremove -y \
   && rm -rf /var/lib/apt/lists/* \
+    /root/.cache \
     /root/.config \
     /root/.vscode-remote
 
