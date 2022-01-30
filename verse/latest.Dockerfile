@@ -74,10 +74,10 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && chown -R root:users /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
-  && echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron \
+  && echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site \
   && install2.r --error --skipinstalled PKI \
   ## And some nice R packages for publishing-related stuff
-  && install2.r --error --deps TRUE  --skipinstalled \
+  && install2.r --error --deps TRUE --skipinstalled \
     blogdown \
     bookdown \
     distill \
@@ -88,7 +88,11 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Clean up
-  && rm -rf /tmp/*
+  && rm -rf /tmp/* \
+    /root/.config \
+    /root/.local \
+    /root/.vscode-remote \
+    /root/.wget-hsts
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}

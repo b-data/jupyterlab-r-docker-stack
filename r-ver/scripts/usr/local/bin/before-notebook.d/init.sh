@@ -30,15 +30,17 @@ if [ "$(id -u)" == 0 ] ; then
   update-locale --reset LANG=$LANG
 
   # Create R user package library
-  su $NB_USER -c "mkdir -p `Rscript -e \
-    'cat(path.expand(Sys.getenv("R_LIBS_USER")))'`"
+  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
+    /usr/local/lib/R/etc/Renviron)
+  su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
   su $NB_USER -c "mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
+  su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "jq -s '.[0] * .[1]' /var/tmp/settings.json \
+  su $NB_USER -c "jq -s '.[0] * .[1]' \
+    /var/tmp/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
@@ -48,21 +50,24 @@ else
     echo "Container must be run as root to change timezone"
   fi
 
-  # Warn if the user wants to change the timezone but hasn't run the container
-  # as root.
+  # Warn if the user wants to change the locale but hasn't run the container as
+  # root.
   if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
     echo "Container must be run as root to update or add locale"
   fi
 
   # Create R user package library
-  mkdir -p `Rscript -e 'cat(path.expand(Sys.getenv("R_LIBS_USER")))'`
+  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
+    /usr/local/lib/R/etc/Renviron)
+  mkdir -p $RLU
 
   # Update code-server settings
   mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak
-  jq -s '.[0] * .[1]' /var/tmp/settings.json \
+  jq -s '.[0] * .[1]' \
+    /var/tmp/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json
 fi

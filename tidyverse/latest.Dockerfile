@@ -20,7 +20,7 @@ RUN apt-get update \
   libtiff-dev \
   libxtst6 \
   unixodbc-dev \
-  && install2.r --error BiocManager \
+  && install2.r --error --skipinstalled BiocManager \
   && install2.r --error --deps TRUE --skipinstalled \
     tidyverse \
     dplyr \

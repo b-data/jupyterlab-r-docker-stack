@@ -29,7 +29,7 @@ RUN apt-get update \
     sqlite3 \
     tk-dev \
     #unixodbc-dev
-  && install2.r --error \
+  && install2.r --error --skipinstalled \
     #RColorBrewer \
     RandomFields \
     RNetCDF \
