@@ -59,7 +59,7 @@ else
   # Create R user package library
   RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
     /usr/local/lib/R/etc/Renviron)
-  mkdir -p $RLU
+  /bin/bash -c "mkdir -p $RLU"
 
   # Update code-server settings
   mv .local/share/code-server/User/settings.json \
