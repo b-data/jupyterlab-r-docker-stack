@@ -13,6 +13,7 @@ if [ "$(id -u)" == 0 ] ; then
   if [ "$TZ" != "Etc/UTC" ]; then
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
       && echo $TZ > /etc/timezone
+    echo "Setting TZ to $TZ"
   fi
 
   # Add/Update locale if needed
@@ -28,6 +29,7 @@ if [ "$(id -u)" == 0 ] ; then
     locale-gen
   fi
   update-locale --reset LANG=$LANG
+  echo "Setting LANG to $LANG"
 
   # Create R user package library
   RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
@@ -44,16 +46,21 @@ if [ "$(id -u)" == 0 ] ; then
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
-  # Warn if the user wants to change the timezone but hasn't run the container
-  # as root.
+  # Warn if the user wants to change the timezone but hasn't started the
+  # container as root.
   if [ "$TZ" != "Etc/UTC" ]; then
-    echo "Container must be run as root to change timezone"
+    echo "WARNING: Setting TZ to $TZ but /etc/localtime and /etc/timezone remain unchanged!"
   fi
 
-  # Warn if the user wants to change the locale but hasn't run the container as
-  # root.
-  if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
-    echo "Container must be run as root to update or add locale"
+  # Warn if the user wants to change the locale but hasn't started the
+  # container as root.
+  if [[ ! -z "$LANGS" ]]; then
+    echo "WARNING: Container must be started as root to add locale(s)!"
+  fi
+  if [[ "$LANG" != "en_US.UTF-8" ]]; then
+    echo "WARNING: Container must be run started root to update locale!"
+    echo "Resetting LANG to en_US.UTF-8"
+    LANG=en_US.UTF-8
   fi
 
   # Create R user package library

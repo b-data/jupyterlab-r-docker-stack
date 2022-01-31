@@ -138,6 +138,7 @@ if [ "$(id -u)" == 0 ] ; then
             new_wd="/home/${NB_USER}/${PWD:13}"
             _log "Changing working directory to ${new_wd}"
             cd "${new_wd}"
+            CODE_WORKDIR=/home/${NB_USER}/projects
         fi
     fi
 
