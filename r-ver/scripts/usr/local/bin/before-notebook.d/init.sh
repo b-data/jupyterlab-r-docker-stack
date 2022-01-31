@@ -11,9 +11,9 @@ TZ=${TZ:=Etc/UTC}
 if [ "$(id -u)" == 0 ] ; then
   # Update timezone if needed
   if [ "$TZ" != "Etc/UTC" ]; then
+    echo "Setting TZ to $TZ"
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
       && echo $TZ > /etc/timezone
-    echo "Setting TZ to $TZ"
   fi
 
   # Add/Update locale if needed
@@ -28,8 +28,10 @@ if [ "$(id -u)" == 0 ] ; then
   if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
     locale-gen
   fi
-  update-locale --reset LANG=$LANG
-  echo "Setting LANG to $LANG"
+  if [ "$LANG" != "en_US.UTF-8" ]; then
+    echo "Setting LANG to $LANG"
+    update-locale --reset LANG=$LANG
+  fi
 
   # Create R user package library
   RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
