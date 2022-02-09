@@ -27,9 +27,9 @@ RUN apt-get update \
     devtools \
     formatR \
   ## dplyr database backends
+  && Rscript -e "devtools::install_version('duckdb', version = '0.3.1')" \
   && install2.r --error --skipinstalled \
     arrow \
-    duckdb \
     fst \
   ## Clean up
   && rm -rf /tmp/* \
