@@ -35,7 +35,7 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    R_VERSION_UPDATE: "false"
+    R_VERSION_UPDATE: "true"
   before_script:
     - *before-script-build
 
@@ -46,7 +46,8 @@ build:latest-linux-amd64:
     - os:linux
   script:
     - >
-      docker build --pull -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
       -f geospatial/$CI_APP_TAG.Dockerfile .
     - |
@@ -68,7 +69,8 @@ build:latest-linux-arm64v8:
     - os:linux
   script:
     - >
-      docker build --pull -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
       -f geospatial/$CI_APP_TAG.Dockerfile .
     - |
@@ -90,7 +92,8 @@ build:version-linux-amd64:
     - os:linux
   script:
     - >
-      docker build --pull -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f geospatial/$CI_APP_TAG.Dockerfile .
     - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 -<<EOF
@@ -112,7 +115,8 @@ build:version-linux-arm64v8:
     - os:linux
   script:
     - >
-      docker build --pull -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f geospatial/$CI_APP_TAG.Dockerfile .
     - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 -<<EOF

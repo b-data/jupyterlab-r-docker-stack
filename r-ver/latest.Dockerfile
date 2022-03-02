@@ -10,6 +10,8 @@ LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.vendor="b-data GmbH" \
       org.opencontainers.image.authors="Olivier Benz <olivier.benz@b-data.ch>"
 
+ARG NCPUS=1
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG NB_USER=jovyan
@@ -203,7 +205,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     /root/.vscode-remote
 
 ## Install the R kernel for JupyterLab
-RUN install2.r --error --deps TRUE --skipinstalled \
+RUN install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
     httpgd \

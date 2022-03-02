@@ -1,5 +1,7 @@
 FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.1.2
 
+ARG NCPUS=1
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 USER root
@@ -20,15 +22,15 @@ RUN apt-get update \
   libtiff-dev \
   libxtst6 \
   unixodbc-dev \
-  && install2.r --error --skipinstalled BiocManager \
-  && install2.r --error --deps TRUE --skipinstalled \
+  && install2.r --error --skipinstalled -n $NCPUS BiocManager \
+  && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     tidyverse \
     dplyr \
     devtools \
     formatR \
   ## dplyr database backends
-  && Rscript -e "devtools::install_version('duckdb', version = '0.3.1')" \
-  && install2.r --error --skipinstalled \
+  && Rscript -e "devtools::install_version('duckdb', version = '0.3.1', Ncpus = Sys.getenv('NCPUS'))" \
+  && install2.r --error --skipinstalled -n $NCPUS \
     arrow \
     fst \
   ## Clean up

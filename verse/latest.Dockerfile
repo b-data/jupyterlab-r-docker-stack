@@ -1,5 +1,7 @@
 FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.1.2
 
+ARG NCPUS=1
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG CTAN_REPO=${CTAN_REPO:-https://mirror.ctan.org/systems/texlive/tlnet}
@@ -43,7 +45,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     qpdf \
     texinfo \
   ## Install R package redland
-  && install2.r --error --skipinstalled redland \
+  && install2.r --error --skipinstalled -n $NCPUS redland \
   ## Explicitly install runtime library sub-deps of librdf0-dev
   && apt-get install -y \
 	  libcurl4-openssl-dev \
@@ -75,9 +77,9 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
   && echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site \
-  && install2.r --error --skipinstalled PKI \
+  && install2.r --error --skipinstalled -n $NCPUS PKI \
   ## And some nice R packages for publishing-related stuff
-  && install2.r --error --deps TRUE --skipinstalled \
+  && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     blogdown \
     bookdown \
     distill \

@@ -1,5 +1,7 @@
 FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.2
 
+ARG NCPUS=1
+
 ARG DEBIAN_FRONTEND=noninteractive
 
 USER root
@@ -29,7 +31,7 @@ RUN apt-get update \
     sqlite3 \
     tk-dev \
     #unixodbc-dev
-  && install2.r --error --skipinstalled \
+  && install2.r --error --skipinstalled -n $NCPUS \
     #RColorBrewer \
     RandomFields \
     RNetCDF \
@@ -60,7 +62,7 @@ RUN apt-get update \
     geoR \
     geosphere \
   ## from bioconductor
-  && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE)" \
+  && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE, Ncpus = Sys.getenv('NCPUS'))" \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
