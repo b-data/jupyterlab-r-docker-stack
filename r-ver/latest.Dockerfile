@@ -160,14 +160,13 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
     jupyterlab-git \
+    jupyterlab-lsp \
     notebook \
     nbconvert \
+    python-lsp-server[all] \
     radian \
   ## Remove python3-dev
   && apt-get remove --purge -y $DEPS \
-  ## Set JupyterLab Dark theme
-  && mkdir -p /usr/local/share/jupyter/lab/settings \
-  && echo '{\n  "@jupyterlab/apputils-extension:themes": {\n    "theme": "JupyterLab Dark"\n  },\n  "@jupyterlab/terminal-extension:plugin": {\n    "fontFamily": "MesloLGS NF"\n  }\n}' > /usr/local/share/jupyter/lab/settings/overrides.json \
   ## Include custom fonts
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
