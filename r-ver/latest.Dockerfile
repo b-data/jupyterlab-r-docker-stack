@@ -17,7 +17,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
-ARG JUPYTERHUB_VERSION=1.5.0
+ARG JUPYTERHUB_VERSION=2.2.0
 ARG JUPYTERLAB_VERSION=3.3.0
 ARG CODE_SERVER_RELEASE=4.1.0
 ARG GIT_VERSION=2.35.1
@@ -43,7 +43,8 @@ COPY --from=gsi /usr/local /usr/local
 
 USER root
 
-RUN apt-get update \
+RUN dpkgArch="$(dpkg --print-architecture)" \
+  && apt-get update \
   && apt-get -y install --no-install-recommends \
     curl \
     file \
@@ -93,9 +94,9 @@ RUN apt-get update \
   && git config --system pull.rebase false \
   ## Install Git LFS
   && cd /tmp \
-  && curl -sSLO https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-$(dpkg --print-architecture)-v${GIT_LFS_VERSION}.tar.gz \
-  && tar xfz git-lfs-linux-$(dpkg --print-architecture)-v${GIT_LFS_VERSION}.tar.gz --no-same-owner --one-top-level \
-  && cd git-lfs-linux-$(dpkg --print-architecture)-v${GIT_LFS_VERSION} \
+  && curl -sSLO https://github.com/git-lfs/git-lfs/releases/download/v${GIT_LFS_VERSION}/git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz \
+  && tar xfz git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION}.tar.gz --no-same-owner --one-top-level \
+  && cd git-lfs-linux-${dpkgArch}-v${GIT_LFS_VERSION} \
   && sed -i "s/git lfs install/#git lfs install/g" install.sh \
   && echo '\n\
     mkdir -p $prefix/share/man/man1\n\
@@ -117,9 +118,9 @@ RUN apt-get update \
     popd > /dev/null' >> install.sh \
   && ./install.sh \
   ## Install pandoc
-  && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  && dpkg -i pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
-  && rm pandoc-${PANDOC_VERSION}-1-$(dpkg --print-architecture).deb \
+  && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
+  && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
+  && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
   ## Clean up
@@ -127,7 +128,7 @@ RUN apt-get update \
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
   ## Install Tini
-  && curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-$(dpkg --print-architecture) -o /usr/local/bin/tini \
+  && curl -sL https://github.com/krallin/tini/releases/download/v0.19.0/tini-${dpkgArch} -o /usr/local/bin/tini \
   && chmod +x /usr/local/bin/tini
 
 ## Install code-server
@@ -146,7 +147,6 @@ ENV PATH=/opt/code-server/bin:$PATH
 
 ## Install JupyterLab
 RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-dev/extensions \
-  && dpkgArch="$(dpkg --print-architecture)" \
   && curl -sLO https://bootstrap.pypa.io/get-pip.py \
   && python3 get-pip.py \
   && rm get-pip.py \
