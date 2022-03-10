@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.1.2
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.1.3
 
 ARG NCPUS=1
 

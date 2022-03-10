@@ -3,7 +3,7 @@ ARG GIT_VERSION=2.35.1
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
-FROM registry.gitlab.b-data.ch/r/r-ver:4.1.2
+FROM registry.gitlab.b-data.ch/r/r-ver:4.1.3
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -18,7 +18,7 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=2.2.0
-ARG JUPYTERLAB_VERSION=3.3.0
+ARG JUPYTERLAB_VERSION=3.3.1
 ARG CODE_SERVER_RELEASE=4.1.0
 ARG GIT_VERSION=2.35.1
 ARG GIT_LFS_VERSION=3.1.2
