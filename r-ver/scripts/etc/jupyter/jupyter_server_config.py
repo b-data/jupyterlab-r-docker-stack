@@ -9,8 +9,8 @@ import stat
 import shutil
 
 c = get_config()
-c.NotebookApp.ip = '0.0.0.0'
-c.NotebookApp.port = 8888
+c.ServerApp.ip = '0.0.0.0'
+c.ServerApp.port = 8888
 
 # https://github.com/jupyter/notebook/issues/3130
 c.FileContentsManager.delete_to_trash = False
@@ -87,7 +87,7 @@ if "GEN_CERT" in os.environ:
     )
     # Restrict access to the file
     os.chmod(pem_file, stat.S_IRUSR | stat.S_IWUSR)
-    c.NotebookApp.certfile = pem_file
+    c.ServerApp.certfile = pem_file
 
 # Change default umask for all subprocesses of the notebook server if set in
 # the environment

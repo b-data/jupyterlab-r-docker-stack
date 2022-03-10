@@ -1,4 +1,6 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.1
+FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.2
+
+ARG NCPUS=1
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -6,12 +8,13 @@ USER root
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends \
+    gdal-bin \
     libfftw3-dev \
     libgdal-dev \
     libgeos-dev \
     libgsl0-dev \
-    libgl1-mesa-dev \
-    libglu1-mesa-dev \
+    #libgl1-mesa-dev \
+    #libglu1-mesa-dev \
     libhdf4-alt-dev \
     libhdf5-dev \
     libjq-dev \
@@ -28,7 +31,7 @@ RUN apt-get update \
     sqlite3 \
     tk-dev \
     #unixodbc-dev
-  && install2.r --error \
+  && install2.r --error --skipinstalled -n $NCPUS \
     #RColorBrewer \
     RandomFields \
     RNetCDF \
@@ -50,14 +53,43 @@ RUN apt-get update \
     sp \
     spacetime \
     spatstat \
+    spatialreg \
     spdep \
+    stars \
+    terra \
+    tidync \
+    tmap \
     geoR \
     geosphere \
-    ## from bioconductor
-    && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE)" \
-    ## Clean up
-    && rm -rf /tmp/* \
-    && rm -rf /var/lib/apt/lists/*
+  ## from bioconductor
+  && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE, Ncpus = Sys.getenv('NCPUS'))" \
+  ## Clean up
+  && rm -rf /tmp/* \
+  && rm -rf /var/lib/apt/lists/*
+
+## Install wgrib2 for NOAA's NOMADS / rNOMADS forecast files
+#RUN cd /opt \
+#  && wget https://www.ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz \
+#  && tar -xvf wgrib2.tgz \
+#  && rm -rf wgrib2.tgz \
+#  && cd grib2 \
+#  ## arm64: Needs to be compiled with USE_NETCDF4=1, USE_JASPER=0
+#  ## https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/index.html
+#  && if [ $(dpkg --print-architecture) = "arm64" ]; then \
+#    sed -i 's/^USE_NETCDF4=0/USE_NETCDF4=1/' makefile; \
+#    sed -i 's/^USE_NETCDF3=1/USE_NETCDF3=0/' makefile; \
+#    sed -i 's/^USE_JASPER=1/USE_JASPER=0/' makefile; \
+#    NETCDF4_SRC=`sed -n 's/   netcdf4src=\(.*\)/\1/p' makefile`; \
+#    wget ftp://ftp.unidata.ucar.edu/pub/netcdf/$NETCDF4_SRC; \
+#    HDF5_SRC=`sed -n 's/   hdf5src:=\(.*\)/\1/p' makefile`; \
+#    HDF5_MAJ_MIN_PAT=`echo $HDF5_SRC | \
+#      sed -n 's/hdf5-\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*/\1/p'`; \
+#    HDF5_MAJ_MIN=`echo $HDF5_MAJ_MIN_PAT | \
+#      sed -n 's/\([[:digit:]]\+\.[[:digit:]]\+\).*/\1/p'`; \
+#    wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-$HDF5_MAJ_MIN/hdf5-$HDF5_MAJ_MIN_PAT/src/$HDF5_SRC; \
+#  fi \
+#  && CC=gcc FC=gfortran make \
+#  && ln -s /opt/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}

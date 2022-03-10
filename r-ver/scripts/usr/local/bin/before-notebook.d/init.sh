@@ -11,6 +11,7 @@ TZ=${TZ:=Etc/UTC}
 if [ "$(id -u)" == 0 ] ; then
   # Update timezone if needed
   if [ "$TZ" != "Etc/UTC" ]; then
+    echo "Setting TZ to $TZ"
     ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
       && echo $TZ > /etc/timezone
   fi
@@ -27,42 +28,55 @@ if [ "$(id -u)" == 0 ] ; then
   if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
     locale-gen
   fi
-  update-locale --reset LANG=$LANG
+  if [ "$LANG" != "en_US.UTF-8" ]; then
+    echo "Setting LANG to $LANG"
+    update-locale --reset LANG=$LANG
+  fi
 
   # Create R user package library
-  su $NB_USER -c "mkdir -p `Rscript -e \
-    'cat(path.expand(Sys.getenv("R_LIBS_USER")))'`"
+  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
+    /usr/local/lib/R/etc/Renviron)
+  su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
   su $NB_USER -c "mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
+  su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak"
-  su $NB_USER -c "jq -s '.[0] * .[1]' /var/tmp/settings.json \
+  su $NB_USER -c "jq -s '.[0] * .[1]' \
+    /var/tmp/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
-  # Warn if the user wants to change the timezone but hasn't run the container
-  # as root.
+  # Warn if the user wants to change the timezone but hasn't started the
+  # container as root.
   if [ "$TZ" != "Etc/UTC" ]; then
-    echo "Container must be run as root to change timezone"
+    echo "WARNING: Setting TZ to $TZ but /etc/localtime and /etc/timezone remain unchanged!"
   fi
 
-  # Warn if the user wants to change the timezone but hasn't run the container
-  # as root.
-  if [[ "$LANG" != "en_US.UTF-8" || ! -z "$LANGS" ]]; then
-    echo "Container must be run as root to update or add locale"
+  # Warn if the user wants to change the locale but hasn't started the
+  # container as root.
+  if [[ ! -z "$LANGS" ]]; then
+    echo "WARNING: Container must be started as root to add locale(s)!"
+  fi
+  if [[ "$LANG" != "en_US.UTF-8" ]]; then
+    echo "WARNING: Container must be run started root to update locale!"
+    echo "Resetting LANG to en_US.UTF-8"
+    LANG=en_US.UTF-8
   fi
 
   # Create R user package library
-  mkdir -p `Rscript -e 'cat(path.expand(Sys.getenv("R_LIBS_USER")))'`
+  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
+    /usr/local/lib/R/etc/Renviron)
+  /bin/bash -c "mkdir -p $RLU"
 
   # Update code-server settings
   mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak
-  jq -s '.[0] * .[1]' /var/tmp/settings.json \
+  jq -s '.[0] * .[1]' \
+    /var/tmp/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json
 fi

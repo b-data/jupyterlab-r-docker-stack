@@ -1,4 +1,6 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.1.1
+FROM registry.gitlab.b-data.ch/jupyterlab/r/r-ver:4.1.2
+
+ARG NCPUS=1
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -6,29 +8,31 @@ USER root
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
+  cmake \
   #libxml2-dev \
   #libcairo2-dev \
   libfribidi-dev \
   libgit2-dev \
   libharfbuzz-dev \
-  libsqlite3-dev \
-  libmariadbd-dev \
+  libmariadb-dev \
   libpq-dev \
-  libssh2-1-dev \
-  unixodbc-dev \
   libsasl2-dev \
+  libsqlite3-dev \
+  libssh2-1-dev \
   libtiff-dev \
-  && install2.r --error BiocManager \
-  && install2.r --error \
-    --deps TRUE \
-    --skipinstalled \
+  libxtst6 \
+  unixodbc-dev \
+  && install2.r --error --skipinstalled -n $NCPUS BiocManager \
+  && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     tidyverse \
     dplyr \
     devtools \
     formatR \
-    #remotes \
-    selectr \
-    caTools \
+  ## dplyr database backends
+  && Rscript -e "devtools::install_version('duckdb', version = '0.3.1', Ncpus = Sys.getenv('NCPUS'))" \
+  && install2.r --error --skipinstalled -n $NCPUS \
+    arrow \
+    fst \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
