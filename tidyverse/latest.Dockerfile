@@ -29,8 +29,15 @@ RUN apt-get update \
     devtools \
     formatR \
   ## dplyr database backends
-  && Rscript -e "devtools::install_version('duckdb', version = '0.3.1')" \
-  && Rscript -e "devtools::install_version('fstcore', version = '0.9.8')" \
+  && if [ $(dpkg --print-architecture) = "arm64" ]; then \
+    ## https://github.com/duckdb/duckdb/issues/3049
+    cp -a /usr/local/lib/R/etc/Makeconf /usr/local/lib/R/etc/Makeconf.bak; \
+    sed -i 's/fpic/fPIC/g' /usr/local/lib/R/etc/Makeconf; \
+    install2.r --error --skipinstalled -n $NCPUS duckdb; \
+    mv /usr/local/lib/R/etc/Makeconf.bak /usr/local/lib/R/etc/Makeconf; \
+  else \
+    install2.r --error --skipinstalled -n $NCPUS duckdb; \
+  fi \
   && install2.r --error --skipinstalled -n $NCPUS \
     arrow \
     fst \
