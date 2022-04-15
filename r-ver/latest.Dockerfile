@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian:bullseye
-ARG GIT_VERSION=2.35.1
+ARG GIT_VERSION=2.35.3
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
@@ -19,8 +19,8 @@ ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=2.2.2
 ARG JUPYTERLAB_VERSION=3.3.3
-ARG CODE_SERVER_RELEASE=4.2.0
-ARG GIT_VERSION=2.35.1
+ARG CODE_SERVER_RELEASE=4.3.0
+ARG GIT_VERSION=2.35.3
 ARG GIT_LFS_VERSION=3.1.2
 ARG PANDOC_VERSION=2.18
 ARG CODE_WORKDIR
@@ -181,7 +181,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter@2022.2.1010641114 \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python@2022.2.1924087327 \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension christian-kohler.path-intellisense \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension eamodio.gitlens \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
