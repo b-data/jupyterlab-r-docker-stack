@@ -34,8 +34,7 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Create R user package library
-  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
-    /usr/local/lib/R/etc/Renviron)
+  RLU=$(Rscript -e "cat(Sys.getenv('R_LIBS_USER'))")
   su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
@@ -66,7 +65,7 @@ else
   fi
 
   # Create R user package library
-  RLU=$(Rscript -e 'cat(Sys.getenv("R_LIBS_USER"))')
+  RLU=$(Rscript -e "cat(Sys.getenv('R_LIBS_USER'))")
   /bin/bash -c "mkdir -p $RLU"
 
   # Update code-server settings
