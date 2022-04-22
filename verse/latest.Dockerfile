@@ -1,4 +1,4 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.1.2
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.1.3
 
 ARG NCPUS=1
 
@@ -15,7 +15,7 @@ ENV PATH=/opt/TinyTeX/bin/x86_64-linux:$PATH \
 WORKDIR ${HOME}
 
 ## Add LaTeX, rticles and bookdown support
-RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-dev/extensions \
+RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
   && wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && dpkg -i texlive-local.deb \
   && rm texlive-local.deb \
