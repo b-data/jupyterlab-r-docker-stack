@@ -9,7 +9,7 @@
     if [[ $CI_COMMIT_BRANCH == "master" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-latest}
     elif [[ $CI_COMMIT_BRANCH == "freeze-version" ]]; then
-      export CI_APP_TAG=${CI_APP_TAG:-4.1.2}
+      export CI_APP_TAG=${CI_APP_TAG:-4.1.3}
     else
       export CI_APP_TAG=${CI_APP_TAG:-$CI_COMMIT_SHA}
     fi
@@ -35,7 +35,7 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    UPDATE_MODE: "false"
+    UPDATE_MODE: "true"
   before_script:
     - *before-script-build
 
@@ -106,7 +106,7 @@ build:version-linux-amd64:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - verse/4.1.2.Dockerfile
+        - verse/4.1.3.Dockerfile
 
 build:version-linux-arm64v8:
   extends: .build
@@ -129,7 +129,7 @@ build:version-linux-arm64v8:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - verse/4.1.2.Dockerfile
+        - verse/4.1.3.Dockerfile
 
 build-manifest:latest-linux-multiarch:
   extends: .build
@@ -212,7 +212,7 @@ build-manifest:version-linux-multiarch:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true"
       changes:
-        - verse/4.1.2.Dockerfile
+        - verse/4.1.3.Dockerfile
 
 trigger-latest-build:
   extends: .build
@@ -238,4 +238,4 @@ trigger-version-build:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true"
       changes:
-        - verse/4.1.2.Dockerfile
+        - verse/4.1.3.Dockerfile
