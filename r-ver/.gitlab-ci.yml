@@ -18,7 +18,7 @@
     --password-stdin $CI_REGISTRY
   - >
     export VERSION_MAJ_MIN_PAT=`sed -n
-    "s|.*r-ver:\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
+    "s|.*R_VERSION=\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
     r-ver/$CI_APP_TAG.Dockerfile | head -1`
     
     export VERSION_MAJ_MIN=`echo $VERSION_MAJ_MIN_PAT |

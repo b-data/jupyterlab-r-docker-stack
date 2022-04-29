@@ -1,4 +1,6 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:4.2.0
+ARG R_VERSION=4.2.0
+
+FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:${R_VERSION}
 
 ARG NCPUS=1
 

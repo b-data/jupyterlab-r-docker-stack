@@ -18,7 +18,7 @@
     --password-stdin $CI_REGISTRY
   - >
     export VERSION_MAJ_MIN_PAT=`sed -n
-    "s|.*tidyverse:\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
+    "s|.*R_VERSION=\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
     verse/$CI_APP_TAG.Dockerfile | head -1`
     
     export VERSION_MAJ_MIN=`echo $VERSION_MAJ_MIN_PAT |
@@ -35,7 +35,7 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    UPDATE_MODE: "false"
+    UPDATE_MODE: "true"
   before_script:
     - *before-script-build
 
