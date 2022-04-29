@@ -34,7 +34,7 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Create R user package library
-  RLU=$(Rscript -e "cat(Sys.getenv('R_LIBS_USER'))")
+  RLU=$(su $NB_USER -c "Rscript -e \"cat(Sys.getenv('R_LIBS_USER'))\"")
   su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
