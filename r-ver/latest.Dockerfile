@@ -16,11 +16,12 @@ FROM registry.gitlab.b-data.ch/r/r-ver:${R_VERSION} as files
 ARG NB_UID
 ARG NB_GID
 
-RUN mkdir -p /var/tmp/var/tmp/skel
-
 COPY assets /var/tmp
-COPY --chown=${NB_UID}:${NB_GID} conf/user/var/tmp/skel /var/tmp/var/tmp/skel
+COPY conf/user /var/tmp
 COPY scripts /var/tmp
+
+RUN chown -R ${NB_UID}:${NB_GID} /var/tmp/var/tmp/skel \
+  && chown root:root /var/tmp/var/tmp/skel
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
