@@ -43,7 +43,7 @@ if [ "$(id -u)" == 0 ] ; then
   su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "jq -s '.[0] * .[1]' \
-    /var/tmp/skel/.local/share/code-server/User/settings.json \
+    /var/backup/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
@@ -74,7 +74,7 @@ else
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak
   jq -s '.[0] * .[1]' \
-    /var/tmp/skel/.local/share/code-server/User/settings.json \
+    /var/backup/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json
 fi
