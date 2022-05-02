@@ -22,9 +22,13 @@ COPY assets /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN find /files -type d -exec chmod 755 {} \; \
-  && chown -R ${NB_UID}:${NB_GID} /files/var/backup/skel \
-  && chown root:root /files/var/backup/skel
+RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+  && chown root:root /files/var/backups/skel \
+  ## Make sure file modes are correct
+  ## File mode is 777 when using docker user namespaces
+  && find /files -type d -exec chmod 755 {} \; \
+  && find /files -type f -exec chmod 644 {} \; \
+  && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 
@@ -150,8 +154,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   ## Add user
   && useradd -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
-  && mkdir -p /var/backup/skel \
-  && chown ${NB_UID}:${NB_GID} /var/backup/skel \
+  && mkdir -p /var/backups/skel \
+  && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Clean up
   && cd / \
   && rm -rf /tmp/* \
@@ -265,11 +269,11 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> .zshrc \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> .zshrc \
   ## Create backup of home directory
-  && cp -a $HOME/. /var/backup/skel
+  && cp -a $HOME/. /var/backups/skel
 
 ## Copy files as late as possible to avoid cache busting
 COPY --from=files /files /
-COPY --from=files /files/var/backup/skel ${HOME}
+COPY --from=files /files/var/backups/skel ${HOME}
 
 EXPOSE 8888
 
