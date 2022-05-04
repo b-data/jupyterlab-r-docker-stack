@@ -5,7 +5,7 @@ ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG NB_GID=100
 ARG JUPYTERHUB_VERSION=2.2.2
-ARG JUPYTERLAB_VERSION=3.3.4
+ARG JUPYTERLAB_VERSION=3.4.0
 ARG CODE_SERVER_RELEASE=4.3.0
 ARG GIT_VERSION=2.36.0
 ARG GIT_LFS_VERSION=3.1.4
@@ -23,9 +23,8 @@ COPY conf/user /files
 COPY scripts /files
 
 RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
-  && chown root:root /files/var/backups/skel \
-  ## Make sure file modes are correct
-  ## File mode is 777 when using docker user namespaces
+  ## Ensure file modes are correct when using CI
+  ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
