@@ -114,7 +114,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
       python3-distutils; \
     ## make some useful symlinks that are expected to exist
     ## ("/usr/bin/python" and friends)
-	  for src in idle3 pydoc3 python3 python3-config; do \
+	  for src in pydoc3 python3 python3-config; do \
 		  dst="$(echo "$src" | tr -d 3)"; \
 		  [ -s "/usr/bin/$src" ]; \
 		  [ ! -e "/usr/bin/$dst" ]; \
