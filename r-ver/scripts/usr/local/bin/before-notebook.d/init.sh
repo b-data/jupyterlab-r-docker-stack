@@ -59,7 +59,7 @@ else
     echo "WARNING: Container must be started as root to add locale(s)!"
   fi
   if [[ "$LANG" != "en_US.UTF-8" ]]; then
-    echo "WARNING: Container must be run started root to update locale!"
+    echo "WARNING: Container must be started as root to update locale!"
     echo "Resetting LANG to en_US.UTF-8"
     LANG=en_US.UTF-8
   fi
