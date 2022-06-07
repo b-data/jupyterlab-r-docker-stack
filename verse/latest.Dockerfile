@@ -1,4 +1,6 @@
 ARG R_VERSION=4.2.0
+ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
+ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:${R_VERSION}
 
@@ -6,19 +8,20 @@ ARG NCPUS=1
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ARG CTAN_REPO=${CTAN_REPO:-https://mirror.ctan.org/systems/texlive/tlnet}
-ENV CTAN_REPO=${CTAN_REPO}
+ARG CODE_BUILTIN_EXTENSIONS_DIR
+ARG CTAN_REPO
+ARG TARGETARCH
 
 USER root
 
-ENV PATH=/opt/TinyTeX/bin/x86_64-linux:$PATH \
-    HOME=/root
+ENV HOME=/root \
+    CTAN_REPO=${CTAN_REPO} \
+    PATH=/opt/TinyTeX/bin/${TARGETARCH}-linux:$PATH
 
 WORKDIR ${HOME}
 
 ## Add LaTeX, rticles and bookdown support
-RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
-  && wget "https://travis-bin.yihui.name/texlive-local.deb" \
+RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && dpkg -i texlive-local.deb \
   && rm texlive-local.deb \
   && apt-get update \
@@ -63,16 +66,19 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ~/.TinyTeX /opt/TinyTeX \
-  && /opt/TinyTeX/bin/*/tlmgr path add \
+  && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
+    /opt/TinyTeX/bin/${TARGETARCH}-linux \
+  && /opt/TinyTeX/bin/${TARGETARCH}-linux/tlmgr path add \
   && tlmgr update --self \
   && tlmgr install \
     ae \
+    cm-super \
+    context \
+    dvipng \
     listings \
     makeindex \
     parskip \
     pdfcrop \
-  ## context installs on aarch64 but returns non-zero exit code
-  && tlmgr install context || true \
   && tlmgr path add \
   && Rscript -e "tinytex::r_texmf()" \
   && chown -R root:users /opt/TinyTeX \
