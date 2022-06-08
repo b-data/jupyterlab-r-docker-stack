@@ -80,7 +80,7 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     pdfcrop \
   && tlmgr path add \
   && Rscript -e "tinytex::r_texmf()" \
-  && chown -R root:users /opt/TinyTeX \
+  && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
   && echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site \
