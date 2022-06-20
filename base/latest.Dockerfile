@@ -12,7 +12,7 @@ ARG GIT_VERSION=2.36.1
 ARG GIT_LFS_VERSION=3.2.0
 ARG PANDOC_VERSION=2.18
 
-FROM registry.gitlab.b-data.ch/r/r-ver:${R_VERSION} as files
+FROM registry.gitlab.b-data.ch/r/ver:${R_VERSION} as files
 
 ARG NB_UID
 ARG NB_GID
@@ -33,7 +33,7 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
 FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
 FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
-FROM registry.gitlab.b-data.ch/r/r-ver:${R_VERSION}
+FROM registry.gitlab.b-data.ch/r/ver:${R_VERSION}
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
