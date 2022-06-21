@@ -1,4 +1,4 @@
-ARG R_VERSION=4.2.0
+ARG R_VERSION
 
 FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:${R_VERSION}
 

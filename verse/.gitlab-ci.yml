@@ -9,23 +9,16 @@
     if [[ $CI_COMMIT_BRANCH == "master" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-latest}
     elif [[ $CI_COMMIT_BRANCH == "freeze-version" ]]; then
-      export CI_APP_TAG=${CI_APP_TAG:-4.1.3}
+      export CI_APP_TAG=${CI_APP_TAG:-$R_VERSION}
     else
       export CI_APP_TAG=${CI_APP_TAG:-$CI_COMMIT_SHA}
     fi
   - >
     echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER
     --password-stdin $CI_REGISTRY
-  - >
-    export VERSION_MAJ_MIN_PAT=`sed -n
-    "s|.*R_VERSION=\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"
-    verse/$CI_APP_TAG.Dockerfile | head -1`
-    
-    export VERSION_MAJ_MIN=`echo $VERSION_MAJ_MIN_PAT |
-    sed -n "s|\([[:digit:]]\+\.[[:digit:]]\+\).*|\1|p"`
-    
-    export VERSION_MAJ=`echo $VERSION_MAJ_MIN_PAT |
-    sed -n "s|\([[:digit:]]\+\).*|\1|p"`
+  - export VERSION_MAJ_MIN_PAT=$R_VERSION
+  - export VERSION_MAJ_MIN=`echo "${VERSION_MAJ_MIN_PAT:0:3}"`
+  - export VERSION_MAJ=`echo "${VERSION_MAJ_MIN_PAT:0:1}"`
 
 .build:
   image: registry.gitlab.b-data.ch/docker/docker-buildx:latest
@@ -35,7 +28,8 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    UPDATE_MODE: "false"
+    R_VERSION: "4.2.0"
+    UPDATE_MODE: "true"
   before_script:
     - *before-script-build
 
@@ -46,10 +40,12 @@ build:latest-linux-amd64:
     - os:linux
   script:
     - >
-      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      docker build --pull
+      --build-arg R_VERSION
+      --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
-      -f verse/$CI_APP_TAG.Dockerfile .
+      -f verse/latest.Dockerfile .
     - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 \
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-amd64 -<<EOF
@@ -69,10 +65,12 @@ build:latest-linux-arm64v8:
     - os:linux
   script:
     - >
-      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      docker build --pull
+      --build-arg R_VERSION
+      --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
-      -f verse/$CI_APP_TAG.Dockerfile .
+      -f verse/latest.Dockerfile .
     - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 \
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-arm64v8 -<<EOF
@@ -92,21 +90,21 @@ build:version-linux-amd64:
     - os:linux
   script:
     - >
-      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      docker build --pull
+      --build-arg R_VERSION
+      --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
-      -f verse/$CI_APP_TAG.Dockerfile .
+      -f verse/$R_VERSION.Dockerfile .
     - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 -<<EOF
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       USER root
       EOF
-    - |
-      docker push $CI_APP_REPO:$CI_APP_TAG-linux-amd64
-      docker push $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64
+    - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - verse/4.1.3.Dockerfile
+        - verse/$R_VERSION.Dockerfile
 
 build:version-linux-arm64v8:
   extends: .build
@@ -115,21 +113,21 @@ build:version-linux-arm64v8:
     - os:linux
   script:
     - >
-      docker build --pull --build-arg NCPUS=$((`nproc`/2+1))
+      docker build --pull
+      --build-arg R_VERSION
+      --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-      -f verse/$CI_APP_TAG.Dockerfile .
+      -f verse/$R_VERSION.Dockerfile .
     - |
       docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 -<<EOF
       FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       USER root
       EOF
-    - |
-      docker push $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-      docker push $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
+    - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - verse/4.1.3.Dockerfile
+        - verse/$R_VERSION.Dockerfile
 
 build-manifest:latest-linux-multiarch:
   extends: .build
@@ -210,9 +208,9 @@ build-manifest:version-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true"
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
-        - verse/4.1.3.Dockerfile
+        - verse/$R_VERSION.Dockerfile
 
 trigger-latest-build:
   extends: .build
@@ -236,6 +234,6 @@ trigger-version-build:
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_GEOSPATIAL -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/169/trigger/pipeline
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $UPDATE_MODE != "true"
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
-        - verse/4.1.3.Dockerfile
+        - verse/$R_VERSION.Dockerfile

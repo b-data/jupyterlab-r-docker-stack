@@ -1,4 +1,4 @@
-ARG R_VERSION=4.2.0
+ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
