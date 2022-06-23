@@ -33,7 +33,7 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    R_VERSION: "4.2.0"
+    R_VERSION: "4.2.1"
     UPDATE_MODE: "false"
   before_script:
     - *before-script-build
