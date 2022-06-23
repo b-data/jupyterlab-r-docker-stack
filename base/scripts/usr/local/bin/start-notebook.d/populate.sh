@@ -5,5 +5,5 @@
 set -e
 
 if [ "$(ls -A "/home/jovyan" 2> /dev/null)" == "" ]; then
-    cp -a /var/tmp/skel/. /home/jovyan
+    cp -a /var/backups/skel/. /home/jovyan
 fi

@@ -1,4 +1,6 @@
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:4.1.3
+ARG R_VERSION
+
+FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:${R_VERSION}
 
 ARG NCPUS=1
 
@@ -33,7 +35,6 @@ RUN apt-get update \
     #unixodbc-dev
   && install2.r --error --skipinstalled -n $NCPUS \
     #RColorBrewer \
-    RandomFields \
     RNetCDF \
     classInt \
     deldir \
@@ -59,8 +60,11 @@ RUN apt-get update \
     terra \
     tidync \
     tmap \
-    geoR \
     geosphere \
+  ## Archived on 2022-05-04 as check problems were not corrected in time.
+  && Rscript -e "devtools::install_version('RandomFields', version = '3.3.14')" \
+  ## Archived on 2022-05-04 as requires archived package 'RandomFields'.
+  && Rscript -e "devtools::install_version('geoR', version = '1.8-1')" \
   ## from bioconductor
   && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE, Ncpus = Sys.getenv('NCPUS'))" \
   ## Clean up

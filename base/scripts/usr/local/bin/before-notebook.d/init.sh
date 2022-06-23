@@ -34,8 +34,7 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Create R user package library
-  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
-    /usr/local/lib/R/etc/Renviron)
+  RLU=$(su $NB_USER -c "Rscript -e \"cat(Sys.getenv('R_LIBS_USER'))\"")
   su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
@@ -44,7 +43,7 @@ if [ "$(id -u)" == 0 ] ; then
   su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "jq -s '.[0] * .[1]' \
-    /var/tmp/skel/.local/share/code-server/User/settings.json \
+    /var/backups/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json"
 else
@@ -60,14 +59,13 @@ else
     echo "WARNING: Container must be started as root to add locale(s)!"
   fi
   if [[ "$LANG" != "en_US.UTF-8" ]]; then
-    echo "WARNING: Container must be run started root to update locale!"
+    echo "WARNING: Container must be started as root to update locale!"
     echo "Resetting LANG to en_US.UTF-8"
     LANG=en_US.UTF-8
   fi
 
   # Create R user package library
-  RLU=$(sed -n "s|^R_LIBS_USER=\${R_LIBS_USER-'\(.*\)'}|\1|p" \
-    /usr/local/lib/R/etc/Renviron)
+  RLU=$(Rscript -e "cat(Sys.getenv('R_LIBS_USER'))")
   /bin/bash -c "mkdir -p $RLU"
 
   # Update code-server settings
@@ -76,7 +74,7 @@ else
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
     .local/share/code-server/User/settings.json.bak
   jq -s '.[0] * .[1]' \
-    /var/tmp/skel/.local/share/code-server/User/settings.json \
+    /var/backups/skel/.local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak > \
     .local/share/code-server/User/settings.json
 fi
