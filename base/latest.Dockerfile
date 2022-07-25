@@ -239,10 +239,14 @@ RUN apt-get update \
     languageserver \
     httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
-  ## Disable help panel and revert to old behaviour
-  && echo 'options(vsc.helpPanel = FALSE)' >> /usr/local/lib/R/etc/Rprofile.site \
+  ## IRkernel: Enable 'image/svg+xml' instead of 'image/png' for plot display
+  ## IRkernel: Enable 'application/pdf' for PDF conversion
+  && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
+    >> /usr/local/lib/R/etc/Rprofile.site \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.4.0 \
+  ## Ikuyadeu.r: Disable help panel and revert to old behaviour
+  && echo "options(vsc.helpPanel = FALSE)" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \
