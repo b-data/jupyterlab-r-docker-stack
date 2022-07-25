@@ -92,7 +92,6 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     gnupg \
     htop \
     info \
-    inkscape \
     jq \
     libclang-dev \
     man-db \
