@@ -1,5 +1,6 @@
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
+ARG QUARTO_VERSION=1.0.37
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM registry.gitlab.b-data.ch/jupyterlab/r/tidyverse:${R_VERSION}
@@ -9,6 +10,7 @@ ARG NCPUS=1
 ARG DEBIAN_FRONTEND=noninteractive
 
 ARG CODE_BUILTIN_EXTENSIONS_DIR
+ARG QUARTO_VERSION
 ARG CTAN_REPO
 
 USER root
@@ -20,7 +22,8 @@ ENV HOME=/root \
 WORKDIR ${HOME}
 
 ## Add LaTeX, rticles and bookdown support
-RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
+RUN dpkgArch="$(dpkg --print-architecture)" \
+  && wget "https://travis-bin.yihui.name/texlive-local.deb" \
   && dpkg -i texlive-local.deb \
   && rm texlive-local.deb \
   && apt-get update \
@@ -61,6 +64,16 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
   ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
 	&& apt-get -y autoremove \
   && rm -rf /var/lib/apt/lists/* \
+  && if [ ${dpkgArch} = "amd64" ]; then \
+    ## Install quarto
+    curl -sLO https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${dpkgArch}.deb; \
+    dpkg -i quarto-${QUARTO_VERSION}-linux-${dpkgArch}.deb; \
+    rm quarto-${QUARTO_VERSION}-linux-${dpkgArch}.deb; \
+    ## Remove qurto pandoc
+    rm /opt/quarto/bin/tools/pandoc; \
+    ## Link to system pandoc
+    ln -s /usr/bin/pandoc /opt/quarto/bin/tools/pandoc; \
+  fi \
   ## Admin-based install of TinyTeX:
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
@@ -102,6 +115,9 @@ RUN wget "https://travis-bin.yihui.name/texlive-local.deb" \
     rJava \
     xaringan \
   ## Install code-server extensions
+  && if [ ${dpkgArch} = "amd64" ]; then \
+    code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto; \
+  fi \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Clean up
   && rm -rf /tmp/* \
