@@ -1,7 +1,6 @@
 {
   "editor.tabSize": 2,
-  "telemetry.enableTelemetry": false,
-  "gitlens.advanced.telemetry.enabled": false,
+  "telemetry.telemetryLevel": "off",
   "r.bracketedPaste": true,
   "r.plot.useHttpgd": true,
   "r.rterm.linux": "/usr/local/bin/radian",
