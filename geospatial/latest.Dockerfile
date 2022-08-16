@@ -1,6 +1,7 @@
+ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/jupyterlab/r/verse
 ARG R_VERSION
 
-FROM registry.gitlab.b-data.ch/jupyterlab/r/verse:${R_VERSION}
+FROM ${BUILD_ON_IMAGE}:${R_VERSION}
 
 ARG NCPUS=1
 
