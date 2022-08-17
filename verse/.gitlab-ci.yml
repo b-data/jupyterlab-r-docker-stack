@@ -6,7 +6,7 @@
     fi
   - |
     export CI_APP_REPO=${CI_APP_REPO:-$CI_REGISTRY_IMAGE}
-    if [[ $CI_COMMIT_BRANCH == "master" ]]; then
+    if [[ $CI_COMMIT_BRANCH == "main" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-latest}
     elif [[ $CI_COMMIT_BRANCH == "freeze-version" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-$R_VERSION}
@@ -59,7 +59,7 @@ build:latest-linux-amd64:
       EOF
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
         - verse/latest.Dockerfile
 
@@ -84,7 +84,7 @@ build:latest-linux-arm64v8:
       EOF
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
         - verse/latest.Dockerfile
 
@@ -186,7 +186,7 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:$VERSION_MAJ
       docker manifest push $CI_APP_REPO:$VERSION_MAJ-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true"
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
         - verse/latest.Dockerfile
 
@@ -222,9 +222,9 @@ trigger-latest-build:
     - apk upgrade --no-cache
     - apk add --update --no-cache curl
   script:
-    - curl -X POST -F token=$JUPYTERLAB_R_GEOSPATIAL -F ref=master https://gitlab.b-data.ch/api/v4/projects/169/trigger/pipeline
+    - curl -X POST -F token=$JUPYTERLAB_R_GEOSPATIAL -F ref=main https://gitlab.b-data.ch/api/v4/projects/169/trigger/pipeline
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true"
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
         - verse/latest.Dockerfile
 
