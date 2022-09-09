@@ -101,26 +101,41 @@ For `<major>.<minor>.<patch>` ≥ `4.2.0`.
 self built:
 
 ```bash
-docker run --rm -ti jupyterlab-r-base[:<major>.<minor>.<patch>]
+docker run -it --rm \
+  -p 8888:8888 \
+  -v $PWD:/home/jovyan \
+  jupyterlab-r-base[:<major>.<minor>.<patch>]
 ```
 
 from the project's GitLab Container Registries:
 
 *  [jupyterlab/r/base](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)  
     ```bash
-    docker run -it --rm -p 8888:8888 -v $PWD:/home/jovyan registry.gitlab.b-data.ch/jupyterlab/r/base[:<major>[.<minor>[.<patch>]]]
+    docker run -it --rm \
+      -p 8888:8888 \
+      -v $PWD:/home/jovyan \
+      registry.gitlab.b-data.ch/jupyterlab/r/base[:<major>[.<minor>[.<patch>]]]
     ```
 *  [jupyterlab/r/tidyverse](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
     ```bash
-    docker run -it --rm -p 8888:8888 -v $PWD:/home/jovyan registry.gitlab.b-data.ch/jupyterlab/r/tidyverse[:<major>[.<minor>[.<patch>]]]
+    docker run -it --rm \
+      -p 8888:8888 \
+      -v $PWD:/home/jovyan \
+      registry.gitlab.b-data.ch/jupyterlab/r/tidyverse[:<major>[.<minor>[.<patch>]]]
     ```
 *  [jupyterlab/r/verse](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
     ```bash
-    docker run -it --rm -p 8888:8888 -v $PWD:/home/jovyan registry.gitlab.b-data.ch/jupyterlab/r/verse[:<major>[.<minor>[.<patch>]]]
+    docker run -it --rm \
+      -p 8888:8888 \
+      -v $PWD:/home/jovyan \
+      registry.gitlab.b-data.ch/jupyterlab/r/verse[:<major>[.<minor>[.<patch>]]]
     ```
 *  [jupyterlab/r/geospatial](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
     ```bash
-    docker run -it --rm -p 8888:8888 -v $PWD:/home/jovyan registry.gitlab.b-data.ch/jupyterlab/r/geospatial[:<major>[.<minor>[.<patch>]]]
+    docker run -it --rm \
+      -p 8888:8888 \
+      -v $PWD:/home/jovyan \
+      registry.gitlab.b-data.ch/jupyterlab/r/geospatial[:<major>[.<minor>[.<patch>]]]
     ```
 
 The use of the `-v` flag in the command mounts the current working directory on
