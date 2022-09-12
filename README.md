@@ -5,6 +5,7 @@
 Pre-built multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
 *  `registry.gitlab.b-data.ch/jupyterlab/r/base`
+    *  `registry.gitlab.b-data.ch/jupyterlab/r/r-ver` (4.0.4 ≤ version < 4.2.0)
 *  `registry.gitlab.b-data.ch/jupyterlab/r/tidyverse`
 *  `registry.gitlab.b-data.ch/jupyterlab/r/verse`
 *  `registry.gitlab.b-data.ch/jupyterlab/r/geospatial`
