@@ -2,17 +2,19 @@
 
 # JupyterLab R docker stack
 
-Pre-built multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
+Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
-*  `registry.gitlab.b-data.ch/jupyterlab/r/base`
-    *  `registry.gitlab.b-data.ch/jupyterlab/r/r-ver` (4.0.4 ≤ version < 4.2.0)
-*  `registry.gitlab.b-data.ch/jupyterlab/r/tidyverse`
-*  `registry.gitlab.b-data.ch/jupyterlab/r/verse`
-*  `registry.gitlab.b-data.ch/jupyterlab/r/geospatial`
+*  [`registry.gitlab.b-data.ch/jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)  
+    *  [`registry.gitlab.b-data.ch/jupyterlab/r/r-ver`](https://gitlab.b-data.ch/jupyterlab/r/r-ver/container_registry)   (4.0.4 ≤ version < 4.2.0)
+*  [`registry.gitlab.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
+*  [`registry.gitlab.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
+*  [`registry.gitlab.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
 
 Images considered stable for R versions ≥ 4.2.0.  
 :point_right: The current state may eventually be backported to versions ≥
 4.0.4.
+
+:microscope: Check out `jupyterlab/r/verse` at https://demo.jupyter.b-data.ch.
 
 **Features**
 
@@ -22,11 +24,11 @@ Images considered stable for R versions ≥ 4.2.0.
        branding/telemetry/licensing.
     *  **Git**: A distributed version-control system for tracking changes in
        source code.
+    *  **Git LFS**: A Git extension for versioning large files.
     *  **Pandoc**: A universal markup converter.
     *  **Python**: An interpreted, object-oriented, high-level programming
        language with dynamic semantics.
-    *  **Quarto**: An open-source scientific and technical publishing system
-       built on Pandoc.  
+    *  **Quarto**: A scientific and technical publishing system built on Pandoc.  
        :information_source: verse image, amd64 only
     *  **R**: A language and environment for statistical computing and
        graphics.
@@ -110,28 +112,28 @@ docker run -it --rm \
 
 from the project's GitLab Container Registries:
 
-*  [jupyterlab/r/base](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)  
+*  [`jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
       registry.gitlab.b-data.ch/jupyterlab/r/base[:<major>[.<minor>[.<patch>]]]
     ```
-*  [jupyterlab/r/tidyverse](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
+*  [`jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
       registry.gitlab.b-data.ch/jupyterlab/r/tidyverse[:<major>[.<minor>[.<patch>]]]
     ```
-*  [jupyterlab/r/verse](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
+*  [`jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
       registry.gitlab.b-data.ch/jupyterlab/r/verse[:<major>[.<minor>[.<patch>]]]
     ```
-*  [jupyterlab/r/geospatial](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
+*  [`jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
