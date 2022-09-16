@@ -240,8 +240,9 @@ RUN apt-get update \
   && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
     >> /usr/local/lib/R/etc/Rprofile.site \
   ## Install code-server extension
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r \
-  ## Ikuyadeu.r: Disable help panel and revert to old behaviour
+  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-2.5.3.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-2.5.3.vsix \
+  ## REditorSupport.r: Disable help panel and revert to old behaviour
   && echo "options(vsc.helpPanel = FALSE)" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Clean up
   && rm -rf /tmp/* \
