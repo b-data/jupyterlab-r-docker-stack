@@ -54,7 +54,7 @@ RUN apt-get update \
     geosphere \
     ## from bioconductor
     ## ‘rhdf5’ and ‘rhdf5filters’ have non-zero exit status on aarch64
-    && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE)" \
+    && R -e "BiocManager::install('rhdf5', update = FALSE, ask = FALSE)" \
     ## Clean up
     && rm -rf /tmp/* \
     && rm -rf /var/lib/apt/lists/*

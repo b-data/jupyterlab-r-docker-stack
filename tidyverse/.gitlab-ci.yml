@@ -6,7 +6,7 @@
     fi
   - |
     export CI_APP_REPO=${CI_APP_REPO:-$CI_REGISTRY_IMAGE}
-    if [[ $CI_COMMIT_BRANCH == "master" ]]; then
+    if [[ $CI_COMMIT_BRANCH == "main" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-latest}
     elif [[ $CI_COMMIT_BRANCH == "freeze-version" ]]; then
       export CI_APP_TAG=${CI_APP_TAG:-$R_VERSION}
@@ -33,7 +33,7 @@
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: "/certs"
-    R_VERSION: "4.2.0"
+    R_VERSION: "4.2.1"
     UPDATE_MODE: "false"
   before_script:
     - *before-script-build
@@ -59,7 +59,7 @@ build:latest-linux-amd64:
       EOF
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
         - tidyverse/latest.Dockerfile
 
@@ -84,7 +84,7 @@ build:latest-linux-arm64v8:
       EOF
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
         - tidyverse/latest.Dockerfile
 
@@ -96,7 +96,6 @@ build:version-linux-amd64:
   script:
     - >
       docker build --pull
-      --build-arg R_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f tidyverse/$R_VERSION.Dockerfile .
@@ -119,7 +118,6 @@ build:version-linux-arm64v8:
   script:
     - >
       docker build --pull
-      --build-arg R_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f tidyverse/$R_VERSION.Dockerfile .
@@ -188,7 +186,7 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:$VERSION_MAJ
       docker manifest push $CI_APP_REPO:$VERSION_MAJ-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true"
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
         - tidyverse/latest.Dockerfile
 
@@ -224,9 +222,9 @@ trigger-latest-build:
     - apk upgrade --no-cache
     - apk add --update --no-cache curl
   script:
-    - curl -X POST -F token=$JUPYTERLAB_R_VERSE -F ref=master https://gitlab.b-data.ch/api/v4/projects/168/trigger/pipeline
+    - curl -X POST -F token=$JUPYTERLAB_R_VERSE -F ref=main https://gitlab.b-data.ch/api/v4/projects/168/trigger/pipeline
   rules:
-    - if: $CI_COMMIT_BRANCH == "master" && $UPDATE_MODE != "true"
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
         - tidyverse/latest.Dockerfile
 

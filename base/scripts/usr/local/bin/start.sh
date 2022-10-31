@@ -101,7 +101,7 @@ if [ "$(id -u)" == 0 ] ; then
         fi
         # Recreate the desired user as we want it
         userdel "${NB_USER}"
-        useradd --home "/home/${NB_USER}" --uid "${NB_UID}" --gid "${NB_GID}" --groups 100 --no-log-init "${NB_USER}"
+        useradd --home "/home/${NB_USER}" --shell /bin/bash --uid "${NB_UID}" --gid "${NB_GID}" --groups 100 --no-log-init "${NB_USER}"
     fi
 
     # Move or symlink the jovyan home directory to the desired users home
@@ -126,7 +126,7 @@ if [ "$(id -u)" == 0 ] ; then
         # The home directory could be bind mounted. Populate it if it is empty
         elif [[ "$(ls -A "/home/${NB_USER}" 2> /dev/null)" == "" ]]; then
             _log "Populating home dir /home/${NB_USER}..."
-            if cp -a /home/jovyan/. "/home/${NB_USER}/"; then
+            if su $NB_USER -c "cp -a /home/jovyan/. /home/${NB_USER}/"; then
                 _log "Success!"
             else
                 _log "Failed to copy data from /home/jovyan to /home/${NB_USER}!"

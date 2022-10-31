@@ -54,7 +54,7 @@ RUN apt-get update \
     geoR \
     geosphere \
     ## from bioconductor
-    && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE)" \
+    && R -e "BiocManager::install('rhdf5', update = FALSE, ask = FALSE)" \
     ## Clean up
     && rm -rf /tmp/* \
     && rm -rf /var/lib/apt/lists/*

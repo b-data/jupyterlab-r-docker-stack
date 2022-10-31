@@ -66,7 +66,7 @@ RUN apt-get update \
   ## Archived on 2022-05-04 as requires archived package 'RandomFields'.
   && Rscript -e "devtools::install_version('geoR', version = '1.8-1')" \
   ## from bioconductor
-  && R -e "BiocManager::install('rhdf5', update=FALSE, ask=FALSE, Ncpus = Sys.getenv('NCPUS'))" \
+  && R -e "BiocManager::install('rhdf5', update = FALSE, ask = FALSE)" \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
