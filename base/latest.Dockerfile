@@ -239,8 +239,7 @@ RUN apt-get update \
   && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
     >> /usr/local/lib/R/etc/Rprofile.site \
   ## Install code-server extension
-  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-2.6.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-2.6.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
   && echo "options(vsc.helpPanel = FALSE)" >> /usr/local/lib/R/etc/Rprofile.site \
   ## Clean up
