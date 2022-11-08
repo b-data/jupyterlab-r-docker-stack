@@ -12,12 +12,12 @@ USER root
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
     cmake \
+    default-libmysqlclient-dev \
     #libxml2-dev \
     #libcairo2-dev \
     libfribidi-dev \
     libgit2-dev \
     libharfbuzz-dev \
-    libmariadb-dev \
     libpq-dev \
     libsasl2-dev \
     libsqlite3-dev \
