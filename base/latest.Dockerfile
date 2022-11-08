@@ -1,4 +1,5 @@
-ARG BASE_IMAGE=debian:bullseye
+ARG BASE_IMAGE=debian
+ARG BASE_IMAGE_TAG=bullseye
 ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/r/ver
 ARG R_VERSION
 
@@ -7,7 +8,7 @@ ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=2.3.1
 ARG JUPYTERLAB_VERSION=3.5.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.8.2
+ARG CODE_SERVER_VERSION=4.8.3
 ARG GIT_VERSION=2.38.1
 ARG GIT_LFS_VERSION=3.2.0
 ARG PANDOC_VERSION=2.19.2
@@ -30,7 +31,7 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
-FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
+FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
 FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
