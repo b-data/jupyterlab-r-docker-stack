@@ -37,6 +37,10 @@
   before_script:
     - *before-script-build
 
+.post:
+  image: registry.gitlab.b-data.ch/docker/docker-buildx:latest
+  stage: .post
+
 build:latest-linux-amd64:
   extends: .build
   tags:
@@ -50,12 +54,12 @@ build:latest-linux-amd64:
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
       -f latest.Dockerfile .
-    - |
-      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 \
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-amd64 -<<EOF
-      FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
-      USER root
-      EOF
+    - >
+      docker build
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64
+      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-amd64
+      -f ../common/subtags/root.Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
@@ -75,12 +79,12 @@ build:latest-linux-arm64v8:
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
       -f latest.Dockerfile .
-    - |
-      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 \
-      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-arm64v8 -<<EOF
-      FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-      USER root
-      EOF
+    - >
+      docker build
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
+      -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-arm64v8
+      -f ../common/subtags/root.Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
@@ -98,11 +102,11 @@ build:version-linux-amd64:
       --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
       -f $R_VERSION.Dockerfile .
-    - |
-      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64 -<<EOF
-      FROM $CI_APP_REPO:$CI_APP_TAG-linux-amd64
-      USER root
-      EOF
+    - >
+      docker build
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64
+      -f ../common/subtags/root.Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
@@ -120,11 +124,11 @@ build:version-linux-arm64v8:
       --build-arg NCPUS=$((`nproc`/2+1))
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
       -f $R_VERSION.Dockerfile .
-    - |
-      docker build -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8 -<<EOF
-      FROM $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-      USER root
-      EOF
+    - >
+      docker build
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
+      -f ../common/subtags/root.Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
@@ -134,6 +138,7 @@ build:version-linux-arm64v8:
 build-manifest:latest-linux-multiarch:
   extends: .build
   stage: deploy
+  needs: ["build:latest-linux-amd64", "build:latest-linux-arm64v8"]
   script:
     - |
       for i in $OS_ARCH; do
@@ -192,6 +197,7 @@ build-manifest:latest-linux-multiarch:
 build-manifest:version-linux-multiarch:
   extends: .build
   stage: deploy
+  needs: ["build:version-linux-amd64", "build:version-linux-arm64v8"]
   script:
     - |
       for i in $OS_ARCH; do
@@ -215,8 +221,9 @@ build-manifest:version-linux-multiarch:
         - base/$R_VERSION.Dockerfile
 
 trigger-latest-build:
-  extends: .build
+  extends: .post
   stage: .post
+  needs: ["build-manifest:latest-linux-multiarch"]
   before_script:
     - apk upgrade --no-cache
     - apk add --update --no-cache curl
@@ -228,8 +235,9 @@ trigger-latest-build:
         - base/latest.Dockerfile
 
 trigger-version-build:
-  extends: .build
+  extends: .post
   stage: .post
+  needs: ["build-manifest:version-linux-multiarch"]
   before_script:
     - apk upgrade --no-cache
     - apk add --update --no-cache curl
