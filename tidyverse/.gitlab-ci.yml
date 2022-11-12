@@ -27,7 +27,6 @@
 
 .build:
   image: registry.gitlab.b-data.ch/docker/docker-buildx:latest
-  stage: build
   services:
     - docker:dind
   variables:
@@ -264,7 +263,6 @@ trigger-version-build:
 build:latest-devtools-linux-amd64:
   extends: .build
   stage: build2
-  needs: ["build-manifest:latest-linux-multiarch"]
   tags:
     - arch:amd64
     - os:linux
@@ -295,7 +293,6 @@ build:latest-devtools-linux-amd64:
 build:latest-devtools-linux-arm64v8:
   extends: .build
   stage: build2
-  needs: ["build-manifest:latest-linux-multiarch"]
   tags:
     - arch:arm64/v8
     - os:linux
@@ -326,7 +323,6 @@ build:latest-devtools-linux-arm64v8:
 build:version-devtools-linux-amd64:
   extends: .build
   stage: build2
-  needs: ["build-manifest:version-linux-multiarch"]
   tags:
     - arch:amd64
     - os:linux
@@ -352,7 +348,6 @@ build:version-devtools-linux-amd64:
 build:version-devtools-linux-arm64v8:
   extends: .build
   stage: build2
-  needs: ["build-manifest:version-linux-multiarch"]
   tags:
     - arch:arm64/v8
     - os:linux
