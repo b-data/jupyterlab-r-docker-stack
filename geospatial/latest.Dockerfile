@@ -7,6 +7,10 @@ ARG NCPUS=1
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG BUILD_ON_IMAGE
+
+ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}
+
 USER root
 
 RUN apt-get update \

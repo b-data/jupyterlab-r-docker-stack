@@ -64,7 +64,7 @@ build:latest-linux-amd64:
       -f latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-amd64
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-amd64
       -t $CI_APP_REPO:$CI_APP_TAG-root-linux-amd64
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-amd64
       -f ../common/subtags/root/Dockerfile .
@@ -90,7 +90,7 @@ build:latest-linux-arm64v8:
       -f latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-linux-arm64v8
       -t $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-root-linux-arm64v8
       -f ../common/subtags/root/Dockerfile .
@@ -275,7 +275,7 @@ build:latest-devtools-linux-amd64:
       -f common/subtags/devtools/latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-devtools-linux-amd64
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-amd64
       -t $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-amd64
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root-linux-amd64
       -f common/subtags/root/Dockerfile .
@@ -287,6 +287,7 @@ build:latest-devtools-linux-amd64:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
+        - base/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build:latest-devtools-linux-arm64v8:
@@ -305,7 +306,7 @@ build:latest-devtools-linux-arm64v8:
       -f common/subtags/devtools/latest.Dockerfile .
     - >
       docker build
-      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
+      --build-arg BUILD_ON_IMAGE=$CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-linux-arm64v8
       -t $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
       -t $CI_APP_REPO:$VERSION_MAJ_MIN_PAT-devtools-root-linux-arm64v8
       -f common/subtags/root/Dockerfile .
@@ -317,6 +318,7 @@ build:latest-devtools-linux-arm64v8:
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
+        - base/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build:version-devtools-linux-amd64:
@@ -342,6 +344,7 @@ build:version-devtools-linux-amd64:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
+        - base/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
 
 build:version-devtools-linux-arm64v8:
@@ -367,6 +370,7 @@ build:version-devtools-linux-arm64v8:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
+        - base/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
 
 build-manifest:latest-devtools-linux-multiarch:
@@ -426,6 +430,7 @@ build-manifest:latest-devtools-linux-multiarch:
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
+        - base/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build-manifest:version-devtools-linux-multiarch:
@@ -452,4 +457,5 @@ build-manifest:version-devtools-linux-multiarch:
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
+        - base/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
