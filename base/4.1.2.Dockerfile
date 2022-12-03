@@ -186,7 +186,8 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mhutchie.git-graph \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.4.0 \
+  && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-2.4.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-2.4.0.vsix \
   ## Create tmp folder for Jupyter extension
   && cd /opt/code-server/vendor/modules/code-oss-dev/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 tmp \
@@ -194,7 +195,7 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   && mkdir -p /usr/local/bin/start-notebook.d \
   && mkdir -p /usr/local/bin/before-notebook.d \
   ## Disable help panel and revert to old behaviour
-  && echo 'options(vsc.helpPanel = FALSE)' >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo 'options(vsc.helpPanel = FALSE)' >> $(R RHOME)/etc/Rprofile.site \
   ## Clean up
   && rm -rf /tmp/* \
   && apt-get autoremove -y \

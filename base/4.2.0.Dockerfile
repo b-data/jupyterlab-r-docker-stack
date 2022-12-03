@@ -237,9 +237,10 @@ RUN apt-get update \
     httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
   ## Disable help panel and revert to old behaviour
-  && echo 'options(vsc.helpPanel = FALSE)' >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo 'options(vsc.helpPanel = FALSE)' >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r@2.4.0 \
+  && curl -sLO https://dl.b-data.ch/vsix/Ikuyadeu.r-2.4.0.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension Ikuyadeu.r-2.4.0.vsix \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \

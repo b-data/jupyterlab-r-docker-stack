@@ -31,10 +31,10 @@ RUN apt-get update \
   ## dplyr database backends
   && if [ $(dpkg --print-architecture) = "arm64" ]; then \
     ## https://github.com/duckdb/duckdb/issues/3049
-    cp -a /usr/local/lib/R/etc/Makeconf /usr/local/lib/R/etc/Makeconf.bak; \
-    sed -i 's/fpic/fPIC/g' /usr/local/lib/R/etc/Makeconf; \
+    cp -a $(R RHOME)/etc/Makeconf $(R RHOME)/etc/Makeconf.bak; \
+    sed -i 's/fpic/fPIC/g' $(R RHOME)/etc/Makeconf; \
     install2.r --error --skipinstalled -n $NCPUS duckdb; \
-    mv /usr/local/lib/R/etc/Makeconf.bak /usr/local/lib/R/etc/Makeconf; \
+    mv $(R RHOME)/etc/Makeconf.bak $(R RHOME)/etc/Makeconf; \
   else \
     install2.r --error --skipinstalled -n $NCPUS duckdb; \
   fi \
