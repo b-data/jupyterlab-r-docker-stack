@@ -76,6 +76,9 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
 ## https://ropensci.org/blog/2020/11/12/installing-v8
 ENV DOWNLOAD_STATIC_LIBV8=1
 
+## Disable prompt to install miniconda
+ENV RETICULATE_MINICONDA_ENABLED=0
+
 ## Install Git
 COPY --from=gsi /usr/local /usr/local
 ## Install Git LFS
