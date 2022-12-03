@@ -28,6 +28,12 @@ COPY conf/user /files
 COPY scripts /files
 
 RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+  ## Use standard R terminal for CUDA images
+  ## radian forces usage of /usr/bin/python
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    sed -i 's|/usr/local/bin/radian|/usr/local/bin/R|g' \
+      /files/var/backups/skel/.local/share/code-server/User/settings.json; \
+  fi \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
@@ -239,6 +245,16 @@ RUN apt-get update \
     libxml2-dev \
   ## Install radian
   && pip install radian \
+  ## Provide NVBLAS-enabled radian
+  ## Enabled at runtime and only if nvidia-smi and at least one GPU are present
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    nvblasLib="$(cd $CUDA_HOME/lib* && ls libnvblas.so* | head -n 1)"; \
+    cp -a $(which radian) $(which radian)_; \
+    echo '#!/bin/bash' > $(which radian); \
+    echo "command -v nvidia-smi >/dev/null && nvidia-smi -L | grep 'GPU[[:space:]]\?[[:digit:]]\+' >/dev/null && export LD_PRELOAD=$nvblasLib" \
+      >> $(which radian); \
+    echo "$(which radian)_ \"\${@}\"" >> $(which radian); \
+  fi \
   ## Install the R kernel for JupyterLab
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
