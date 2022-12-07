@@ -320,7 +320,7 @@ build:version-devtools-linux-amd64:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-linux-amd64
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-amd64
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
         - geospatial/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
@@ -346,7 +346,7 @@ build:version-devtools-linux-arm64v8:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
         - geospatial/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
@@ -433,7 +433,7 @@ build-manifest:version-devtools-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
         - geospatial/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
