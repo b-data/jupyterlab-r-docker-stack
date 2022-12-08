@@ -277,7 +277,7 @@ trigger-latest-cuda-build:
     - apk upgrade --no-cache
     - apk add --update --no-cache curl
   script:
-    - curl -X POST -F token=$JUPYTERLA_CUDA_R_VERSE -F ref=main https://gitlab.b-data.ch/api/v4/projects/309/trigger/pipeline
+    - curl -X POST -F token=$JUPYTERLAB_CUDA_R_VERSE -F ref=main https://gitlab.b-data.ch/api/v4/projects/309/trigger/pipeline
   rules:
     - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CUDA_IMAGE
       changes:
