@@ -258,6 +258,8 @@ trigger-latest-build:
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=main https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
   rules:
+    - if: $CUDA_IMAGE
+      when: never
     - if: $CI_COMMIT_BRANCH == "main"
       changes:
         - base/latest.Dockerfile
@@ -272,6 +274,8 @@ trigger-version-build:
   script:
     - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
   rules:
+    - if: $CUDA_IMAGE
+      when: never
     - if: $CI_COMMIT_BRANCH == "freeze-version"
       changes:
         - base/$R_VERSION.Dockerfile
