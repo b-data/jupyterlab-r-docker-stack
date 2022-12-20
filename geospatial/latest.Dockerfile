@@ -73,29 +73,5 @@ RUN apt-get update \
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
 
-## Install wgrib2 for NOAA's NOMADS / rNOMADS forecast files
-#RUN cd /opt \
-#  && wget https://www.ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz \
-#  && tar -xvf wgrib2.tgz \
-#  && rm -rf wgrib2.tgz \
-#  && cd grib2 \
-#  ## arm64: Needs to be compiled with USE_NETCDF4=1, USE_JASPER=0
-#  ## https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/index.html
-#  && if [ $(dpkg --print-architecture) = "arm64" ]; then \
-#    sed -i 's/^USE_NETCDF4=0/USE_NETCDF4=1/' makefile; \
-#    sed -i 's/^USE_NETCDF3=1/USE_NETCDF3=0/' makefile; \
-#    sed -i 's/^USE_JASPER=1/USE_JASPER=0/' makefile; \
-#    NETCDF4_SRC=`sed -n 's/   netcdf4src=\(.*\)/\1/p' makefile`; \
-#    wget ftp://ftp.unidata.ucar.edu/pub/netcdf/$NETCDF4_SRC; \
-#    HDF5_SRC=`sed -n 's/   hdf5src:=\(.*\)/\1/p' makefile`; \
-#    HDF5_MAJ_MIN_PAT=`echo $HDF5_SRC | \
-#      sed -n 's/hdf5-\([[:digit:]]\+\.[[:digit:]]\+\.[[:digit:]]\+\).*/\1/p'`; \
-#    HDF5_MAJ_MIN=`echo $HDF5_MAJ_MIN_PAT | \
-#      sed -n 's/\([[:digit:]]\+\.[[:digit:]]\+\).*/\1/p'`; \
-#    wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-$HDF5_MAJ_MIN/hdf5-$HDF5_MAJ_MIN_PAT/src/$HDF5_SRC; \
-#  fi \
-#  && CC=gcc FC=gfortran make \
-#  && ln -s /opt/grib2/wgrib2/wgrib2 /usr/local/bin/wgrib2
-
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
