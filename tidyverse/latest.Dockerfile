@@ -18,7 +18,6 @@ RUN apt-get update \
     cmake \
     default-libmysqlclient-dev \
     #libxml2-dev \
-    #libcairo2-dev \
     libfribidi-dev \
     libgit2-dev \
     libharfbuzz-dev \
