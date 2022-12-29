@@ -1,7 +1,6 @@
 .env:
   variables:
     R_VERSION: "4.2.2"
-    UPDATE_MODE: "false"
 
 .before-script-build: &before-script-build
   - |
