@@ -39,6 +39,10 @@ RUN apt-get update \
     arrow \
     duckdb \
     fst \
+  ## Get rid of libharfbuzz-dev and its dependencies (incl. python3)
+  && apt-get -y purge libharfbuzz-dev \
+  && apt-get -y autoremove \
+  && apt-get -y install --no-install-recommends libharfbuzz-icu0 \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
