@@ -84,8 +84,8 @@ latest:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.2.1 \
-  -t jupyterlab-r-base \
+  --build-arg R_VERSION=4.2.2 \
+  -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```
 
@@ -93,11 +93,11 @@ version:
 
 ```bash
 cd base && docker build \
-  -t jupyterlab-r-base:<major>.<minor>.<patch> \
-  -f <major>.<minor>.<patch>.Dockerfile .
+  -t jupyterlab/r/base:MAJOR.MINOR.PATCH \
+  -f MAJOR.MINOR.PATCH.Dockerfile .
 ```
 
-For `<major>.<minor>.<patch>` ≥ `4.2.0`.
+For `MAJOR.MINOR.PATCH` ≥ `4.2.0`.
 
 ### Run container
 
@@ -107,7 +107,7 @@ self built:
 docker run -it --rm \
   -p 8888:8888 \
   -v $PWD:/home/jovyan \
-  jupyterlab-r-base[:<major>.<minor>.<patch>]
+  jupyterlab/r/base[:MAJOR.MINOR.PATCH]
 ```
 
 from the project's GitLab Container Registries:
@@ -117,28 +117,28 @@ from the project's GitLab Container Registries:
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
-      registry.gitlab.b-data.ch/jupyterlab/r/base[:<major>[.<minor>[.<patch>]]]
+      registry.gitlab.b-data.ch/jupyterlab/r/base[:MAJOR[.MINOR[.PATCH]]]
     ```
 *  [`jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
-      registry.gitlab.b-data.ch/jupyterlab/r/tidyverse[:<major>[.<minor>[.<patch>]]]
+      registry.gitlab.b-data.ch/jupyterlab/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
     ```
 *  [`jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
-      registry.gitlab.b-data.ch/jupyterlab/r/verse[:<major>[.<minor>[.<patch>]]]
+      registry.gitlab.b-data.ch/jupyterlab/r/verse[:MAJOR[.MINOR[.PATCH]]]
     ```
 *  [`jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
     ```bash
     docker run -it --rm \
       -p 8888:8888 \
       -v $PWD:/home/jovyan \
-      registry.gitlab.b-data.ch/jupyterlab/r/geospatial[:<major>[.<minor>[.<patch>]]]
+      registry.gitlab.b-data.ch/jupyterlab/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
     ```
 
 The use of the `-v` flag in the command mounts the current working directory on
