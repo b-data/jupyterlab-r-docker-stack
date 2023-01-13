@@ -19,6 +19,11 @@ Images considered stable for R versions ≥ 4.2.0.
 
 :microscope: Check out `jupyterlab/r/verse` at https://demo.jupyter.b-data.ch.
 
+**Build chain**
+
+base → tidyverse → verse → geospatial  
+:information_source: The term verse+ means *verse or later* in the build chain.
+
 **Features**
 
 * **JupyterLab**: A web-based interactive development environment for Jupyter
@@ -32,11 +37,11 @@ Images considered stable for R versions ≥ 4.2.0.
   * **Python**: An interpreted, object-oriented, high-level programming language
     with dynamic semantics.
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
-    :information_source: verse image, amd64 only
+    :information_source: verse+ images, amd64 only
   * **R**: A language and environment for statistical computing and graphics.
   * **TinyTeX**: A lightweight, cross-platform, portable, and easy-to-maintain
     LaTeX distribution based on TeX Live.  
-    :information_source: verse image
+    :information_source: verse+ images
   * **Zsh**: A shell designed for interactive use, although it is also a
     powerful scripting language.
 
@@ -49,14 +54,22 @@ The following extensions are pre-installed for **code-server**:
 * [Excel Viewer](https://open-vsx.org/extension/GrapeCity/gc-excelviewer)
 * [Jupyter](https://open-vsx.org/extension/ms-toolsai/jupyter)
 * [LaTeX Workshop](https://open-vsx.org/extension/James-Yu/latex-workshop)  
-  :information_source: verse image
+  :information_source: verse+ images
 * [Path Intellisense](https://open-vsx.org/extension/christian-kohler/path-intellisense)
 * [Project Manager](https://open-vsx.org/extension/alefragnani/project-manager)
 * [Python](https://open-vsx.org/extension/ms-python/python)
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
-  :information_source: verse image, amd64 only
+  :information_source: verse+ images, amd64 only
 * [R](https://open-vsx.org/extension/Ikuyadeu/r)
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
+
+**Subtags**
+
+* `{R_VERSION,latest}-root`: Container runs as `root`
+* `{R_VERSION,latest}-devtools`: Includes the requirements according to
+  * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
+  * [REditorSupport/vscode-R > Wiki > Contributing](https://github.com/REditorSupport/vscode-R/wiki/Contributing)
+* `{R_VERSION,latest}-devtools-root`: The combination of both
 
 ## Table of Contents
 
@@ -162,6 +175,8 @@ The server logs appear in the terminal.
    [RStudio](https://github.com/rstudio/rstudio)
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
+
+See [NOTES](NOTES.md) for tweaks, settings, etc.
 
 ## Contributing
 
