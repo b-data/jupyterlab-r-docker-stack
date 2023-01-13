@@ -13,6 +13,10 @@ Images available for R versions ≥ 4.2.2.
 https://demo.cuda.jupyter.b-data.ch.  
 :point_right: You can ask [b-data](mailto:request@b-data.ch?subject=[CUDA%20Jupyter]%20Request%20to%20whitelist%20GitHub%20account) to whitelist your GitHub account for access.
 
+**Build chain**
+
+The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack).
+
 **Features**
 
 The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack)
@@ -27,6 +31,10 @@ plus
   * including development libraries and headers
 * R configured to use NVBLAS, with fallback on OpenBLAS
   * using standard R terminal instead of radian
+
+**Subtags**
+
+The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack).
 
 ## Table of Contents
 
@@ -143,7 +151,7 @@ The server logs appear in the terminal.
 **What makes this project different:**
 
 1. Multi-arch: `linux/amd64`, `linux/arm64/v8`
-1. Based on [`nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04`](https://hub.docker.com/r/nvidia/cuda/tags?page=1&name=11.8.0-cudnn8-devel-ubuntu20.04)
+1. Derived from [`nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04`](https://hub.docker.com/r/nvidia/cuda/tags?page=1&name=11.8.0-cudnn8-devel-ubuntu20.04)
     * including development libraries and headers
 1. TensortRT and TensorRT plugin libraries
     * including development libraries and headers
@@ -151,3 +159,5 @@ The server logs appear in the terminal.
    [JupyterLab](https://github.com/jupyterlab/jupyterlab)
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
+
+See [NOTES](NOTES.md) for tweaks, settings, etc.
