@@ -47,7 +47,8 @@ unattended computations.
 
 ### Environment variables
 
-* `DOWNLOAD_STATIC_LIBV8=1`: R (V8): Installing V8 on Linux, the alternative way.
+* `DOWNLOAD_STATIC_LIBV8=1`: R (V8): Installing V8 on Linux, the alternative
+  way.
 * `RETICULATE_MINICONDA_ENABLED=0`: R (reticulate): Disable prompt to install
   miniconda.
 * `CS_DISABLE_GETTING_STARTED_OVERRIDE=1`: code-server: Hide the coder/coder
@@ -114,7 +115,8 @@ are installed.
 ### Default
 
 * R: `$(R RHOME)/etc/Rprofile.site`
-  * IRkernel: Only enable `image/svg+xml` and `application/pdf` for plot display.
+  * IRkernel: Only enable `image/svg+xml` and `application/pdf` for plot
+    display.
   * R Extension (code-server): Disable help panel and revert to old behaviour.
 * [Terminal IPython](base/conf/ipython/usr/local/etc/ipython/ipython_config.py):
   * Only enable figure formats `svg` and `pdf` for Terminal IPython.
@@ -148,11 +150,13 @@ are installed.
 ### Customise
 
 * R: Create file `~/.Rprofile`
-  * Valid plot mimetypes: `image/png`, `image/jpeg`, `image/svg+xml`, `application/pdf`.
+  * Valid plot mimetypes: `image/png`, `image/jpeg`, `image/svg+xml`,
+    `application/pdf`.  
     :information_source: MIME type `text/plain` must always be specified.
 * Terminal IPython: Create file `~/.ipython/profile_default/ipython_config.py`
   * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
-* IPython kernel: Create file `~/.ipython/profile_default/ipython_kernel_config.py`
+* IPython kernel: Create file
+  `~/.ipython/profile_default/ipython_kernel_config.py`
   * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
 * JupyterLab: Settings > Advanced Settings Editor
 * code-server: Manage > Settings
@@ -180,7 +184,7 @@ The CUDA and OS versions are selected as follows:
 
 ## Tweaks
 
-* Provide NVBLAS-enabled R and Rscript and radian.
+* Provide NVBLAS-enabled R, Rscript and radian.
   * Enabled at runtime and only if `nvidia-smi` and at least one GPU are
     present.
 
@@ -209,4 +213,4 @@ Package `libsecret-1-dev` depends on `python3` from the OS' package repository.
 The OS' Python version is installed at `/usr/bin`.  
 
 :information_source: Because the [recent Python version](#python) is installed
-at `/user/local/bin`, it precedes the OS' Python version.
+at `/user/local/bin`, it takes precedence over the OS' Python version.
