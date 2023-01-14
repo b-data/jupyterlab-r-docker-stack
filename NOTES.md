@@ -70,7 +70,7 @@ unattended computations.
 
 * `BASE_IMAGE`: Its very base, a [Docker Official Image](https://hub.docker.com/search?q=&type=image&image_filter=official).
 * `PARENT_IMAGE`: The image it was built on.
-* `BUILD_DATE`: The date (UTC) it was built.
+* `BUILD_DATE`: The date it was built (ISO 8601 format).
 * `CRAN`: The CRAN mirror URL.
 * `CTAN_REPO`: The CTAN mirror URL.
 
