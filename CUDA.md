@@ -69,11 +69,11 @@ latest:
 
 ```bash
 cd base && docker build \
-  --build-arg BASE_IMAGE=ubuntu
-  --build-arg BASE_IMAGE_TAG=20.04
-  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/r/ver
-  --build-arg R_VERSION=4.2.2
-  --build-arg CUDA_IMAGE_FLAVOR=devel
+  --build-arg BASE_IMAGE=ubuntu \
+  --build-arg BASE_IMAGE_TAG=20.04 \
+  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/r/ver \
+  --build-arg R_VERSION=4.2.2 \
+  --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base \
   -f latest.Dockerfile .
 ```
@@ -82,10 +82,10 @@ version:
 
 ```bash
 cd base && docker build \
-  --build-arg BASE_IMAGE=ubuntu
-  --build-arg BASE_IMAGE_TAG=20.04
-  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/r/ver
-  --build-arg CUDA_IMAGE_FLAVOR=devel
+  --build-arg BASE_IMAGE=ubuntu \
+  --build-arg BASE_IMAGE_TAG=20.04 \
+  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/r/ver \
+  --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base:MAJOR.MINOR.PATCH \
   -f MAJOR.MINOR.PATCH.Dockerfile .
 ```
