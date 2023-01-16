@@ -1,6 +1,6 @@
-# CUDA-enabled JupyterLab R images
+# CUDA-enabled JupyterLab R docker stack
 
-GPU-accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) images:
+GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) images:
 
 * [`registry.gitlab.b-data.ch/jupyterlab/cuda/r/base`](https://gitlab.b-data.ch/jupyterlab/cuda/r/base/container_registry)
 * [`registry.gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
@@ -15,12 +15,13 @@ https://demo.cuda.jupyter.b-data.ch.
 
 **Build chain**
 
-The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack).
+The same as the
+[JupyterLab R docker stack](README.md#jupyterlab-r-docker-stack).
 
 **Features**
 
-The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack)
-plus
+The same as the
+[JupyterLab R docker stack](README.md#jupyterlab-r-docker-stack) plus
 
 * CUDA runtime,
   [CUDA math libraries](https://developer.nvidia.com/gpu-accelerated-libraries),
@@ -34,7 +35,8 @@ plus
 
 **Subtags**
 
-The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack).
+The same as the
+[JupyterLab R docker stack](README.md#jupyterlab-r-docker-stack).
 
 ## Table of Contents
 
@@ -45,14 +47,15 @@ The same as the [JupyterLab R images](README.md#jupyterlab-r-docker-stack).
 
 ## Prerequisites
 
-The same as the [JupyterLab R images](README.md#prerequisites) plus
+The same as the
+[JupyterLab R docker stack](README.md#prerequisites) plus
 
 * NVIDIA GPU
 * NVIDIA Linux driver
 * NVIDIA Container Toolkit
 
-:information_source: The host running the CUDA-enabled images only requires the
-NVIDIA driver, the CUDA toolkit does not have to be installed.
+:information_source: The host running the GPU accelerated images only requires
+the NVIDIA driver, the CUDA toolkit does not have to be installed.
 
 ## Install
 
@@ -160,4 +163,4 @@ The server logs appear in the terminal.
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
 
-See [NOTES](NOTES.md) for tweaks, settings, etc.
+See [Notes](NOTES.md) for tweaks, settings, etc.
