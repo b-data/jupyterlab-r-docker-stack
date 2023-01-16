@@ -1,7 +1,7 @@
 [![minimal-readme compliant](https://img.shields.io/badge/readme%20style-minimal-brightgreen.svg)](https://github.com/RichardLitt/standard-readme/blob/master/example-readmes/minimal-readme.md) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) <a href="https://liberapay.com/benz0li/donate"><img src="https://liberapay.com/assets/widgets/donate.svg" alt="Donate using Liberapay" height="20"></a>
 
-| See [CUDA](CUDA.md) for GPU-accelerated images. |
-|-------------------------------------------------|
+| See the [CUDA-enabled JupyterLab R docker stack](CUDA.md) for GPU accelerated images. |
+|---------------------------------------------------------------------------------------|
 
 # JupyterLab R docker stack
 
@@ -176,7 +176,7 @@ The server logs appear in the terminal.
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
 
-See [NOTES](NOTES.md) for tweaks, settings, etc.
+See [Notes](NOTES.md) for tweaks, settings, etc.
 
 ## Contributing
 
