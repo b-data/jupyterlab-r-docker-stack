@@ -72,7 +72,7 @@ unattended computations.
 * `PARENT_IMAGE`: The image it was built on.
 * `BUILD_DATE`: The date it was built (ISO 8601 format).
 * `CRAN`: The CRAN mirror URL.
-* `CTAN_REPO`: The CTAN mirror URL.
+* `CTAN_REPO`: The CTAN mirror URL. (verse+ images)
 
 **`MRAN`**
 
@@ -101,7 +101,7 @@ The default shell is Zsh, further enhanced with
 Pre-installed extensions are treated as *built-in* and therefore cannot be
 updated at user level.
 
-### TeX packages
+### TeX packages (verse+ images)
 
 In addition to the TeX packages used in
 [rocker/verse](https://github.com/rocker-org/rocker-versioned2/blob/master/scripts/install_texlive.sh),
@@ -171,7 +171,7 @@ The Python version is selected as follows:
 
 * The latest [Python version numba is compatible with](https://numba.readthedocs.io/en/stable/user/installing.html#compatibility).
 
-This Python version is installed at `/user/local/bin`.
+This Python version is installed at `/usr/local/bin`.
 
 # Notes on CUDA
 
@@ -213,4 +213,4 @@ Package `libsecret-1-dev` depends on `python3` from the OS' package repository.
 The OS' Python version is installed at `/usr/bin`.  
 
 :information_source: Because the [recent Python version](#python) is installed
-at `/user/local/bin`, it takes precedence over the OS' Python version.
+at `/usr/local/bin`, it takes precedence over the OS' Python version.
