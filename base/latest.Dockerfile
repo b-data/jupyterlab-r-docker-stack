@@ -246,6 +246,7 @@ RUN apt-get update \
     ## Current ZeroMQ library for R pbdZMQ
     libzmq3-dev \
     ## Required for R extension
+    libcairo2-dev \
     libcurl4-openssl-dev \
     libfontconfig1-dev \
     libssl-dev \
@@ -276,6 +277,9 @@ RUN apt-get update \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
   && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
+  ## Get rid of libcairo2-dev and its dependencies (incl. python3)
+  && apt-get -y purge libcairo2-dev \
+  && apt-get -y autoremove \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \
