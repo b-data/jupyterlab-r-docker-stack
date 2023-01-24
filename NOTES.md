@@ -1,9 +1,8 @@
 # Notes
 
 This docker stack uses modified startup scripts from
-[jupyter/docker-stacks](https://github.com/jupyter/docker-stacks).
-
-Nevertheless, all [Docker Options](https://github.com/jupyter/docker-stacks/blob/main/docs/using/common.md#docker-options)
+[jupyter/docker-stacks](https://github.com/jupyter/docker-stacks).  
+:information_source: Nevertheless, all [Docker Options](https://github.com/jupyter/docker-stacks/blob/main/docs/using/common.md#docker-options)
 and [Permission-specific configurations](https://github.com/jupyter/docker-stacks/blob/main/docs/using/common.md#permission-specific-configurations)
 can be used for the images of this docker stack.
 
@@ -15,7 +14,7 @@ and/or
 [rocker-org/rocker-versioned2](https://github.com/rocker-org/rocker-versioned2),
 these images are tweaked as follows:
 
-### Startup scripts
+### Jupyter startup scripts
 
 Shell script [/usr/local/bin/start.sh](base/scripts/usr/local/bin/start.sh) is
 modified to
@@ -23,7 +22,7 @@ modified to
 * allow *bind mounting* of a home directory.
 * reset `CODE_WORKDIR` for custom `NB_USER`s.
 
-### Startup Hooks
+### Jupyter startup hooks
 
 The following startup hooks are put in place:
 
@@ -145,7 +144,26 @@ are installed.
   * Oh My Zsh: `~/.zshrc`
     * Set PATH so it includes user's private bin if it exists
     * Update last-activity timestamps while in screen/tmux session
-  * [Powerlevel10k](base/conf/user/var/backups/skel/.p10k.zsh)
+  * [Powerlevel10k](base/conf/user/var/backups/skel/.p10k.zsh): `p10k configure`
+    * Does this look like a diamond (rotated square)?: (y)  Yes.
+    * Does this look like a lock?: (y)  Yes.
+    * Does this look like a Debian logo (swirl/spiral)?: (y)  Yes.
+    * Do all these icons fit between the crosses?: (y)  Yes.
+    * Prompt Style: (3)  Rainbow.
+    * Character Set: (1)  Unicode.
+    * Show current time?: (2)  24-hour format.
+    * Prompt Separators: (1)  Angled.
+    * Prompt Heads: (1)  Sharp.
+    * Prompt Tails: (1)  Flat.
+    * Prompt Height: (2)  Two lines.
+    * Prompt Connection: (2)  Dotted.
+    * Prompt Frame: (2)  Left.
+    * Connection & Frame Color: (2)  Light.
+    * Prompt Spacing: (2)  Sparse.
+    * Icons: (2)  Many icons.
+    * Prompt Flow: (1)  Concise.
+    * Enable Transient Prompt?: (n)  No.
+    * Instant Prompt Mode: (3)  Off.
 
 ### Customise
 
@@ -164,6 +182,8 @@ are installed.
 * Zsh
   * Oh My Zsh: Edit `~/.zshrc`.
   * Powerlevel10k: Run `p10k configure` or edit `~/.p10k.zsh`.
+    * Update command:
+      `git -C ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k pull`
 
 ## Python
 
