@@ -263,11 +263,25 @@ RUN apt-get update \
       >> $(which radian); \
     echo "$(which radian)_ \"\${@}\"" >> $(which radian); \
   fi \
+  ## Install httpgd
+  ## Archived on 2023-01-24 as issues were not corrected in time.
+  && cd /tmp \
+  && install2.r --error --skipinstalled -n $NCPUS \
+    later \
+    systemfonts \
+    cpp11 \
+    testthat \
+    xml2 \
+    fontquiver \
+    knitr \
+    rmarkdown \
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/BH/BH_1.78.0-0.tar.gz \
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_1.3.0.tar.gz \
+  && R CMD INSTALL BH_1.78.0-0.tar.gz httpgd_1.3.0.tar.gz \
   ## Install the R kernel for JupyterLab
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
-    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
   ## IRkernel: Enable 'image/svg+xml' instead of 'image/png' for plot display
   ## IRkernel: Enable 'application/pdf' for PDF conversion
