@@ -253,15 +253,15 @@ RUN apt-get update \
     libxml2-dev \
   ## Install radian
   && pip install radian \
-  ## Provide NVBLAS-enabled radian
+  ## Provide NVBLAS-enabled radian_
   ## Enabled at runtime and only if nvidia-smi and at least one GPU are present
   && if [ ! -z "$CUDA_IMAGE" ]; then \
     nvblasLib="$(cd $CUDA_HOME/lib* && ls libnvblas.so* | head -n 1)"; \
     cp -a $(which radian) $(which radian)_; \
-    echo '#!/bin/bash' > $(which radian); \
+    echo '#!/bin/bash' > $(which radian)_; \
     echo "command -v nvidia-smi >/dev/null && nvidia-smi -L | grep 'GPU[[:space:]]\?[[:digit:]]\+' >/dev/null && export LD_PRELOAD=$nvblasLib" \
-      >> $(which radian); \
-    echo "$(which radian)_ \"\${@}\"" >> $(which radian); \
+      >> $(which radian)_; \
+    echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
   ## Install httpgd
   ## Archived on 2023-01-24 as issues were not corrected in time.
@@ -283,6 +283,9 @@ RUN apt-get update \
     IRkernel \
     languageserver \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
+  ## Get rid of libcairo2-dev and its dependencies (incl. python3)
+  && apt-get -y purge libcairo2-dev \
+  && apt-get -y autoremove \
   ## IRkernel: Enable 'image/svg+xml' instead of 'image/png' for plot display
   ## IRkernel: Enable 'application/pdf' for PDF conversion
   && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
@@ -291,9 +294,6 @@ RUN apt-get update \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
   && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
-  ## Get rid of libcairo2-dev and its dependencies (incl. python3)
-  && apt-get -y purge libcairo2-dev \
-  && apt-get -y autoremove \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \
