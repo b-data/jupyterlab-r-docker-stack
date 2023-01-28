@@ -30,8 +30,8 @@ The same as the
   * including development libraries and headers
 * TensortRT and TensorRT plugin libraries
   * including development libraries and headers
-* R configured to use NVBLAS, with fallback on OpenBLAS
-  * using standard R terminal instead of radian
+* NVBLAS-enabled `R_` and `Rscript_`
+  * using standard R terminal instead of radian in code-server
 
 **Subtags**
 

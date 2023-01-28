@@ -193,7 +193,7 @@ The Python version is selected as follows:
 
 This Python version is installed at `/usr/local/bin`.
 
-# Notes on CUDA
+# Additional notes on CUDA
 
 The CUDA and OS versions are selected as follows:
 
@@ -204,7 +204,7 @@ The CUDA and OS versions are selected as follows:
 
 ## Tweaks
 
-* Provide NVBLAS-enabled R, Rscript and radian.
+* Provide NVBLAS-enabled `R_` and `Rscript_`.
   * Enabled at runtime and only if `nvidia-smi` and at least one GPU are
     present.
 
@@ -218,7 +218,37 @@ The CUDA and OS versions are selected as follows:
 
 * `CUDA_IMAGE`: The CUDA image it is derived from.
 
-# Notes on subtag `devtools`
+## Settings
+
+### Default
+
+* code-server
+  * Extensions > R > Rterm: Linux: `/usr/local/bin/R`
+
+## Basic Linear Algebra Subprograms (BLAS)
+
+These images use OpenBLAS by default.
+
+To have `R` and `Rscript` use NVBLAS instead,
+
+1. copy the NVBLAS-enabled executables to `~/.local/bin`  
+   ```bash
+   for file in $(which {R,Rscript}); do
+     cp "$file"_ "$HOME/.local/bin/$(basename $file)";
+   done
+   ```
+1. set Extensions > R > Rterm > Linux: `/home/USER/.local/bin/R` in code-server
+   settings  
+   :point_right: Substitute `USER` with your user name.
+
+and restart the R terminal.
+
+:information_source: The
+[xgboost](https://cran.r-project.org/package=xgboost) package benefits greatly
+from NVBLAS, if it is
+[installed correctly](https://xgboost.readthedocs.io/en/stable/build.html).
+
+# Additional notes on subtag `devtools`
 
 Node.js is installed with corepack enabled by default. Use it to manage Yarn
 and/or pnpm:
