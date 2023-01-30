@@ -263,25 +263,11 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
-  ## Install httpgd
-  ## Archived on 2023-01-24 as issues were not corrected in time.
-  && cd /tmp \
-  && install2.r --error --skipinstalled -n $NCPUS \
-    later \
-    systemfonts \
-    cpp11 \
-    testthat \
-    xml2 \
-    fontquiver \
-    knitr \
-    rmarkdown \
-  && curl -sLO https://cran.r-project.org/src/contrib/Archive/BH/BH_1.78.0-0.tar.gz \
-  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_1.3.0.tar.gz \
-  && R CMD INSTALL BH_1.78.0-0.tar.gz httpgd_1.3.0.tar.gz \
-  ## Install the R kernel for JupyterLab
+  ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
+    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
   ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \
