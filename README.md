@@ -70,6 +70,13 @@ The following extensions are pre-installed for **code-server**:
   * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
   * [REditorSupport/vscode-R > Wiki > Contributing](https://github.com/REditorSupport/vscode-R/wiki/Contributing)
 * `{R_VERSION,latest}-devtools-root`: The combination of both
+* `{R_VERSION,latest}-docker`: Includes
+  * `docker-ce-cli`
+  * `docker-buildx-plugin`
+  * `docker-compose-plugin`
+* `{R_VERSION,latest}-docker-root`: The combination of both
+* `{R_VERSION,latest}-devtools-docker`: The combination of both
+* `{R_VERSION,latest}-devtools-docker-root`: The combination of all three
 
 ## Table of Contents
 
