@@ -7,11 +7,11 @@
 
 Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
-* [`registry.gitlab.b-data.ch/jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)
-  * [`registry.gitlab.b-data.ch/jupyterlab/r/r-ver`](https://gitlab.b-data.ch/jupyterlab/r/r-ver/container_registry) (4.0.4 ≤ version < 4.2.0)
-* [`registry.gitlab.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
-* [`registry.gitlab.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
-* [`registry.gitlab.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)
+  * [`glcr.b-data.ch/jupyterlab/r/r-ver`](https://gitlab.b-data.ch/jupyterlab/r/r-ver/container_registry) (4.0.4 ≤ version < 4.2.0)
+* [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
 
 Images considered stable for R versions ≥ 4.2.0.  
 :point_right: The current state may eventually be backported to versions ≥
@@ -139,28 +139,28 @@ from the project's GitLab Container Registries:
   docker run -it --rm \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/r/base[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/r/base[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
   ```bash
   docker run -it --rm \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
   ```bash
   docker run -it --rm \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/r/verse[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/r/verse[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
   ```bash
   docker run -it --rm \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
   ```
 
 The use of the `-v` flag in the command mounts the current working directory on

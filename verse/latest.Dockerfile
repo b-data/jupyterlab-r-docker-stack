@@ -1,4 +1,4 @@
-ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/jupyterlab/r/tidyverse
+ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG QUARTO_VERSION=1.2.335

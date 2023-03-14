@@ -2,10 +2,10 @@
 
 GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
-* [`registry.gitlab.b-data.ch/jupyterlab/cuda/r/base`](https://gitlab.b-data.ch/jupyterlab/cuda/r/base/container_registry)
-* [`registry.gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
-* [`registry.gitlab.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
-* [`registry.gitlab.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/base`](https://gitlab.b-data.ch/jupyterlab/cuda/r/base/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
 
 Images available for R versions ≥ 4.2.2.
 
@@ -74,7 +74,7 @@ latest:
 cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
-  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/r/ver \
+  --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/r/ver \
   --build-arg R_VERSION=4.2.2 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base \
@@ -87,7 +87,7 @@ version:
 cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
-  --build-arg BUILD_ON_IMAGE=registry.gitlab.b-data.ch/cuda/r/ver \
+  --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/r/ver \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base:MAJOR.MINOR.PATCH \
   -f MAJOR.MINOR.PATCH.Dockerfile .
@@ -115,7 +115,7 @@ from the project's GitLab Container Registries:
     --gpus '"device=all"' \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/cuda/r/base[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/cuda/r/base[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)  
   ```bash
@@ -123,7 +123,7 @@ from the project's GitLab Container Registries:
     --gpus '"device=all"' \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/cuda/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)  
   ```bash
@@ -131,7 +131,7 @@ from the project's GitLab Container Registries:
     --gpus '"device=all"' \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/cuda/r/verse[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/cuda/r/verse[:MAJOR[.MINOR[.PATCH]]]
   ```
 * [`jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)  
   ```bash
@@ -139,7 +139,7 @@ from the project's GitLab Container Registries:
     --gpus '"device=all"' \
     -p 8888:8888 \
     -v $PWD:/home/jovyan \
-    registry.gitlab.b-data.ch/jupyterlab/cuda/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
+    glcr.b-data.ch/jupyterlab/cuda/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
   ```
 
 The use of the `-v` flag in the command mounts the current working directory on

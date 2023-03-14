@@ -1,4 +1,4 @@
-ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/jupyterlab/r/verse
+ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/verse
 ARG R_VERSION
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}

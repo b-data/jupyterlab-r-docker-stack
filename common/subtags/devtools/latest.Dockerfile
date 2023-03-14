@@ -6,7 +6,7 @@ ARG R_VERSION
 ARG NODE_VERSION=16.19.1
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 
-FROM registry.gitlab.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as nsi
+FROM glcr.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as nsi
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
 
