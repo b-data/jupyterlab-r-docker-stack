@@ -1,6 +1,5 @@
 {
   "editor.tabSize": 2,
-  "telemetry.telemetryLevel": "off",
   "gitlens.graph.statusBar.enabled": false,
   "gitlens.menus": {
     "scm": {
@@ -16,8 +15,12 @@
   "r.bracketedPaste": true,
   "r.plot.useHttpgd": true,
   "r.rterm.linux": "/usr/local/bin/radian",
-  "r.rterm.option": [],
+  "r.rterm.option": [
+    "--no-save",
+    "--no-restore"
+  ],
   "r.workspaceViewer.showObjectSize": true,
-  "workbench.colorTheme": "Default Dark+",
-  "terminal.integrated.fontFamily": "MesloLGS NF"
+  "telemetry.telemetryLevel": "off",
+  "terminal.integrated.fontFamily": "MesloLGS NF",
+  "workbench.colorTheme": "Default Dark+"
 }

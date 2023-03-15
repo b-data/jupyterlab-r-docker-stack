@@ -1,7 +1,7 @@
-ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/jupyterlab/r/tidyverse
+ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.1.251
+ARG QUARTO_VERSION=1.2.335
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
@@ -10,15 +10,19 @@ ARG NCPUS=1
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG BUILD_ON_IMAGE
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG QUARTO_VERSION
 ARG CTAN_REPO
+ARG BUILD_START
 
 USER root
 
-ENV HOME=/root \
+ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
+    HOME=/root \
     CTAN_REPO=${CTAN_REPO} \
-    PATH=/opt/TinyTeX/bin/linux:/opt/quarto/bin:$PATH
+    PATH=/opt/TinyTeX/bin/linux:/opt/quarto/bin:$PATH \
+    BUILD_DATE=${BUILD_START}
 
 WORKDIR ${HOME}
 
@@ -39,6 +43,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     libgmp3-dev \
     libgl1-mesa-dev \
     libglu1-mesa-dev \
+    libharfbuzz-dev \
     libhunspell-dev \
     libicu-dev \
     liblzma-dev \
@@ -56,15 +61,14 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && install2.r --error --skipinstalled -n $NCPUS redland \
   ## Explicitly install runtime library sub-deps of librdf0-dev
   && apt-get install -y \
-	  libcurl4-openssl-dev \
-	  libxslt-dev \
-	  librdf0 \
-	  redland-utils \
-	  rasqal-utils \
-	  raptor2-utils \
+    libcurl4-openssl-dev \
+    libxslt-dev \
+    librdf0 \
+    redland-utils \
+    rasqal-utils \
+    raptor2-utils \
   ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
-	&& apt-get -y autoremove \
-  && rm -rf /var/lib/apt/lists/* \
+  && apt-get -y autoremove \
   && if [ ${dpkgArch} = "amd64" ]; then \
     ## Install quarto
     curl -sLO https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz; \
@@ -116,6 +120,19 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     rmdshower \
     rJava \
     xaringan \
+  ## Install Cairo: R Graphics Device using Cairo Graphics Library
+  ## Install magick: Advanced Graphics and Image-Processing in R
+  && install2.r --error --skipinstalled -n $NCPUS \
+    Cairo \
+    magick \
+  ## Get rid of libharfbuzz-dev
+  && apt-get -y purge libharfbuzz-dev \
+  ## Get rid of libmagick++-dev
+  && apt-get -y purge libmagick++-dev \
+  ## and their dependencies (incl. python3)
+  && apt-get -y autoremove \
+  && apt-get -y install --no-install-recommends \
+    '^libmagick\+\+-6.q16-[0-9]+$' \
   ## Install code-server extensions
   && if [ ${dpkgArch} = "amd64" ]; then \
     code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto; \
@@ -126,7 +143,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     /root/.config \
     /root/.local \
     /root/.vscode-remote \
-    /root/.wget-hsts
+    /root/.wget-hsts \
+  && rm -rf /var/lib/apt/lists/*
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}

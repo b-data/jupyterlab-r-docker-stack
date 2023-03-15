@@ -1,18 +1,20 @@
-ARG BASE_IMAGE=debian:bullseye
-ARG BUILD_ON_IMAGE=registry.gitlab.b-data.ch/r/ver
+ARG BASE_IMAGE=debian
+ARG BASE_IMAGE_TAG=bullseye
+ARG BUILD_ON_IMAGE=glcr.b-data.ch/r/ver
 ARG R_VERSION
+ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=2.3.1
-ARG JUPYTERLAB_VERSION=3.5.0
+ARG JUPYTERHUB_VERSION=3.1.1
+ARG JUPYTERLAB_VERSION=3.6.1
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_RELEASE=4.8.1
-ARG GIT_VERSION=2.38.1
-ARG GIT_LFS_VERSION=3.2.0
+ARG CODE_SERVER_VERSION=4.9.1
+ARG GIT_VERSION=2.40.0
+ARG GIT_LFS_VERSION=3.3.0
 ARG PANDOC_VERSION=2.19.2
 
-FROM ${BUILD_ON_IMAGE}:${R_VERSION} as files
+FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} as files
 
 ARG NB_UID
 ENV NB_GID=100
@@ -20,20 +22,29 @@ ENV NB_GID=100
 RUN mkdir /files
 
 COPY assets /files
+COPY conf/ipython /files
+COPY conf/jupyter /files
+COPY conf/jupyterlab /files
 COPY conf/user /files
 COPY scripts /files
 
 RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+  ## Use standard R terminal for CUDA images
+  ## radian forces usage of /usr/bin/python
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    sed -i 's|/usr/local/bin/radian|/usr/local/bin/R|g' \
+      /files/var/backups/skel/.local/share/code-server/User/settings.json; \
+  fi \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
-FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
-FROM registry.gitlab.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
+FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as gsi
+FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} as glfsi
 
-FROM ${BUILD_ON_IMAGE}:${R_VERSION}
+FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
 
 LABEL org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.source="https://gitlab.b-data.ch/jupyterlab/r/docker-stack" \
@@ -44,31 +55,40 @@ ARG NCPUS=1
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+ARG BUILD_ON_IMAGE
+ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER
 ARG NB_UID
 ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
-ARG CODE_SERVER_RELEASE
+ARG CODE_SERVER_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
+ARG BUILD_START
 
 ARG CODE_WORKDIR
 
-ENV NB_USER=${NB_USER} \
+ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} \
+    NB_USER=${NB_USER} \
     NB_UID=${NB_UID} \
-    NB_GID=100 \
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
-    CODE_SERVER_RELEASE=${CODE_SERVER_RELEASE} \
+    CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
-    PANDOC_VERSION=${PANDOC_VERSION}
+    PANDOC_VERSION=${PANDOC_VERSION} \
+    BUILD_DATE=${BUILD_START}
+
+ENV NB_GID=100
 
 ## Installing V8 on Linux, the alternative way
 ## https://ropensci.org/blog/2020/11/12/installing-v8
 ENV DOWNLOAD_STATIC_LIBV8=1
+
+## Disable prompt to install miniconda
+ENV RETICULATE_MINICONDA_ENABLED=0
 
 ## Install Git
 COPY --from=gsi /usr/local /usr/local
@@ -78,6 +98,10 @@ COPY --from=glfsi /usr/local /usr/local
 USER root
 
 RUN dpkgArch="$(dpkg --print-architecture)" \
+  ## Unminimise if the system has been minimised
+  && if [ $(command -v unminimize) ]; then \
+    yes | unminimize; \
+  fi \
   && apt-get update \
   && apt-get -y install --no-install-recommends \
     bash-completion \
@@ -99,21 +123,26 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     psmisc \
     screen \
     sudo \
+    swig \
     tmux \
-    vim \
+    vim-tiny \
     wget \
     zsh \
-    ## Additional git runtime dependencies
+    ## Git: Additional runtime dependencies
     libcurl3-gnutls \
     liberror-perl \
-    ## Additional git runtime recommendations
+    ## Git: Additional runtime recommendations
     less \
     ssh-client \
-  ## Additional python-dev dependencies
+  ## Python: Additional dev dependencies
   && if [ -z "$PYTHON_VERSION" ]; then \
     apt-get -y install --no-install-recommends \
       python3-dev \
-      python3-distutils; \
+      ## Install Python package installer
+      ## (dep: python3-distutils, python3-setuptools and python3-wheel)
+      python3-pip \
+      ## Install venv module for python3
+      python3-venv; \
     ## make some useful symlinks that are expected to exist
     ## ("/usr/bin/python" and friends)
     for src in pydoc3 python3 python3-config; do \
@@ -122,14 +151,15 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
       [ ! -e "/usr/bin/$dst" ]; \
       ln -svT "$src" "/usr/bin/$dst"; \
     done; \
+  else \
+    ## Force update pip, setuptools and wheel
+    curl -sLO https://bootstrap.pypa.io/get-pip.py; \
+    python get-pip.py \
+      pip \
+      setuptools \
+      wheel; \
+    rm get-pip.py; \
   fi \
-  ## Install/update pip, setuptools and wheel
-  && curl -sLO https://bootstrap.pypa.io/get-pip.py \
-  && python get-pip.py \
-    pip \
-    setuptools \
-    wheel \
-  && rm get-pip.py \
   ## Install font MesloLGS NF
   && mkdir -p /usr/share/fonts/truetype/meslo \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Regular.ttf \
@@ -137,16 +167,20 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Italic.ttf \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
   && fc-cache -fv \
-  ## Set default branch name to main
+  ## Git: Set default branch name to main
   && git config --system init.defaultBranch main \
-  ## Store passwords for one hour in memory
+  ## Git: Store passwords for one hour in memory
   && git config --system credential.helper "cache --timeout=3600" \
-  ## Merge the default branch from the default remote when "git pull" is run
+  ## Git: Merge the default branch from the default remote when "git pull" is run
   && git config --system pull.rebase false \
   ## Install pandoc
   && curl -sLO https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
+  ## Delete potential user with UID 1000
+  && if $(grep -q 1000 /etc/passwd); then \
+    userdel $(id -un 1000); \
+  fi \
   ## Add user
   && useradd -l -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
   && mkdir -p /var/backups/skel \
@@ -159,12 +193,13 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && rm -rf /var/lib/apt/lists/* \
     $HOME/.cache
 
-ENV PATH=/opt/code-server/bin:$PATH
+ENV PATH=/opt/code-server/bin:$PATH \
+    CS_DISABLE_GETTING_STARTED_OVERRIDE=1
 
 ## Install code-server
 RUN mkdir /opt/code-server \
   && cd /opt/code-server \
-  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_RELEASE}/code-server-${CODE_SERVER_RELEASE}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
+  && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
   && curl -sL https://upload.wikimedia.org/wikipedia/commons/9/9a/Visual_Studio_Code_1.35_icon.svg -o vscode.svg \
   ## Include custom fonts
   && sed -i 's|</head>|	<link rel="preload" href="{{BASE}}/_static/src/browser/media/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">\n	</head>|g' /opt/code-server/lib/vscode/out/vs/code/browser/workbench/workbench.html \
@@ -227,21 +262,33 @@ RUN apt-get update \
     libxml2-dev \
   ## Install radian
   && pip install radian \
-  ## Install the R kernel for JupyterLab
+  ## Provide NVBLAS-enabled radian_
+  ## Enabled at runtime and only if nvidia-smi and at least one GPU are present
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    nvblasLib="$(cd $CUDA_HOME/lib* && ls libnvblas.so* | head -n 1)"; \
+    cp -a $(which radian) $(which radian)_; \
+    echo '#!/bin/bash' > $(which radian)_; \
+    echo "command -v nvidia-smi >/dev/null && nvidia-smi -L | grep 'GPU[[:space:]]\?[[:digit:]]\+' >/dev/null && export LD_PRELOAD=$nvblasLib" \
+      >> $(which radian)_; \
+    echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
+  fi \
+  ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
     httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE)" \
+  ## Get rid of libcairo2-dev and its dependencies (incl. python3)
+  && apt-get -y purge libcairo2-dev \
+  && apt-get -y autoremove \
   ## IRkernel: Enable 'image/svg+xml' instead of 'image/png' for plot display
   ## IRkernel: Enable 'application/pdf' for PDF conversion
   && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
-    >> /usr/local/lib/R/etc/Rprofile.site \
+    >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
-  && curl -sLO https://dl.b-data.ch/vsix/REditorSupport.r-2.6.1.vsix \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r-2.6.1.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
-  && echo "options(vsc.helpPanel = FALSE)" >> /usr/local/lib/R/etc/Rprofile.site \
+  && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \
