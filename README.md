@@ -121,6 +121,19 @@ cd base && docker build \
 
 For `MAJOR.MINOR.PATCH` ≥ `4.2.0`.
 
+### Create home directory
+
+Create an empty directory:
+
+```bash
+mkdir jupyterlab-jovyan
+sudo chown 1000:100 jupyterlab-jovyan
+cd jupyterlab-jovyan
+```
+
+It will be *bind mounted* as the JupyterLab user's home directory and
+automatically populated on first run.
+
 ### Run container
 
 self built:
@@ -128,44 +141,62 @@ self built:
 ```bash
 docker run -it --rm \
   -p 8888:8888 \
-  -v $PWD:/home/jovyan \
+  -u root \
+  -v "${PWD}":/home/jovyan \
+  -e NB_UID=$(id -u) \
+  -e NB_GID=$(id -g) \
+  -e CHOWN_HOME=yes \
+  -e CHOWN_HOME_OPTS='-R' \
   jupyterlab/r/base[:MAJOR.MINOR.PATCH]
 ```
 
 from the project's GitLab Container Registries:
 
-* [`jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/base[:MAJOR[.MINOR[.PATCH]]]
-  ```
-* [`jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
-  ```
-* [`jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/verse[:MAJOR[.MINOR[.PATCH]]]
-  ```
-* [`jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
-  ```
+```bash
+docker run -it --rm \
+  -p 8888:8888 \
+  -u root \
+  -v "${PWD}":/home/jovyan \
+  -e NB_UID=$(id -u) \
+  -e NB_GID=$(id -g) \
+  -e CHOWN_HOME=yes \
+  -e CHOWN_HOME_OPTS='-R' \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]]
+```
+
+`IMAGE` being one of
+
+* [`glcr.b-data.ch/jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
 
 The use of the `-v` flag in the command mounts the current working directory on
-the host (`$PWD` in the example command) as `/home/jovyan` in the container. The
-server logs appear in the terminal.
+the host (`${PWD}` in the command) as `/home/jovyan` in the container.
+
+`-e NB_UID=$(id -u) -e NB_GID=$(id -g)` instructs the startup script to switch
+the user ID and the primary group ID of `${NB_USER}` to the user and group ID of
+the one executing the command.
+
+`-e CHOWN_HOME=yes -e CHOWN_HOME_OPTS='-R'` instructs the startup script to
+recursively change the `${NB_USER}` home directory owner and group to the
+current value of `${NB_UID}` and `${NB_GID}`.  
+:information_source: This is only required for the first run.
+
+The server logs appear in the terminal.
+
+**Using Docker Desktop**
+
+`sudo chown 1000:100 jupyterlab-jovyan` *might* not be required. Also
+
+```bash
+docker run -it --rm \
+  -p 8888:8888 \
+  -v "${PWD}":/home/jovyan \
+  IMAGE
+```
+
+*might* be sufficient.
 
 ## Similar projects
 
