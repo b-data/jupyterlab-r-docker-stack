@@ -63,6 +63,7 @@ RUN apt-get update \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension dbaeumer.vscode-eslint \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension esbenp.prettier-vscode \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.black-formatter \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
