@@ -102,13 +102,17 @@ Create an empty directory:
 ```bash
 mkdir jupyterlab-jovyan
 sudo chown 1000:100 jupyterlab-jovyan
-cd jupyterlab-jovyan
 ```
 
 It will be *bind mounted* as the JupyterLab user's home directory and
 automatically populated on first run.
 
 ### Run container
+
+| :exclamation: Always mount the user's **entire** home directory.<br>Mounting a subfolder prevents the container from starting.[^1] |
+|:-----------------------------------------------------------------------------------------------------------------------------------|
+
+[^1]: The only exception is the use case described at [Jupyter Docker Stacks > Quick Start > Example 2](https://github.com/jupyter/docker-stacks#quick-start).
 
 self built:
 
@@ -117,7 +121,7 @@ docker run -it --rm \
   --gpus '"device=all"' \
   -p 8888:8888 \
   -u root \
-  -v "${PWD}":/home/jovyan \
+  -v "${PWD}/jupyterlab-jovyan":/home/jovyan \
   -e NB_UID=$(id -u) \
   -e NB_GID=$(id -g) \
   -e CHOWN_HOME=yes \
@@ -132,7 +136,7 @@ docker run -it --rm \
   --gpus '"device=all"' \
   -p 8888:8888 \
   -u root \
-  -v "${PWD}":/home/jovyan \
+  -v "${PWD}/jupyterlab-jovyan":/home/jovyan \
   -e NB_UID=$(id -u) \
   -e NB_GID=$(id -g) \
   -e CHOWN_HOME=yes \
@@ -147,8 +151,8 @@ docker run -it --rm \
 * [`glcr.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
 
-The use of the `-v` flag in the command mounts the current working directory on
-the host (`${PWD}` in the command) as `/home/jovyan` in the container.
+The use of the `-v` flag in the command mounts the empty directory on the host
+(`${PWD}/jupyterlab-jovyan` in the command) as `/home/jovyan` in the container.
 
 `-e NB_UID=$(id -u) -e NB_GID=$(id -g)` instructs the startup script to switch
 the user ID and the primary group ID of `${NB_USER}` to the user and group ID of
@@ -169,7 +173,7 @@ The server logs appear in the terminal.
 docker run -it --rm \
   --gpus '"device=all"' \
   -p 8888:8888 \
-  -v "${PWD}":/home/jovyan \
+  -v "${PWD}/jupyterlab-jovyan":/home/jovyan \
   IMAGE[:MAJOR[.MINOR[.PATCH]]]
 ```
 
