@@ -33,6 +33,9 @@ The same as the
 * NVBLAS-enabled `R_` and `Rscript_`
   * using standard R terminal instead of radian in code-server
 
+:point_right: See the [CUDA Version Matrix](CUDA_VERSION_MATRIX.md) for detailed
+information.
+
 **Subtags**
 
 The same as the
