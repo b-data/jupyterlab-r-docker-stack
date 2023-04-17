@@ -91,6 +91,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ~/.TinyTeX /opt/TinyTeX \
+  && sed -i 's/\/root\/.TinyTeX/\/opt\/TinyTeX/g' \
+    /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
   && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
     /opt/TinyTeX/bin/linux \
   && /opt/TinyTeX/bin/linux/tlmgr path add \
@@ -116,6 +118,10 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
+  ## Make the TeX Live fonts available as system fonts
+  && cp /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
+    /etc/fonts/conf.d/09-texlive.conf \
+  && fc-cache -fsv \
   && install2.r --error --skipinstalled -n $NCPUS PKI \
   ## And some nice R packages for publishing-related stuff
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
