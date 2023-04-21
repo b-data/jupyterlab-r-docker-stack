@@ -100,11 +100,12 @@ For `MAJOR.MINOR.PATCH` ≥ `4.2.2`.
 
 ### Create home directory
 
-Create an empty directory:
+Create an empty directory using docker:
 
 ```bash
-mkdir jupyterlab-jovyan
-sudo chown 1000:100 jupyterlab-jovyan
+docker run --rm \
+  -v "${PWD}/jupyterlab-jovyan":/dummy \
+  alpine chown 1000:100 /dummy
 ```
 
 It will be *bind mounted* as the JupyterLab user's home directory and
