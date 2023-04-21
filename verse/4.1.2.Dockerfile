@@ -16,9 +16,6 @@ WORKDIR ${HOME}
 
 ## Add LaTeX, rticles and bookdown support
 RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-dev/extensions \
-  && wget "https://travis-bin.yihui.name/texlive-local.deb" \
-  && dpkg -i texlive-local.deb \
-  && rm texlive-local.deb \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
     default-jdk \
@@ -57,6 +54,16 @@ RUN export CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/vendor/modules/code-oss-
   ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
 	&& apt-get -y autoremove \
   && rm -rf /var/lib/apt/lists/* \
+  ## Tell APT about the TeX Live installation
+  ## by building a dummy package using equivs
+  && apt-get install -y --no-install-recommends equivs \
+  && cd /tmp \
+  && wget https://github.com/scottkosty/install-tl-ubuntu/raw/master/debian-control-texlive-in.txt \
+  && equivs-build debian-* \
+  && mv texlive-local*.deb texlive-local.deb \
+  && dpkg -i texlive-local.deb \
+  && apt-get -y purge equivs \
+  && apt-get -y autoremove \
   ## Admin-based install of TinyTeX:
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \

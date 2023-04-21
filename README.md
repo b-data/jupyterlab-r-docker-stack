@@ -1,7 +1,7 @@
 [![minimal-readme compliant](https://img.shields.io/badge/readme%20style-minimal-brightgreen.svg)](https://github.com/RichardLitt/standard-readme/blob/master/example-readmes/minimal-readme.md) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) <a href="https://liberapay.com/benz0li/donate"><img src="https://liberapay.com/assets/widgets/donate.svg" alt="Donate using Liberapay" height="20"></a>
 
 | See the [CUDA-enabled JupyterLab R docker stack](CUDA.md) for GPU accelerated docker images. |
-|----------------------------------------------------------------------------------------------|
+|:---------------------------------------------------------------------------------------------|
 
 # JupyterLab R docker stack
 
@@ -45,6 +45,9 @@ base → tidyverse → verse → geospatial
   * **Zsh**: A shell designed for interactive use, although it is also a
     powerful scripting language.
 
+:point_right: See the [Version Matrix](VERSION_MATRIX.md) for detailed
+information.
+
 The following extensions are pre-installed for **code-server**:
 
 * [.gitignore Generator](https://github.com/piotrpalarz/vscode-gitignore-generator)
@@ -74,6 +77,7 @@ The following extensions are pre-installed for **code-server**:
   * `docker-ce-cli`
   * `docker-buildx-plugin`
   * `docker-compose-plugin`
+  * `docker-scan-plugin`
 * `{R_VERSION,latest}-docker-root`: The combination of both
 * `{R_VERSION,latest}-devtools-docker`: The combination of both
 * `{R_VERSION,latest}-devtools-docker-root`: The combination of all three
@@ -106,7 +110,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.2.2 \
+  --build-arg R_VERSION=4.2.3 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```
@@ -121,51 +125,86 @@ cd base && docker build \
 
 For `MAJOR.MINOR.PATCH` ≥ `4.2.0`.
 
+### Create home directory
+
+Create an empty directory:
+
+```bash
+mkdir jupyterlab-jovyan
+sudo chown 1000:100 jupyterlab-jovyan
+```
+
+It will be *bind mounted* as the JupyterLab user's home directory and
+automatically populated on first run.
+
 ### Run container
+
+| :exclamation: Always mount the user's **entire** home directory.<br>Mounting a subfolder prevents the container from starting.[^1] |
+|:-----------------------------------------------------------------------------------------------------------------------------------|
+
+[^1]: The only exception is the use case described at [Jupyter Docker Stacks > Quick Start > Example 2](https://github.com/jupyter/docker-stacks#quick-start).
 
 self built:
 
 ```bash
 docker run -it --rm \
   -p 8888:8888 \
-  -v $PWD:/home/jovyan \
+  -u root \
+  -v "${PWD}/jupyterlab-jovyan":/home/jovyan \
+  -e NB_UID=$(id -u) \
+  -e NB_GID=$(id -g) \
+  -e CHOWN_HOME=yes \
+  -e CHOWN_HOME_OPTS='-R' \
   jupyterlab/r/base[:MAJOR.MINOR.PATCH]
 ```
 
 from the project's GitLab Container Registries:
 
-* [`jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/base[:MAJOR[.MINOR[.PATCH]]]
-  ```
-* [`jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/tidyverse[:MAJOR[.MINOR[.PATCH]]]
-  ```
-* [`jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/verse[:MAJOR[.MINOR[.PATCH]]]
-  ```
-* [`jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)  
-  ```bash
-  docker run -it --rm \
-    -p 8888:8888 \
-    -v $PWD:/home/jovyan \
-    glcr.b-data.ch/jupyterlab/r/geospatial[:MAJOR[.MINOR[.PATCH]]]
-  ```
+```bash
+docker run -it --rm \
+  -p 8888:8888 \
+  -u root \
+  -v "${PWD}/jupyterlab-jovyan":/home/jovyan \
+  -e NB_UID=$(id -u) \
+  -e NB_GID=$(id -g) \
+  -e CHOWN_HOME=yes \
+  -e CHOWN_HOME_OPTS='-R' \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]]
+```
 
-The use of the `-v` flag in the command mounts the current working directory on
-the host (`$PWD` in the example command) as `/home/jovyan` in the container. The
-server logs appear in the terminal.
+`IMAGE` being one of
+
+* [`glcr.b-data.ch/jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
+
+The use of the `-v` flag in the command mounts the empty directory on the host
+(`${PWD}/jupyterlab-jovyan` in the command) as `/home/jovyan` in the container.
+
+`-e NB_UID=$(id -u) -e NB_GID=$(id -g)` instructs the startup script to switch
+the user ID and the primary group ID of `${NB_USER}` to the user and group ID of
+the one executing the command.
+
+`-e CHOWN_HOME=yes -e CHOWN_HOME_OPTS='-R'` instructs the startup script to
+recursively change the `${NB_USER}` home directory owner and group to the
+current value of `${NB_UID}` and `${NB_GID}`.  
+:information_source: This is only required for the first run.
+
+The server logs appear in the terminal.
+
+**Using Docker Desktop**
+
+`sudo chown 1000:100 jupyterlab-jovyan` *might* not be required. Also
+
+```bash
+docker run -it --rm \
+  -p 8888:8888 \
+  -v "${PWD}/jupyterlab-jovyan":/home/jovyan \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]]
+```
+
+*might* be sufficient.
 
 ## Similar projects
 

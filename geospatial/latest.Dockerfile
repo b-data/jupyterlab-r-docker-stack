@@ -39,9 +39,6 @@ RUN apt-get update \
     sqlite3 \
     tk-dev \
     #unixodbc-dev
-  ## sf: Installation fails on Debian 11 (bullseye) for v1.0-10
-  ## https://github.com/r-spatial/sf/issues/2118
-  && R -e "devtools::install_version('sf', version = '1.0-9')" \
   && install2.r --error --skipinstalled -n $NCPUS \
     #RColorBrewer \
     RNetCDF \
@@ -59,6 +56,7 @@ RUN apt-get update \
     rgdal \
     rgeos \
     rlas \
+    sf \
     sp \
     spacetime \
     spatstat \

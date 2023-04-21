@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.2.335
+ARG QUARTO_VERSION=1.2.475
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
@@ -28,9 +28,6 @@ WORKDIR ${HOME}
 
 ## Add LaTeX, rticles and bookdown support
 RUN dpkgArch="$(dpkg --print-architecture)" \
-  && wget "https://travis-bin.yihui.name/texlive-local.deb" \
-  && dpkg -i texlive-local.deb \
-  && rm texlive-local.deb \
   && apt-get update \
   && apt-get install -y --no-install-recommends \
     default-jdk \
@@ -80,10 +77,22 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     ## Link to system pandoc
     ln -s /usr/bin/pandoc /opt/quarto/bin/tools/pandoc; \
   fi \
+  ## Tell APT about the TeX Live installation
+  ## by building a dummy package using equivs
+  && apt-get install -y --no-install-recommends equivs \
+  && cd /tmp \
+  && wget https://github.com/scottkosty/install-tl-ubuntu/raw/master/debian-control-texlive-in.txt \
+  && equivs-build debian-* \
+  && mv texlive-local*.deb texlive-local.deb \
+  && dpkg -i texlive-local.deb \
+  && apt-get -y purge equivs \
+  && apt-get -y autoremove \
   ## Admin-based install of TinyTeX:
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ~/.TinyTeX /opt/TinyTeX \
+  && sed -i 's/\/root\/.TinyTeX/\/opt\/TinyTeX/g' \
+    /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
   && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
     /opt/TinyTeX/bin/linux \
   && /opt/TinyTeX/bin/linux/tlmgr path add \
@@ -109,6 +118,10 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
   && chmod -R g+wx /opt/TinyTeX/bin \
+  ## Make the TeX Live fonts available as system fonts
+  && cp /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
+    /etc/fonts/conf.d/09-texlive.conf \
+  && fc-cache -fsv \
   && install2.r --error --skipinstalled -n $NCPUS PKI \
   ## And some nice R packages for publishing-related stuff
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \

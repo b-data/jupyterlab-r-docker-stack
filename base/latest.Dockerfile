@@ -6,8 +6,8 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=3.1.1
-ARG JUPYTERLAB_VERSION=3.6.1
+ARG JUPYTERHUB_VERSION=4.0.0
+ARG JUPYTERLAB_VERSION=3.6.3
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_VERSION=4.9.1
 ARG GIT_VERSION=2.40.0
@@ -166,7 +166,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold.ttf \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Italic.ttf \
   && curl -sL https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold%20Italic.ttf -o /usr/share/fonts/truetype/meslo/MesloLGS\ NF\ Bold\ Italic.ttf \
-  && fc-cache -fv \
+  && fc-cache -fsv \
   ## Git: Set default branch name to main
   && git config --system init.defaultBranch main \
   ## Git: Store passwords for one hour in memory
@@ -180,6 +180,11 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Delete potential user with UID 1000
   && if $(grep -q 1000 /etc/passwd); then \
     userdel $(id -un 1000); \
+  fi \
+  ## Do not set user limits for sudo/sudo-i
+  && sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo \
+  && if [ -f "/etc/pam.d/sudo-i" ]; then \
+    sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo-i; \
   fi \
   ## Add user
   && useradd -l -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
