@@ -37,7 +37,7 @@ base → tidyverse → verse → geospatial
   * **Python**: An interpreted, object-oriented, high-level programming language
     with dynamic semantics.
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
-    :information_source: verse+ images, amd64 only
+    :information_source: verse+ images
   * **R**: A language and environment for statistical computing and graphics.
   * **TinyTeX**: A lightweight, cross-platform, portable, and easy-to-maintain
     LaTeX distribution based on TeX Live.  
@@ -62,7 +62,7 @@ The following extensions are pre-installed for **code-server**:
 * [Project Manager](https://open-vsx.org/extension/alefragnani/project-manager)
 * [Python](https://open-vsx.org/extension/ms-python/python)
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
-  :information_source: verse+ images, amd64 only
+  :information_source: verse+ images
 * [R](https://open-vsx.org/extension/Ikuyadeu/r)
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
 

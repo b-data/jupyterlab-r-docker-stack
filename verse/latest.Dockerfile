@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.2.475
+ARG QUARTO_VERSION=1.3.340
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
@@ -19,10 +19,12 @@ ARG BUILD_START
 USER root
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
-    HOME=/root \
+    QUARTO_VERSION=${QUARTO_VERSION} \
     CTAN_REPO=${CTAN_REPO} \
-    PATH=/opt/TinyTeX/bin/linux:/opt/quarto/bin:$PATH \
     BUILD_DATE=${BUILD_START}
+
+ENV HOME=/root \
+    PATH=/opt/TinyTeX/bin/linux:/opt/quarto/bin:$PATH
 
 WORKDIR ${HOME}
 
@@ -66,17 +68,15 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     raptor2-utils \
   ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
   && apt-get -y autoremove \
-  && if [ ${dpkgArch} = "amd64" ]; then \
-    ## Install quarto
-    curl -sLO https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz; \
-    mkdir -p /opt/quarto; \
-    tar -xzf quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz -C /opt/quarto --no-same-owner --strip-components=1; \
-    rm quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz; \
-    ## Remove quarto pandoc
-    rm /opt/quarto/bin/tools/pandoc; \
-    ## Link to system pandoc
-    ln -s /usr/bin/pandoc /opt/quarto/bin/tools/pandoc; \
-  fi \
+  ## Install quarto
+  && curl -sLO https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz  \
+  && mkdir -p /opt/quarto \
+  && tar -xzf quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz -C /opt/quarto --no-same-owner --strip-components=1 \
+  && rm quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz \
+  ## Remove quarto pandoc
+  && rm /opt/quarto/bin/tools/pandoc \
+  ## Link to system pandoc
+  && ln -s /usr/bin/pandoc /opt/quarto/bin/tools/pandoc \
   ## Tell APT about the TeX Live installation
   ## by building a dummy package using equivs
   && apt-get install -y --no-install-recommends equivs \
@@ -147,9 +147,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && apt-get -y install --no-install-recommends \
     '^libmagick\+\+-6.q16-[0-9]+$' \
   ## Install code-server extensions
-  && if [ ${dpkgArch} = "amd64" ]; then \
-    code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto; \
-  fi \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Clean up
   && rm -rf /tmp/* \
