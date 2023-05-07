@@ -292,6 +292,19 @@ RUN apt-get update \
   ## IRkernel: Enable 'application/pdf' for PDF conversion
   && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
     >> $(R RHOME)/etc/Rprofile.site \
+  ## IRkernel: Include user's private bin in PATH
+  && echo "if (dir.exists(file.path(Sys.getenv('HOME'), 'bin')) && Sys.getenv('SHLVL') == '0') {" \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), 'bin'), Sys.getenv('PATH')," \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo "    sep = .Platform\$path.sep))}" \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo "if (dir.exists(file.path(Sys.getenv('HOME'), '.local/bin')) && Sys.getenv('SHLVL') == '0') {" \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), '.local/bin'), Sys.getenv('PATH')," \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo "    sep = .Platform\$path.sep))}" \
+    >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
