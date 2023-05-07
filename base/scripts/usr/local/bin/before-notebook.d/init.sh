@@ -38,6 +38,12 @@ if [ "$(id -u)" == 0 ] ; then
   su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
+  su $NB_USER -c "mkdir -p .local/share/code-server/User"
+  if [[ ! -f ".local/share/code-server/User/settings.json" ]]; then
+    su $NB_USER -c "cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
+      .local/share/code-server/User/settings.json"
+  fi
+
   su $NB_USER -c "mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
@@ -69,6 +75,12 @@ else
   /bin/bash -c "mkdir -p $RLU"
 
   # Update code-server settings
+  mkdir -p .local/share/code-server/User
+  if [[ ! -f ".local/share/code-server/User/settings.json" ]]; then
+    cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
+      .local/share/code-server/User/settings.json
+  fi
+
   mv .local/share/code-server/User/settings.json \
     .local/share/code-server/User/settings.json.bak
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
