@@ -68,16 +68,17 @@ The following extensions are pre-installed for **code-server**:
 
 **Subtags**
 
-* `{R_VERSION,latest}-root`: Container runs as `root`
-* `{R_VERSION,latest}-devtools`: Includes the requirements according to
+* `{R_VERSION,latest}-root` (versions ≥ 4.2.0): Container runs as `root`
+* `{R_VERSION,latest}-devtools` (versions ≥ 4.2.2): Includes the requirements
+  according to
   * [coder/code-server > Docs > Contributing](https://github.com/coder/code-server/blob/main/docs/CONTRIBUTING.md)
   * [REditorSupport/vscode-R > Wiki > Contributing](https://github.com/REditorSupport/vscode-R/wiki/Contributing)
 * `{R_VERSION,latest}-devtools-root`: The combination of both
-* `{R_VERSION,latest}-docker`: Includes
+* `{R_VERSION,latest}-docker` (versions ≥ 4.2.2): Includes
   * `docker-ce-cli`
   * `docker-buildx-plugin`
   * `docker-compose-plugin`
-  * `docker-scan-plugin`
+  * `docker-scan-plugin` (amd64 only)
 * `{R_VERSION,latest}-docker-root`: The combination of both
 * `{R_VERSION,latest}-devtools-docker`: The combination of both
 * `{R_VERSION,latest}-devtools-docker-root`: The combination of all three
