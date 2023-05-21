@@ -214,6 +214,7 @@ docker run -it --rm \
 * [jupyter/docker-stacks](https://github.com/jupyter/docker-stacks)
 * [rocker-org/rocker-versioned2](https://github.com/rocker-org/rocker-versioned2)
 * [pangeo-data/pangeo-docker-images](https://github.com/pangeo-data/pangeo-docker-images)
+* [geocompx/docker](https://github.com/geocompx/docker)
 
 **What makes this project different:**
 
