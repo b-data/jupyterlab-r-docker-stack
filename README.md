@@ -12,6 +12,7 @@ Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 * [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/r/qgisprocess/container_registry)
 
 Images considered stable for R versions ≥ 4.2.0.  
 :point_right: The current state may eventually be backported to versions ≥
@@ -21,7 +22,7 @@ Images considered stable for R versions ≥ 4.2.0.
 
 **Build chain**
 
-base → tidyverse → verse → geospatial  
+base → tidyverse → verse → geospatial → qgisprocess  
 :information_source: The term verse+ means *verse or later* in the build chain.
 
 **Features**
@@ -33,12 +34,23 @@ base → tidyverse → verse → geospatial
   * **Git**: A distributed version-control system for tracking changes in source
     code.
   * **Git LFS**: A Git extension for versioning large files.
+  * **GRASS GIS**: A free and open source Geographic Information System (GIS).  
+    :information_source: qgisprocess image
+  * **Orfeo Toolbox**: An open-source project for state-of-the-art remote
+    sensing.  
+    :information_source: qgisprocess image (amd64 only)
   * **Pandoc**: A universal markup converter.
   * **Python**: An interpreted, object-oriented, high-level programming language
     with dynamic semantics.
+  * **QGIS**: A free, open source, cross platform (lin/win/mac) geographical
+    information system (GIS).  
+    :information_source: qgisprocess image
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
     :information_source: verse+ images
   * **R**: A language and environment for statistical computing and graphics.
+  * **SAGA GIS**: A Geographic Information System (GIS) software with immense
+    capabilities for geodata processing and analysis.  
+    :information_source: qgisprocess image
   * **TinyTeX**: A lightweight, cross-platform, portable, and easy-to-maintain
     LaTeX distribution based on TeX Live.  
     :information_source: verse+ images
@@ -180,6 +192,7 @@ docker run -it --rm \
 * [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/r/qgisprocess/container_registry)
 
 The use of the `-v` flag in the command mounts the empty directory on the host
 (`${PWD}/jupyterlab-jovyan` in the command) as `/home/jovyan` in the container.
