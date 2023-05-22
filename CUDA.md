@@ -6,6 +6,7 @@ GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 * [`glcr.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/cuda/r/qgisprocess/container_registry)
 
 Images available for R versions ≥ 4.2.2.
 
@@ -154,6 +155,7 @@ docker run -it --rm \
 * [`glcr.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/cuda/r/qgisprocess/container_registry)
 
 The use of the `-v` flag in the command mounts the empty directory on the host
 (`${PWD}/jupyterlab-jovyan` in the command) as `/home/jovyan` in the container.
