@@ -38,33 +38,33 @@ if [ "$(id -u)" == 0 ] ; then
   su $NB_USER -c "mkdir -p $RLU"
 
   # Update code-server settings
-  su $NB_USER -c "mkdir -p .local/share/code-server/User"
-  if [[ ! -f ".local/share/code-server/User/settings.json" ]]; then
+  su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/code-server/User"
+  if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
     su $NB_USER -c "cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
-      .local/share/code-server/User/settings.json"
+      /home/$NB_USER/.local/share/code-server/User/settings.json"
   fi
 
-  su $NB_USER -c "mv .local/share/code-server/User/settings.json \
-    .local/share/code-server/User/settings.json.bak"
+  su $NB_USER -c "mv /home/$NB_USER/.local/share/code-server/User/settings.json \
+    /home/$NB_USER/.local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "sed -i ':a;N;\$!ba;s/,\n\}/\n}/g' \
-    .local/share/code-server/User/settings.json.bak"
+    /home/$NB_USER/.local/share/code-server/User/settings.json.bak"
   su $NB_USER -c "jq -s '.[0] * .[1]' \
     /var/backups/skel/.local/share/code-server/User/settings.json \
-    .local/share/code-server/User/settings.json.bak > \
-    .local/share/code-server/User/settings.json"
+    /home/$NB_USER/.local/share/code-server/User/settings.json.bak > \
+    /home/$NB_USER/.local/share/code-server/User/settings.json"
 
   ## QGIS Desktop: Put inital settings in place
-  su $NB_USER -c "mkdir -p .local/share/QGIS/QGIS3/profiles/default/QGIS"
-  if [[ ! -f ".local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
+  su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS"
+  if [[ ! -f "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
     su $NB_USER -c "cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
-      .local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
   fi
 
   ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
-  su $NB_USER -c "mkdir -p .local/share/QGIS/QGIS3/profiles/default/python/plugins"
-  if [[ ! -d ".local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
+  su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+  if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
     su $NB_USER -c "cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
-      .local/share/QGIS/QGIS3/profiles/default/python/plugins"
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
   fi
 else
   # Warn if the user wants to change the timezone but hasn't started the
@@ -89,35 +89,35 @@ else
   /bin/bash -c "mkdir -p $RLU"
 
   # Update code-server settings
-  mkdir -p .local/share/code-server/User
-  if [[ ! -f ".local/share/code-server/User/settings.json" ]]; then
+  mkdir -p /home/$NB_USER/.local/share/code-server/User
+  if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
     cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
-      .local/share/code-server/User/settings.json
+      /home/$NB_USER/.local/share/code-server/User/settings.json
   fi
 
-  mv .local/share/code-server/User/settings.json \
-    .local/share/code-server/User/settings.json.bak
+  mv /home/$NB_USER/.local/share/code-server/User/settings.json \
+    /home/$NB_USER/.local/share/code-server/User/settings.json.bak
   sed -i ':a;N;$!ba;s/,\n\}/\n}/g' \
-    .local/share/code-server/User/settings.json.bak
+    /home/$NB_USER/.local/share/code-server/User/settings.json.bak
   jq -s '.[0] * .[1]' \
     /var/backups/skel/.local/share/code-server/User/settings.json \
-    .local/share/code-server/User/settings.json.bak > \
-    .local/share/code-server/User/settings.json
+    /home/$NB_USER/.local/share/code-server/User/settings.json.bak > \
+    /home/$NB_USER/.local/share/code-server/User/settings.json
 
   ## QGIS Desktop: Put inital settings in place
-  mkdir -p .local/share/QGIS/QGIS3/profiles/default/QGIS
-  if [[ ! -f ".local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
+  mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS
+  if [[ ! -f "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
     cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
-      .local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini
   fi
 
   ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
-  mkdir -p .local/share/QGIS/QGIS3/profiles/default/python/plugins
-  if [[ ! -d ".local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
+  mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
+  if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
     cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
-      .local/share/QGIS/QGIS3/profiles/default/python/plugins
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
   fi
 fi
 
 # Remove old .zcompdump files
-rm -f .zcompdump*
+rm -f /home/$NB_USER/.zcompdump*
