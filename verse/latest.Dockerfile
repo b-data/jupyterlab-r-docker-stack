@@ -91,7 +91,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ${HOME}/.TinyTeX /opt/TinyTeX \
-  && sed -i "s/${HOME}\/.TinyTeX/\/opt\/TinyTeX/g" \
+  && sed -i "s|${HOME}/.TinyTeX|/opt/TinyTeX|g" \
     /opt/TinyTeX/texmf-var/fonts/conf/texlive-fontconfig.conf \
   && ln -rs /opt/TinyTeX/bin/$(uname -m)-linux \
     /opt/TinyTeX/bin/linux \
