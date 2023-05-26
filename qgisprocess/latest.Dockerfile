@@ -171,8 +171,8 @@ RUN apt-get update \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
-    $HOME/.cache \
-    $HOME/.grass*
+    ${HOME}/.cache \
+    ${HOME}/.grass*
 
 ## Install QGIS related stuff
 RUN apt-get update \
@@ -185,9 +185,9 @@ RUN apt-get update \
   && apt-get -y purge python3-pip \
   && apt-get -y autoremove \
   && rm -rf /var/lib/apt/lists/* \
-    $HOME/.cache \
-    $HOME/.config \
-    $HOME/.local
+    ${HOME}/.cache \
+    ${HOME}/.config \
+    ${HOME}/.local
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
@@ -203,8 +203,8 @@ COPY --from=files /files /
 COPY --from=files /files/var/backups/skel ${HOME}
 
 ## QGIS: Install plugin 'Processing Saga NextGen Provider'
-RUN mkdir -p .local/share/QGIS/QGIS3/profiles/default/python/plugins \
-  && cd .local/share/QGIS/QGIS3/profiles/default/python/plugins \
+RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
+  && cd ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
   && qgis-plugin-manager install 'Processing Saga NextGen Provider' \
@@ -215,7 +215,12 @@ RUN mkdir -p .local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && if [ "$(uname -m)" = "x86_64" ]; then \
     qgis_process plugins enable otbprovider; \
   fi \
-  ## Create backup of home directory
-  && cp -a $HOME/.local/share/QGIS /var/backups/skel/.local/share
+  ## Clean up
+  && rm -rf \
+    ${HOME}/.cache \
+    ${HOME}/.config \
+    ${HOME}/.grass* \
+  ## Create backup of QGIS settings
+  && cp -a ${HOME}/.local/share/QGIS /var/backups/skel/.local/share
 
 ENV PYTHONPATH=${PYTHONPATH:+$PYTHONPATH:}${OTB_VERSION:+/usr/local/lib/otb/python}
