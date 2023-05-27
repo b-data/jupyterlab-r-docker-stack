@@ -12,7 +12,7 @@ Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 * [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
-* [`glcr.b-data.ch/jupyterlab/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/r/qgisprocess/container_registry)
+* [`glcr.b-data.ch/jupyterlab/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/r/qgisprocess/container_registry) (versions ≥ 4.3.0)
 
 Images considered stable for R versions ≥ 4.2.0.  
 :point_right: The current state may eventually be backported to versions ≥
