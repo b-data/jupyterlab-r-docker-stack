@@ -57,7 +57,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
 USER root
 
 ENV HOME=/root \
-    ## Make sure grass uses the distro's python
+    ## GRASS GIS: Make sure the distro's python is used
     GRASS_PYTHON=/usr/bin/python3
 
 WORKDIR ${HOME}
@@ -157,7 +157,7 @@ RUN apt-get update \
       fi \
     fi \
   fi \
-  ## Dynamic linker run time bindings for grass
+  ## GRASS GIS: Configure dynamic linker run time bindings
   && echo "$(grass --config path)/lib" | tee /etc/ld.so.conf.d/libgrass.conf \
   && ldconfig \
   ## SAGA GIS: Add en_GB.UTF-8 and update locale
@@ -182,8 +182,10 @@ RUN apt-get update \
   ## Install qgisprocess, the R interface to QGIS
   && R -e "devtools::install_github('r-spatial/qgisprocess')" \
   ## Clean up
-  && apt-get -y purge python3-pip \
-  && apt-get -y autoremove \
+  && if [ ! -z "$PYTHON_VERSION" ]; then \
+    apt-get -y purge python3-pip; \
+    apt-get -y autoremove; \
+  fi \
   && rm -rf /var/lib/apt/lists/* \
     ${HOME}/.cache \
     ${HOME}/.config \
@@ -202,17 +204,18 @@ WORKDIR ${HOME}
 COPY --from=files /files /
 COPY --from=files /files/var/backups/skel ${HOME}
 
-## QGIS: Install plugin 'Processing Saga NextGen Provider'
+  ## QGIS: Install plugin 'Processing Saga NextGen Provider'
 RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && cd ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
   && qgis-plugin-manager install 'Processing Saga NextGen Provider' \
   && rm -rf .cache_qgis_plugin_manager \
-  ## Enable QGIS plugins
+  ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \
   && qgis_process plugins enable grassprovider \
   && if [ "$(uname -m)" = "x86_64" ]; then \
+    ## QGIS: Enable OTB plugin
     qgis_process plugins enable otbprovider; \
   fi \
   ## Clean up
