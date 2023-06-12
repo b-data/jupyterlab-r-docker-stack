@@ -293,15 +293,19 @@ RUN apt-get update \
   && echo "options(jupyter.plot_mimetypes = c('text/plain', 'image/svg+xml', 'application/pdf'))" \
     >> $(R RHOME)/etc/Rprofile.site \
   ## IRkernel: Include user's private bin in PATH
-  && echo "if (dir.exists(file.path(Sys.getenv('HOME'), 'bin')) && Sys.getenv('SHLVL') == '0') {" \
+  && echo "if (dir.exists(file.path(Sys.getenv('HOME'), 'bin')) &&" \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  !grepl(file.path(Sys.getenv('\''HOME'\''), '\''bin'\''), Sys.getenv('\''PATH'\''))) {' \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), 'bin'), Sys.getenv('PATH')," \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "    sep = .Platform\$path.sep))}" \
     >> $(R RHOME)/etc/Rprofile.site \
-  && echo "if (dir.exists(file.path(Sys.getenv('HOME'), '.local/bin')) && Sys.getenv('SHLVL') == '0') {" \
+  && echo "if (dir.exists(file.path(Sys.getenv('HOME'), '.local', 'bin')) &&" \
     >> $(R RHOME)/etc/Rprofile.site \
-  && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), '.local/bin'), Sys.getenv('PATH')," \
+  && echo '  !grepl(file.path(Sys.getenv('\''HOME'\''), '\''.local'\'', '\''bin'\''), Sys.getenv('\''PATH'\''))) {' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), '.local', 'bin'), Sys.getenv('PATH')," \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "    sep = .Platform\$path.sep))}" \
     >> $(R RHOME)/etc/Rprofile.site \
