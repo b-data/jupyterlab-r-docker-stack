@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian
-ARG BASE_IMAGE_TAG=bullseye
+ARG BASE_IMAGE_TAG=12
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/r/ver
 ARG R_VERSION
 ARG CUDA_IMAGE_FLAVOR
@@ -187,7 +187,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo-i; \
   fi \
   ## Add user
-  && useradd -l -m -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+  && useradd -l -m -s $(which zsh) -N -u ${NB_UID} ${NB_USER} \
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Install Tini
@@ -218,6 +218,8 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension alefragnani.project-manager-12.7.0.vsix \
   && curl -sLO https://dl.b-data.ch/vsix/piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension piotrpalarz.vscode-gitignore-generator-1.0.3.vsix \
+  && curl -sLO https://dl.b-data.ch/vsix/mutantdino.resourcemonitor-1.0.7.vsix \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension mutantdino.resourcemonitor-1.0.7.vsix \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension GitLab.gitlab-workflow \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-python.python \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension ms-toolsai.jupyter \
@@ -237,7 +239,8 @@ RUN mkdir /opt/code-server \
     ${HOME}/.local
 
 ## Install JupyterLab
-RUN pip install \
+RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
+  && pip install \
     jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
@@ -268,6 +271,7 @@ RUN apt-get update \
     libssl-dev \
     libxml2-dev \
   ## Install radian
+  && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install radian \
   ## Provide NVBLAS-enabled radian_
   ## Enabled at runtime and only if nvidia-smi and at least one GPU are present

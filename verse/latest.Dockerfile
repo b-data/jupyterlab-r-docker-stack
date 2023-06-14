@@ -69,7 +69,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Get rid of librdf0-dev and its dependencies (incl. libcurl4-gnutls-dev)
   && apt-get -y autoremove \
   ## Install quarto
-  && curl -sLO https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz  \
+  && curl -sLO https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz \
   && mkdir -p /opt/quarto \
   && tar -xzf quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz -C /opt/quarto --no-same-owner --strip-components=1 \
   && rm quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz \

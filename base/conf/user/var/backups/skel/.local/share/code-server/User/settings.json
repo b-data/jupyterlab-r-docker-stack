@@ -20,6 +20,8 @@
     "--no-restore"
   ],
   "r.workspaceViewer.showObjectSize": true,
+  "resmon.show.battery": false,
+  "resmon.show.cpufreq": false,
   "telemetry.telemetryLevel": "off",
   "terminal.integrated.fontFamily": "MesloLGS NF",
   "workbench.colorTheme": "Default Dark+"

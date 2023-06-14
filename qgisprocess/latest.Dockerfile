@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian
-ARG BASE_IMAGE_TAG=bullseye
+ARG BASE_IMAGE_TAG=12
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/geospatial
 ARG R_VERSION
 ARG QGIS_VERSION
@@ -178,7 +178,17 @@ RUN apt-get update \
 RUN apt-get update \
   ## Install QGIS-Plugin-Manager
   && apt-get -y install --no-install-recommends python3-pip \
+  && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && /usr/bin/pip install qgis-plugin-manager \
+  ## QGIS: Make sure qgis_mapserver and qgis_process find the qgis module
+  && cp -a $(which qgis_mapserver) $(which qgis_mapserver)_ \
+  && echo '#!/bin/bash' > $(which qgis_mapserver) \
+  && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_mapserver)_ \"\${@}\"" >> \
+    $(which qgis_mapserver) \
+  && cp -a $(which qgis_process) $(which qgis_process)_ \
+  && echo '#!/bin/bash' > $(which qgis_process) \
+  && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_process)_ \"\${@}\"" >> \
+    $(which qgis_process) \
   ## Install qgisprocess, the R interface to QGIS
   && R -e "devtools::install_github('r-spatial/qgisprocess')" \
   ## Clean up
