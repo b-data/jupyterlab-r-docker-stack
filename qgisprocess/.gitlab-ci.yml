@@ -1,6 +1,6 @@
 .env:
   variables:
-    R_VERSION: "4.3.0"
+    R_VERSION: "4.3.1"
     QGIS_VERSION: "3.30.3"
     OTB_VERSION: "8.1.1"
 

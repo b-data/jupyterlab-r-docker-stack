@@ -1,6 +1,6 @@
 .env:
   variables:
-    R_VERSION: "4.3.0"
+    R_VERSION: "4.3.1"
 
 .before-script-build: &before-script-build
   - |
