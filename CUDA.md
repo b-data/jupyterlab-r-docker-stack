@@ -6,6 +6,7 @@ GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 * [`glcr.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/cuda/r/qgisprocess/container_registry) (versions ≥ 4.3.0)
 
 Images available for R versions ≥ 4.2.2.
 
@@ -78,7 +79,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/r/ver \
-  --build-arg R_VERSION=4.2.3 \
+  --build-arg R_VERSION=4.3.0 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base \
   -f latest.Dockerfile .
@@ -100,11 +101,12 @@ For `MAJOR.MINOR.PATCH` ≥ `4.2.2`.
 
 ### Create home directory
 
-Create an empty directory:
+Create an empty directory using docker:
 
 ```bash
-mkdir jupyterlab-jovyan
-sudo chown 1000:100 jupyterlab-jovyan
+docker run --rm \
+  -v "${PWD}/jupyterlab-jovyan":/dummy \
+  alpine chown 1000:100 /dummy
 ```
 
 It will be *bind mounted* as the JupyterLab user's home directory and
@@ -153,6 +155,7 @@ docker run -it --rm \
 * [`glcr.b-data.ch/jupyterlab/cuda/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/verse`](https://gitlab.b-data.ch/jupyterlab/cuda/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/cuda/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/cuda/r/geospatial/container_registry)
+* [`glcr.b-data.ch/jupyterlab/cuda/r/qgisprocess`](https://gitlab.b-data.ch/jupyterlab/cuda/r/qgisprocess/container_registry)
 
 The use of the `-v` flag in the command mounts the empty directory on the host
 (`${PWD}/jupyterlab-jovyan` in the command) as `/home/jovyan` in the container.
@@ -170,7 +173,8 @@ The server logs appear in the terminal.
 
 **Using Docker Desktop**
 
-`sudo chown 1000:100 jupyterlab-jovyan` *might* not be required. Also
+[Creating a home directory](#create-home-directory) *might* not be required.
+Also
 
 ```bash
 docker run -it --rm \

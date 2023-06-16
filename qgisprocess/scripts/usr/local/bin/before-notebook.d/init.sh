@@ -52,6 +52,20 @@ if [ "$(id -u)" == 0 ] ; then
     /var/backups/skel/.local/share/code-server/User/settings.json \
     /home/$NB_USER/.local/share/code-server/User/settings.json.bak > \
     /home/$NB_USER/.local/share/code-server/User/settings.json"
+
+  ## QGIS Desktop: Put inital settings in place
+  su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS"
+  if [[ ! -f "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
+    su $NB_USER -c "cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
+  fi
+
+  ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
+  su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+  if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
+    su $NB_USER -c "cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+  fi
 else
   # Warn if the user wants to change the timezone but hasn't started the
   # container as root.
@@ -89,6 +103,20 @@ else
     /var/backups/skel/.local/share/code-server/User/settings.json \
     /home/$NB_USER/.local/share/code-server/User/settings.json.bak > \
     /home/$NB_USER/.local/share/code-server/User/settings.json
+
+  ## QGIS Desktop: Put inital settings in place
+  mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS
+  if [[ ! -f "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
+    cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini
+  fi
+
+  ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
+  mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
+  if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
+    cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
+      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
+  fi
 fi
 
 # Remove old .zcompdump files

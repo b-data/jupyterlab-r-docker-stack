@@ -235,7 +235,8 @@ RUN mkdir /opt/code-server \
     $HOME/.local
 
 ## Install JupyterLab
-RUN pip install \
+RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
+  && pip install \
     jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
@@ -266,6 +267,7 @@ RUN apt-get update \
     libssl-dev \
     libxml2-dev \
   ## Install radian
+  && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install radian \
   ## Provide NVBLAS-enabled radian_
   ## Enabled at runtime and only if nvidia-smi and at least one GPU are present

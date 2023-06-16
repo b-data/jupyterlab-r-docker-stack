@@ -1,6 +1,8 @@
 .env:
   variables:
     R_VERSION: "4.3.0"
+    QGIS_VERSION: "3.30.3"
+    OTB_VERSION: "8.1.1"
 
 .before-script-build: &before-script-build
   - |
@@ -60,12 +62,13 @@ build:latest-linux-amd64:
     - os:linux
   script:
     - >
-      cd base && docker build --pull
+      cd qgisprocess && docker build --pull
       --build-arg BASE_IMAGE
       --build-arg BASE_IMAGE_TAG
       --build-arg BUILD_ON_IMAGE
       --build-arg R_VERSION
-      --build-arg CUDA_IMAGE_FLAVOR
+      --build-arg QGIS_VERSION
+      --build-arg OTB_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
@@ -94,9 +97,9 @@ build:latest-linux-amd64:
       -f ../common/subtags/root/Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - base/latest.Dockerfile
+        - qgisprocess/latest.Dockerfile
 
 build:latest-linux-arm64v8:
   extends: .build
@@ -106,12 +109,12 @@ build:latest-linux-arm64v8:
     - os:linux
   script:
     - >
-      cd base && docker build --pull
+      cd qgisprocess && docker build --pull
       --build-arg BASE_IMAGE
       --build-arg BASE_IMAGE_TAG
       --build-arg BUILD_ON_IMAGE
       --build-arg R_VERSION
-      --build-arg CUDA_IMAGE_FLAVOR
+      --build-arg QGIS_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
@@ -140,9 +143,9 @@ build:latest-linux-arm64v8:
       -f ../common/subtags/root/Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - base/latest.Dockerfile
+        - qgisprocess/latest.Dockerfile
 
 build:version-linux-amd64:
   extends: .build
@@ -152,11 +155,11 @@ build:version-linux-amd64:
     - os:linux
   script:
     - >
-      cd base && docker build --pull
+      cd qgisprocess && docker build --pull
       --build-arg BASE_IMAGE
       --build-arg BASE_IMAGE_TAG
       --build-arg BUILD_ON_IMAGE
-      --build-arg CUDA_IMAGE_FLAVOR
+      --build-arg OTB_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
@@ -181,9 +184,9 @@ build:version-linux-amd64:
       -f ../common/subtags/root/Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - base/$R_VERSION.Dockerfile
+        - qgisprocess/$R_VERSION.Dockerfile
 
 build:version-linux-arm64v8:
   extends: .build
@@ -193,11 +196,10 @@ build:version-linux-arm64v8:
     - os:linux
   script:
     - >
-      cd base && docker build --pull
+      cd qgisprocess && docker build --pull
       --build-arg BASE_IMAGE
       --build-arg BASE_IMAGE_TAG
       --build-arg BUILD_ON_IMAGE
-      --build-arg CUDA_IMAGE_FLAVOR
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
@@ -222,9 +224,9 @@ build:version-linux-arm64v8:
       -f ../common/subtags/root/Dockerfile .
     - docker push -a $CI_APP_REPO
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - base/$R_VERSION.Dockerfile
+        - qgisprocess/$R_VERSION.Dockerfile
 
 build-manifest:latest-linux-multiarch:
   extends: .build
@@ -315,9 +317,9 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:$VERSION_MAJ-docker
       docker manifest push $CI_APP_REPO:$VERSION_MAJ-docker-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
-        - base/latest.Dockerfile
+        - qgisprocess/latest.Dockerfile
 
 build-manifest:version-linux-multiarch:
   extends: .build
@@ -351,69 +353,9 @@ build-manifest:version-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
-        - base/$R_VERSION.Dockerfile
-
-trigger-latest-build:
-  extends: .post
-  stage: .post
-  needs: ["build-manifest:latest-linux-multiarch"]
-  before_script:
-    - apk upgrade --no-cache
-    - apk add --update --no-cache curl
-  script:
-    - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=main https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
-  rules:
-    - if: $CUDA_IMAGE
-      when: never
-    - if: $CI_COMMIT_BRANCH == "main"
-      changes:
-        - base/latest.Dockerfile
-
-trigger-version-build:
-  extends: .post
-  stage: .post
-  needs: ["build-manifest:version-linux-multiarch"]
-  before_script:
-    - apk upgrade --no-cache
-    - apk add --update --no-cache curl
-  script:
-    - curl -X POST -F token=$JUPYTERLAB_R_TIDYVERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/167/trigger/pipeline
-  rules:
-    - if: $CUDA_IMAGE
-      when: never
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
-      changes:
-        - base/$R_VERSION.Dockerfile
-
-trigger-latest-cuda-build:
-  extends: .post
-  stage: .post
-  needs: ["build-manifest:latest-linux-multiarch"]
-  before_script:
-    - apk upgrade --no-cache
-    - apk add --update --no-cache curl
-  script:
-    - curl -X POST -F token=$JUPYTERLAB_CUDA_R_TIDYVERSE -F ref=main https://gitlab.b-data.ch/api/v4/projects/308/trigger/pipeline
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CUDA_IMAGE
-      changes:
-        - base/latest.Dockerfile
-
-trigger-version-cuda-build:
-  extends: .post
-  stage: .post
-  needs: ["build-manifest:version-linux-multiarch"]
-  before_script:
-    - apk upgrade --no-cache
-    - apk add --update --no-cache curl
-  script:
-    - curl -X POST -F token=$JUPYTERLAB_CUDA_R_TIDYVERSE -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/308/trigger/pipeline
-  rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CUDA_IMAGE
-      changes:
-        - base/$R_VERSION.Dockerfile
+        - qgisprocess/$R_VERSION.Dockerfile
 
 build:latest-devtools-linux-amd64:
   extends: .build
@@ -461,9 +403,9 @@ build:latest-devtools-linux-amd64:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root-linux-amd64
       docker push $CI_APP_REPO:latest-devtools-docker-root-linux-amd64
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - base/latest.Dockerfile
+        - qgisprocess/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build:latest-devtools-linux-arm64v8:
@@ -512,9 +454,9 @@ build:latest-devtools-linux-arm64v8:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root-linux-arm64v8
       docker push $CI_APP_REPO:latest-devtools-docker-root-linux-arm64v8
   rules:
-    - if: $CI_COMMIT_BRANCH == "main" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - base/latest.Dockerfile
+        - qgisprocess/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build:version-devtools-linux-amd64:
@@ -554,9 +496,9 @@ build:version-devtools-linux-amd64:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-linux-amd64
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root-linux-amd64
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/amd64)/
       changes:
-        - base/$R_VERSION.Dockerfile
+        - qgisprocess/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
 
 build:version-devtools-linux-arm64v8:
@@ -596,9 +538,9 @@ build:version-devtools-linux-arm64v8:
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-linux-arm64v8
       docker push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root-linux-arm64v8
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CI_BUILD_PLATFORMS =~ /(linux\/arm64\/v8)/
       changes:
-        - base/$R_VERSION.Dockerfile
+        - qgisprocess/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile
 
 build-manifest:latest-devtools-linux-multiarch:
@@ -690,9 +632,9 @@ build-manifest:latest-devtools-linux-multiarch:
       docker manifest push $CI_APP_REPO:$VERSION_MAJ-devtools-docker
       docker manifest push $CI_APP_REPO:$VERSION_MAJ-devtools-docker-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
       changes:
-        - base/latest.Dockerfile
+        - qgisprocess/latest.Dockerfile
         - common/subtags/devtools/latest.Dockerfile
 
 build-manifest:version-devtools-linux-multiarch:
@@ -727,7 +669,7 @@ build-manifest:version-devtools-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-docker
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root
   rules:
-    - if: $CI_COMMIT_BRANCH == "freeze-version"
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
-        - base/$R_VERSION.Dockerfile
+        - qgisprocess/$R_VERSION.Dockerfile
         - common/subtags/devtools/$R_VERSION.Dockerfile

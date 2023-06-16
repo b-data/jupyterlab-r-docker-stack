@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=debian
-ARG BASE_IMAGE_TAG=bullseye
+ARG BASE_IMAGE_TAG=12
 ARG BUILD_ON_IMAGE
 ARG R_VERSION
 
@@ -52,7 +52,8 @@ RUN apt-get update \
   fi \
   ## Clean up Node.js installation
   && bash -c 'rm -f /usr/local/bin/{docker-entrypoint.sh,yarn*}' \
-  && bash -c 'rm -f /usr/local/{CHANGELOG.md,LICENSE,README.md}' \
+  && bash -c 'mv /usr/local/{CHANGELOG.md,LICENSE,README.md} \
+    /usr/local/share/doc/node' \
   ## Enable corepack (Yarn, pnpm)
   && corepack enable \
   ## Install nFPM
@@ -67,8 +68,8 @@ RUN apt-get update \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
-    /root/.config \
-    /root/.local
+    ${HOME}/.config \
+    ${HOME}/.local
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}

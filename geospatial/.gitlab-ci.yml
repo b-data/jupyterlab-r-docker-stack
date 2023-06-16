@@ -1,6 +1,6 @@
 .env:
   variables:
-    R_VERSION: "4.2.3"
+    R_VERSION: "4.3.0"
 
 .before-script-build: &before-script-build
   - |
@@ -26,7 +26,7 @@
     sed -n "s|\([[:digit:]]\+\).*|\1|p"`
 
 .build:
-  image: glcr.b-data.ch/docker/docker:latest
+  image: glcr.b-data.ch/docker/docker:dind
   extends: .env
   services:
     - name: glcr.b-data.ch/docker/docker:dind
@@ -40,7 +40,7 @@
   retry: 2
 
 .post:
-  image: glcr.b-data.ch/docker/docker:latest
+  image: glcr.b-data.ch/docker/docker:dind
   stage: .post
   extends: .env
 
@@ -338,27 +338,68 @@ build-manifest:version-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker-root
-    - |
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN $CI_MANIFEST_LIST
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-root $CI_MANIFEST_LIST_ROOT
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-docker $CI_MANIFEST_LIST_DOCKER
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root $CI_MANIFEST_LIST_DOCKER_ROOT
-      if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN \
-          $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-root \
-          $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-docker \
-          $CI_APP_REPO:$CI_APP_TAG-docker-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root \
-          $CI_APP_REPO:$CI_APP_TAG-docker-root-linux-arm64v8
-      fi
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-root
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-docker
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
+      changes:
+        - geospatial/$R_VERSION.Dockerfile
+
+trigger-latest-build:
+  extends: .post
+  stage: .post
+  needs: ["build-manifest:latest-linux-multiarch"]
+  before_script:
+    - apk upgrade --no-cache
+    - apk add --update --no-cache curl
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_R_QGISPROCESS -F ref=main https://gitlab.b-data.ch/api/v4/projects/332/trigger/pipeline
+  rules:
+    - if: $CUDA_IMAGE
+      when: never
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true"
+      changes:
+        - geospatial/latest.Dockerfile
+
+trigger-version-build:
+  extends: .post
+  stage: .post
+  needs: ["build-manifest:version-linux-multiarch"]
+  before_script:
+    - apk upgrade --no-cache
+    - apk add --update --no-cache curl
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_R_QGISPROCESS -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/332/trigger/pipeline
+  rules:
+    - if: $CUDA_IMAGE
+      when: never
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
+      changes:
+        - geospatial/$R_VERSION.Dockerfile
+
+trigger-latest-cuda-build:
+  extends: .post
+  stage: .post
+  needs: ["build-manifest:latest-linux-multiarch"]
+  before_script:
+    - apk upgrade --no-cache
+    - apk add --update --no-cache curl
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_CUDA_R_QGISPROCESS -F ref=main https://gitlab.b-data.ch/api/v4/projects/333/trigger/pipeline
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" && $UPDATE_MODE != "true" && $CUDA_IMAGE
+      changes:
+        - geospatial/latest.Dockerfile
+
+trigger-version-cuda-build:
+  extends: .post
+  stage: .post
+  needs: ["build-manifest:version-linux-multiarch"]
+  before_script:
+    - apk upgrade --no-cache
+    - apk add --update --no-cache curl
+  script:
+    - curl -X POST -F token=$JUPYTERLAB_CUDA_R_QGISPROCESS -F ref=freeze-version https://gitlab.b-data.ch/api/v4/projects/333/trigger/pipeline
+  rules:
+    - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED && $CUDA_IMAGE
       changes:
         - geospatial/$R_VERSION.Dockerfile
 
@@ -673,25 +714,6 @@ build-manifest:version-devtools-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-root
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-docker
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root
-    - |
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-devtools $CI_MANIFEST_LIST
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-root $CI_MANIFEST_LIST_ROOT
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-docker $CI_MANIFEST_LIST_DOCKER
-      docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-docker-root $CI_MANIFEST_LIST_DOCKER_ROOT
-      if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-devtools \
-          $CI_APP_REPO:$CI_APP_TAG-devtools-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-root \
-          $CI_APP_REPO:$CI_APP_TAG-devtools-root-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-docker \
-          $CI_APP_REPO:$CI_APP_TAG-devtools-docker-linux-arm64v8
-        docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-docker-root \
-          $CI_APP_REPO:$CI_APP_TAG-devtools-docker-root-linux-arm64v8
-      fi
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-devtools
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-root
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-docker
-      docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-devtools-docker-root
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
