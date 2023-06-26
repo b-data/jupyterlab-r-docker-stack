@@ -1,7 +1,7 @@
 .env:
   variables:
     R_VERSION: "4.3.1"
-    QGIS_VERSION: "3.30.3"
+    QGIS_VERSION: "3.32.0"
     OTB_VERSION: "8.1.1"
 
 .before-script-build: &before-script-build
