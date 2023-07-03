@@ -283,6 +283,11 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
+  ## digest: Installation fails on arm64 for v0.6.32
+  ## https://github.com/eddelbuettel/digest/issues/189
+  && curl -sSLO https://eddelbuettel.r-universe.dev/src/contrib/digest_0.6.32.1.tar.gz \
+  && R CMD INSTALL digest_0.6.32.1.tar.gz \
+  && rm digest_0.6.32.1.tar.gz \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
