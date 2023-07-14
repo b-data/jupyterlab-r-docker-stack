@@ -166,7 +166,7 @@ RUN apt-get update \
   && sed -i "s/# en_GB.UTF-8/en_GB.UTF-8/g" /etc/locale.gen \
   && locale-gen \
   ## [^1]: SAGA GIS: libvigraimpex11 is not available for jammy
-  && if $(! grep "jammy" /etc/os-release); then \
+  && if $(! grep -q "jammy" /etc/os-release); then \
     apt-get -y install --no-install-recommends '^libvigraimpex[0-9]+$'; \
   fi \
   ## Clean up
