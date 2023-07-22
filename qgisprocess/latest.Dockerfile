@@ -9,6 +9,8 @@ ARG OTB_VERSION
 
 FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} as files
 
+ARG OTB_VERSION
+
 ARG NB_UID=1000
 ENV NB_GID=100
 
@@ -21,9 +23,15 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
     ## QGIS: Set OTB application folder and OTB folder
     qgis3Ini="/files/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"; \
     echo "\n[Processing]" >> ${qgis3Ini}; \
-    echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
-      ${qgis3Ini}; \
-    echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis3Ini}; \
+    if [ -z "${OTB_VERSION}" ]; then \
+      echo "Configuration\OTB_APP_FOLDER=/usr/lib/x86_64-linux-gnu/otb/applications" >> \
+        ${qgis3Ini}; \
+      echo "Configuration\OTB_FOLDER=/usr\n" >> ${qgis3Ini}; \
+    else \
+      echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
+        ${qgis3Ini}; \
+      echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis3Ini}; \
+    fi \
   fi \
   && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Ensure file modes are correct when using CI
@@ -70,6 +78,7 @@ COPY --from=saga-gissi /usr/local /usr/local
 COPY --from=otbsi /usr/local /usr/local
 ENV GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
     OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications}
+ENV OTB_APPLICATION_PATH=${OTB_APPLICATION_PATH:-/usr/lib/otb/applications}
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
@@ -148,13 +157,17 @@ RUN apt-get update \
       '^libopencv-core[0-9][0-9.][0-9][a-z]?$' \
       '^libopencv-ml[0-9][0-9.][0-9][a-z]?$' \
       libtinyxml-dev \
-      $(test -z "${OTB_VERSION}" && echo "otb-*"); \
+      $(test -z "${OTB_VERSION}" && echo "otb-* monteverdi"); \
     if [ ! -z "${OTB_VERSION}" ]; then \
       if [ "$(echo ${OTB_VERSION} | cut -c 1)" -lt "8" ]; then \
         apt-get -y install --no-install-recommends \
           '^libopenthreads[0-9]+$' \
           libossim1; \
       fi \
+    else \
+      mkdir -p /usr/lib/otb; \
+      ln -rs /usr/lib/$(uname -m)-linux-gnu/otb/applications \
+        /usr/lib/otb/applications; \
     fi \
   fi \
   ## GRASS GIS: Configure dynamic linker run time bindings
