@@ -24,7 +24,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
     qgis3Ini="/files/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"; \
     echo "\n[Processing]" >> ${qgis3Ini}; \
     if [ -z "${OTB_VERSION}" ]; then \
-      echo "Configuration\OTB_APP_FOLDER=/usr/lib/x86_64-linux-gnu/otb/applications" >> \
+      echo "Configuration\OTB_APP_FOLDER=/usr/lib/otb/applications" >> \
         ${qgis3Ini}; \
       echo "Configuration\OTB_FOLDER=/usr\n" >> ${qgis3Ini}; \
     else \
