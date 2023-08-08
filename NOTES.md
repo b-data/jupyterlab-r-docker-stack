@@ -46,6 +46,7 @@ unattended computations.
 
 ### Environment variables
 
+* `CRAN`: The CRAN mirror URL.
 * `DOWNLOAD_STATIC_LIBV8=1`: R (V8): Installing V8 on Linux, the alternative
   way.
 * `RETICULATE_MINICONDA_ENABLED=0`: R (reticulate): Disable prompt to install
@@ -70,7 +71,6 @@ unattended computations.
 * `BASE_IMAGE`: Its very base, a [Docker Official Image](https://hub.docker.com/search?q=&type=image&image_filter=official).
 * `PARENT_IMAGE`: The image it was derived from.
 * `BUILD_DATE`: The date it was built (ISO 8601 format).
-* `CRAN`: The CRAN mirror URL.
 * `CTAN_REPO`: The CTAN mirror URL. (verse+ images)
 
 **`MRAN`**
@@ -117,11 +117,8 @@ are installed.
   * IRkernel: Only enable `image/svg+xml` and `application/pdf` for plot
     display.
   * R Extension (code-server): Disable help panel and revert to old behaviour.
-* [Terminal IPython](base/conf/ipython/usr/local/etc/ipython/ipython_config.py):
-  * Only enable figure formats `svg` and `pdf` for Terminal IPython.
-* [IPython kernel](base/conf/ipython/usr/local/etc/ipython/ipython_kernel_config.py):
-  * Only enable figure formats `svg` and `pdf` for IPython Kernel (Jupyter
-    Notebooks).
+* [IPython](base/conf/ipython/usr/local/etc/ipython/ipython_config.py):
+  * Only enable figure formats `svg` and `pdf` for IPython.
 * [JupyterLab](base/conf/jupyterlab/usr/local/share/jupyter/lab/settings/overrides.json):
   * Theme > Selected Theme: JupyterLab Dark
   * Terminal > Font family: MesloLGS NF
@@ -171,10 +168,7 @@ are installed.
   * Valid plot mimetypes: `image/png`, `image/jpeg`, `image/svg+xml`,
     `application/pdf`.  
     :information_source: MIME type `text/plain` must always be specified.
-* Terminal IPython: Create file `~/.ipython/profile_default/ipython_config.py`
-  * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
-* IPython kernel: Create file
-  `~/.ipython/profile_default/ipython_kernel_config.py`
+* IPython: Create file `~/.ipython/profile_default/ipython_config.py`
   * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
 * JupyterLab: Settings > Advanced Settings Editor
 * code-server: Manage > Settings
@@ -189,7 +183,7 @@ are installed.
 
 The Python version is selected as follows:
 
-* The latest [Python version numba is compatible with](https://numba.readthedocs.io/en/stable/user/installing.html#compatibility).
+* The latest [Python version numba is compatible with](https://numba.readthedocs.io/en/stable/user/installing.html#numba-support-info).
 
 This Python version is installed at `/usr/local/bin`.
 
@@ -235,7 +229,7 @@ To have `R` and `Rscript` use NVBLAS instead,
 1. copy the NVBLAS-enabled executables to `~/.local/bin`  
    ```bash
    for file in $(which {R,Rscript}); do
-     cp "$file"_ "$HOME/.local/bin/$(basename $file)";
+     cp "$file"_ "$HOME/.local/bin/$(basename "$file")";
    done
    ```
 1. set Extensions > R > Rterm > Linux: `/home/USER/.local/bin/R` in code-server
@@ -257,11 +251,13 @@ and/or pnpm:
 * [Installation | Yarn - Package Manager > Updating the global Yarn version](https://yarnpkg.com/getting-started/install#updating-the-global-yarn-version)
 * [Installation | pnpm > Using Corepack](https://pnpm.io/installation#using-corepack)
 
-## OS Python
+## System Python
 
-Package `libsecret-1-dev` depends on `python3` from the OS' package repository.
+Package `libsecret-1-dev` depends on `python3` from the system's package
+repository.
 
-The OS' Python version is installed at `/usr/bin`.  
+The system's Python version is installed at `/usr/bin`.  
 
-:information_source: Because the [recent Python version](#python) is installed
-at `/usr/local/bin`, it takes precedence over the OS' Python version.
+:information_source: Because [a more recent Python version](#python) is
+installed at `/usr/local/bin`, it takes precedence over the system's Python
+version.
