@@ -130,9 +130,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     distill \
     quarto \
     rticles \
-    rmdshower \
     rJava \
     xaringan \
+  ## Install rmdshower
+  ## Archived on 2023-08-18 as email to the maintainer is undeliverable.
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/rmdshower/rmdshower_2.1.1.tar.gz \
+  && R CMD INSTALL rmdshower_2.1.1.tar.gz \
   ## Install Cairo: R Graphics Device using Cairo Graphics Library
   ## Install magick: Advanced Graphics and Image-Processing in R
   && install2.r --error --skipinstalled -n $NCPUS \
