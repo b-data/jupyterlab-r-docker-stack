@@ -40,7 +40,7 @@ if [ "$(id -u)" == 0 ] ; then
   # Update code-server settings
   su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/code-server/User"
   if [[ ! -f "/home/$NB_USER/.local/share/code-server/User/settings.json" ]]; then
-    su $NB_USER -c "cp -a /var/backups/skel/.local/share/code-server/User/settings.json \
+    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/code-server/User/settings.json \
       /home/$NB_USER/.local/share/code-server/User/settings.json"
   fi
 
@@ -56,14 +56,14 @@ if [ "$(id -u)" == 0 ] ; then
   ## QGIS Desktop: Put inital settings in place
   su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS"
   if [[ ! -f "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
-    su $NB_USER -c "cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
+    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
       /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
   fi
 
   ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
   su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
   if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
-    su $NB_USER -c "cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
+    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
       /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
   fi
 else
