@@ -54,6 +54,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     ## Installing libnode-dev uninstalls nodejs
     ## https://github.com/jeroen/V8/issues/100
     #libnode-dev \
+    librsvg2-bin \
     qpdf \
     texinfo \
   ## Install R package redland
