@@ -203,7 +203,7 @@ RUN apt-get update \
   && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_process)_ \"\${@}\"" >> \
     $(which qgis_process) \
   ## Install qgisprocess, the R interface to QGIS
-  && R -e "devtools::install_github('r-spatial/qgisprocess')" \
+  && install2.r --error --skipinstalled -n $NCPUS qgisprocess \
   ## Clean up
   && if [ ! -z "$PYTHON_VERSION" ]; then \
     apt-get -y purge python3-pip; \
