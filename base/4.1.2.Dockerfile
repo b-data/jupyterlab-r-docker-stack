@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=debian:bullseye
 ARG GIT_VERSION=2.35.1
 
-FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} as gsi
+FROM registry.gitlab.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE} AS gsi
 
 FROM registry.gitlab.b-data.ch/r/r-ver:4.1.2
 
