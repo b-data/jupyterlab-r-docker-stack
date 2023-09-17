@@ -57,6 +57,7 @@ RUN apt-get update \
     rgeos \
     rlas \
     sf \
+    sfarrow \
     sp \
     spacetime \
     spatstat \
