@@ -62,10 +62,9 @@ if [ "$(id -u)" == 0 ] ; then
 
   ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
   su $NB_USER -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
-  if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
-    su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
-      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
-  fi
+  su $NB_USER -c "rm -rf /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen"
+  su $NB_USER -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
+    /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
 else
   # Warn if the user wants to change the timezone but hasn't started the
   # container as root.
@@ -113,10 +112,9 @@ else
 
   ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
   mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
-  if [[ ! -d "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen" ]]; then
-    cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
-      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
-  fi
+  rm -rf /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen
+  cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
+    /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins
 fi
 
 # Remove old .zcompdump files

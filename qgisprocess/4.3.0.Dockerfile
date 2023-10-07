@@ -7,6 +7,7 @@ ARG QGIS_VERSION=3.30.3
 ARG SAGA_VERSION
 ARG OTB_VERSION
 ## OTB_VERSION=8.1.1
+ARG PROC_SAGA_NG_VERSION
 
 FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS files
 
@@ -47,6 +48,7 @@ ARG BUILD_ON_IMAGE
 ARG QGIS_VERSION
 ARG SAGA_VERSION
 ARG OTB_VERSION
+ARG PROC_SAGA_NG_VERSION
 ARG BUILD_START
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
@@ -66,7 +68,7 @@ WORKDIR ${HOME}
 ## Install QGIS
 COPY --from=qgissi /usr /usr
 ## Install SAGA GIS
-COPY --from=saga-gissi /usr/local /usr/local
+COPY --from=saga-gissi /usr /usr
 ## Install Orfeo Toolbox
 COPY --from=otbsi /usr/local /usr/local
 ENV GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
@@ -220,7 +222,7 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && cd ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
-  && qgis-plugin-manager install 'Processing Saga NextGen Provider'==0.0.7 \
+  && qgis-plugin-manager install 'Processing Saga NextGen Provider'=="${PROC_SAGA_NG_VERSION:-0.0.7}" \
   && rm -rf .cache_qgis_plugin_manager \
   ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \
