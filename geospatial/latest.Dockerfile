@@ -48,13 +48,10 @@ RUN apt-get update \
     hdf5r \
     lidR \
     mapdata \
-    maptools \
     mapview \
     ncdf4 \
     proj4 \
     raster \
-    rgdal \
-    rgeos \
     rlas \
     sf \
     sfarrow \
