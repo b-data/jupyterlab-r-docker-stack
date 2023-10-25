@@ -84,6 +84,8 @@ ENV OTB_APPLICATION_PATH=${OTB_APPLICATION_PATH:-/usr/lib/otb/applications}
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
+    ## Multimedia files trancoding
+    ffmpeg \
     ## QGIS: Additional runtime dependencies
     '^libexiv2-[0-9]+$' \
     '^libgdal[0-9]+$' \

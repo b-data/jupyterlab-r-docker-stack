@@ -33,6 +33,7 @@ RUN apt-get update \
     #libsqlite3-dev \
     #libssl-dev \
     libudunits2-dev \
+    nco \
     netcdf-bin \
     postgis \
     protobuf-compiler \
