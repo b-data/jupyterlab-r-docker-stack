@@ -80,12 +80,13 @@ Environment variable `MRAN` is deprecated:
 > After January 31, 2023, we \[Microsoft\] will no longer maintain the CRAN Time
 > Machine snapshots.
 
-For *frozen* images (R versions ≥ 4.2.2), `CRAN` is no longer set to an `MRAN`
-snapshot in `$(R RHOME)/etc/Rprofile.site`.
+Current situation regarding *frozen* images:
 
-:point_right: Use [renv](https://rstudio.github.io/renv/) to create
-**r**eproducible **env**ironments for your R projects as these will also work
-without the images of this docker stack.
+* R version < 4.2.2: MRAN retired; CRAN snapshots broken.
+* 4.2.2 ≤ R version < 4.3.1: No CRAN snapshots available.
+    * Use [renv](https://rstudio.github.io/renv/) to create **r**eproducible
+      **env**ironments for your R projects.
+* R version ≥ 4.3.1: CRAN snapshots reinstated (PPM).
 
 ### Shell
 

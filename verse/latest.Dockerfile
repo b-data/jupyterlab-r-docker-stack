@@ -153,6 +153,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
+  ## Strip libraries of binary packages installed from PPM
+  && strip $(R RHOME)/site-library/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
