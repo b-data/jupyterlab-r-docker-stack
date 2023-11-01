@@ -1,5 +1,6 @@
 {
   "editor.tabSize": 2,
+  "gitlab.aiAssistedCodeSuggestions.enabled": false,
   "gitlens.graph.statusBar.enabled": false,
   "gitlens.menus": {
     "scm": {
@@ -12,6 +13,8 @@
       "graph": false
     }
   },
+  "gitlens.showWelcomeOnInstall": false,
+  "gitlens.showWhatsNewAfterUpgrades": false,
   "r.bracketedPaste": true,
   "r.plot.useHttpgd": true,
   "r.rterm.linux": "/usr/local/bin/radian",

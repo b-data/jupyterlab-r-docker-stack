@@ -7,8 +7,9 @@ ARG QGIS_VERSION=3.30.3
 ARG SAGA_VERSION
 ARG OTB_VERSION
 ## OTB_VERSION=8.1.1
+ARG PROC_SAGA_NG_VERSION
 
-FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} as files
+FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS files
 
 ARG NB_UID=1000
 ENV NB_GID=100
@@ -33,9 +34,9 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
-FROM glcr.b-data.ch/qgis/qgissi/${QGIS_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as qgissi
-FROM glcr.b-data.ch/saga-gis/saga-gissi${SAGA_VERSION:+/}${SAGA_VERSION:-:none}${SAGA_VERSION:+/$BASE_IMAGE}${SAGA_VERSION:+:$BASE_IMAGE_TAG} as saga-gissi
-FROM glcr.b-data.ch/orfeotoolbox/otbsi${OTB_VERSION:+/}${OTB_VERSION:-:none}${OTB_VERSION:+/$BASE_IMAGE}${OTB_VERSION:+:$BASE_IMAGE_TAG} as otbsi
+FROM glcr.b-data.ch/qgis/qgissi/${QGIS_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS qgissi
+FROM glcr.b-data.ch/saga-gis/saga-gissi${SAGA_VERSION:+/}${SAGA_VERSION:-:none}${SAGA_VERSION:+/$BASE_IMAGE}${SAGA_VERSION:+:$BASE_IMAGE_TAG} AS saga-gissi
+FROM glcr.b-data.ch/orfeotoolbox/otbsi${OTB_VERSION:+/}${OTB_VERSION:-:none}${OTB_VERSION:+/$BASE_IMAGE}${OTB_VERSION:+:$BASE_IMAGE_TAG} AS otbsi
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
 
@@ -47,6 +48,7 @@ ARG BUILD_ON_IMAGE
 ARG QGIS_VERSION
 ARG SAGA_VERSION
 ARG OTB_VERSION
+ARG PROC_SAGA_NG_VERSION
 ARG BUILD_START
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
@@ -66,7 +68,7 @@ WORKDIR ${HOME}
 ## Install QGIS
 COPY --from=qgissi /usr /usr
 ## Install SAGA GIS
-COPY --from=saga-gissi /usr/local /usr/local
+COPY --from=saga-gissi /usr /usr
 ## Install Orfeo Toolbox
 COPY --from=otbsi /usr/local /usr/local
 ENV GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
@@ -166,7 +168,7 @@ RUN apt-get update \
   && sed -i "s/# en_GB.UTF-8/en_GB.UTF-8/g" /etc/locale.gen \
   && locale-gen \
   ## [^1]: SAGA GIS: libvigraimpex11 is not available for jammy
-  && if $(! grep "jammy" /etc/os-release); then \
+  && if $(! grep -q "jammy" /etc/os-release); then \
     apt-get -y install --no-install-recommends '^libvigraimpex[0-9]+$'; \
   fi \
   ## Clean up
@@ -220,7 +222,7 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && cd ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
-  && qgis-plugin-manager install 'Processing Saga NextGen Provider' \
+  && qgis-plugin-manager install 'Processing Saga NextGen Provider'=="${PROC_SAGA_NG_VERSION:-0.0.7}" \
   && rm -rf .cache_qgis_plugin_manager \
   ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \

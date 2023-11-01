@@ -33,6 +33,7 @@ RUN apt-get update \
     #libsqlite3-dev \
     #libssl-dev \
     libudunits2-dev \
+    nco \
     netcdf-bin \
     postgis \
     protobuf-compiler \
@@ -48,15 +49,13 @@ RUN apt-get update \
     hdf5r \
     lidR \
     mapdata \
-    maptools \
     mapview \
     ncdf4 \
     proj4 \
     raster \
-    rgdal \
-    rgeos \
     rlas \
     sf \
+    sfarrow \
     sp \
     spacetime \
     spatstat \
@@ -70,6 +69,8 @@ RUN apt-get update \
     geosphere \
   ## from bioconductor
   && R -e "BiocManager::install('rhdf5', update = FALSE, ask = FALSE)" \
+  ## Strip libraries of binary packages installed from PPM
+  && strip $(R RHOME)/site-library/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*

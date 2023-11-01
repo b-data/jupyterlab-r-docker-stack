@@ -6,8 +6,11 @@ ARG QGIS_VERSION
 
 ARG SAGA_VERSION
 ARG OTB_VERSION
+ARG PROC_SAGA_NG_VERSION
 
-FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} as files
+FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS files
+
+ARG OTB_VERSION
 
 ARG NB_UID=1000
 ENV NB_GID=100
@@ -21,9 +24,15 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
     ## QGIS: Set OTB application folder and OTB folder
     qgis3Ini="/files/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"; \
     echo "\n[Processing]" >> ${qgis3Ini}; \
-    echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
-      ${qgis3Ini}; \
-    echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis3Ini}; \
+    if [ -z "${OTB_VERSION}" ]; then \
+      echo "Configuration\OTB_APP_FOLDER=/usr/lib/otb/applications" >> \
+        ${qgis3Ini}; \
+      echo "Configuration\OTB_FOLDER=/usr\n" >> ${qgis3Ini}; \
+    else \
+      echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
+        ${qgis3Ini}; \
+      echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis3Ini}; \
+    fi \
   fi \
   && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Ensure file modes are correct when using CI
@@ -32,9 +41,9 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
   && find /files -type f -exec chmod 644 {} \; \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \;
 
-FROM glcr.b-data.ch/qgis/qgissi/${QGIS_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} as qgissi
-FROM glcr.b-data.ch/saga-gis/saga-gissi${SAGA_VERSION:+/}${SAGA_VERSION:-:none}${SAGA_VERSION:+/$BASE_IMAGE}${SAGA_VERSION:+:$BASE_IMAGE_TAG} as saga-gissi
-FROM glcr.b-data.ch/orfeotoolbox/otbsi${OTB_VERSION:+/}${OTB_VERSION:-:none}${OTB_VERSION:+/$BASE_IMAGE}${OTB_VERSION:+:$BASE_IMAGE_TAG} as otbsi
+FROM glcr.b-data.ch/qgis/qgissi/${QGIS_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS qgissi
+FROM glcr.b-data.ch/saga-gis/saga-gissi${SAGA_VERSION:+/}${SAGA_VERSION:-:none}${SAGA_VERSION:+/$BASE_IMAGE}${SAGA_VERSION:+:$BASE_IMAGE_TAG} AS saga-gissi
+FROM glcr.b-data.ch/orfeotoolbox/otbsi${OTB_VERSION:+/}${OTB_VERSION:-:none}${OTB_VERSION:+/$BASE_IMAGE}${OTB_VERSION:+:$BASE_IMAGE_TAG} AS otbsi
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
 
@@ -46,6 +55,7 @@ ARG BUILD_ON_IMAGE
 ARG QGIS_VERSION
 ARG SAGA_VERSION
 ARG OTB_VERSION
+ARG PROC_SAGA_NG_VERSION
 ARG BUILD_START
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
@@ -65,14 +75,17 @@ WORKDIR ${HOME}
 ## Install QGIS
 COPY --from=qgissi /usr /usr
 ## Install SAGA GIS
-COPY --from=saga-gissi /usr/local /usr/local
+COPY --from=saga-gissi /usr /usr
 ## Install Orfeo Toolbox
 COPY --from=otbsi /usr/local /usr/local
 ENV GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
     OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications}
+ENV OTB_APPLICATION_PATH=${OTB_APPLICATION_PATH:-/usr/lib/otb/applications}
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
+    ## Multimedia files trancoding
+    ffmpeg \
     ## QGIS: Additional runtime dependencies
     '^libexiv2-[0-9]+$' \
     '^libgdal[0-9]+$' \
@@ -148,13 +161,17 @@ RUN apt-get update \
       '^libopencv-core[0-9][0-9.][0-9][a-z]?$' \
       '^libopencv-ml[0-9][0-9.][0-9][a-z]?$' \
       libtinyxml-dev \
-      $(test -z "${OTB_VERSION}" && echo "otb-*"); \
+      $(test -z "${OTB_VERSION}" && echo "otb-* monteverdi"); \
     if [ ! -z "${OTB_VERSION}" ]; then \
       if [ "$(echo ${OTB_VERSION} | cut -c 1)" -lt "8" ]; then \
         apt-get -y install --no-install-recommends \
           '^libopenthreads[0-9]+$' \
           libossim1; \
       fi \
+    else \
+      mkdir -p /usr/lib/otb; \
+      ln -rs /usr/lib/$(uname -m)-linux-gnu/otb/applications \
+        /usr/lib/otb/applications; \
     fi \
   fi \
   ## GRASS GIS: Configure dynamic linker run time bindings
@@ -165,7 +182,7 @@ RUN apt-get update \
   && sed -i "s/# en_GB.UTF-8/en_GB.UTF-8/g" /etc/locale.gen \
   && locale-gen \
   ## [^1]: SAGA GIS: libvigraimpex11 is not available for jammy
-  && if $(! grep "jammy" /etc/os-release); then \
+  && if $(! grep -q "jammy" /etc/os-release); then \
     apt-get -y install --no-install-recommends '^libvigraimpex[0-9]+$'; \
   fi \
   ## Clean up
@@ -190,7 +207,9 @@ RUN apt-get update \
   && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_process)_ \"\${@}\"" >> \
     $(which qgis_process) \
   ## Install qgisprocess, the R interface to QGIS
-  && R -e "devtools::install_github('r-spatial/qgisprocess')" \
+  && install2.r --error --skipinstalled -n $NCPUS qgisprocess \
+  ## Strip libraries of binary packages installed from PPM
+  && strip $(R RHOME)/site-library/*/libs/*.so \
   ## Clean up
   && if [ ! -z "$PYTHON_VERSION" ]; then \
     apt-get -y purge python3-pip; \
@@ -219,7 +238,7 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && cd ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
-  && qgis-plugin-manager install 'Processing Saga NextGen Provider' \
+  && qgis-plugin-manager install 'Processing Saga NextGen Provider'=="${PROC_SAGA_NG_VERSION:-0.0.7}" \
   && rm -rf .cache_qgis_plugin_manager \
   ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \

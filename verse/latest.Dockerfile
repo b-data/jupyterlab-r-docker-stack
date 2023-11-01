@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.3.361
+ARG QUARTO_VERSION=1.3.450
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
@@ -54,6 +54,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     ## Installing libnode-dev uninstalls nodejs
     ## https://github.com/jeroen/V8/issues/100
     #libnode-dev \
+    librsvg2-bin \
     qpdf \
     texinfo \
   ## Install R package redland
@@ -130,9 +131,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     distill \
     quarto \
     rticles \
-    rmdshower \
     rJava \
     xaringan \
+  ## Install rmdshower
+  ## Archived on 2023-08-18 as email to the maintainer is undeliverable.
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/rmdshower/rmdshower_2.1.1.tar.gz \
+  && R CMD INSTALL rmdshower_2.1.1.tar.gz \
   ## Install Cairo: R Graphics Device using Cairo Graphics Library
   ## Install magick: Advanced Graphics and Image-Processing in R
   && install2.r --error --skipinstalled -n $NCPUS \
@@ -145,10 +149,12 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## and their dependencies (incl. python3)
   && apt-get -y autoremove \
   && apt-get -y install --no-install-recommends \
-    '^libmagick\+\+-6.q16-[0-9]+$' \
+    imagemagick \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
+  ## Strip libraries of binary packages installed from PPM
+  && strip $(R RHOME)/site-library/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
