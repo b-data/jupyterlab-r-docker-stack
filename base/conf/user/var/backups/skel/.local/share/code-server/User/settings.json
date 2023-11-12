@@ -15,6 +15,7 @@
   },
   "gitlens.showWelcomeOnInstall": false,
   "gitlens.showWhatsNewAfterUpgrades": false,
+  "python.languageServer": "Jedi",
   "r.bracketedPaste": true,
   "r.plot.useHttpgd": true,
   "r.rterm.linux": "/usr/local/bin/radian",
