@@ -14,6 +14,8 @@ Images available for R versions ≥ 4.2.2.
 https://demo.cuda.jupyter.b-data.ch.  
 :point_right: You can ask [b-data](mailto:request@b-data.ch?subject=[CUDA%20Jupyter]%20Request%20to%20whitelist%20GitHub%20account) to whitelist your GitHub account for access.
 
+![CUDA screenshot](assets/cuda-screenshot.png)
+
 **Build chain**
 
 The same as the

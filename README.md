@@ -20,6 +20,8 @@ Images considered stable for R versions ≥ 4.2.0.
 
 :microscope: Check out `jupyterlab/r/verse` at https://demo.jupyter.b-data.ch.
 
+![Screenshot](assets/screenshot.png)
+
 **Build chain**
 
 base → tidyverse → verse → geospatial → qgisprocess  
