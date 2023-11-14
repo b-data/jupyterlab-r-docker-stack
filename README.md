@@ -67,18 +67,24 @@ The following extensions are pre-installed for **code-server**:
   :information_source: devtools subtags
 * [Docker](https://open-vsx.org/extension/ms-azuretools/vscode-docker)  
   :information_source: docker subtags
+* [EditorConfig for VS Code](https://open-vsx.org/extension/EditorConfig/EditorConfig)
+  (4.3.0+)
 * [ESLint](https://open-vsx.org/extension/dbaeumer/vscode-eslint)  
   :information_source: devtools subtags
 * [Git Graph](https://open-vsx.org/extension/mhutchie/git-graph)
 * [GitHub Pull Requests and Issues](https://open-vsx.org/extension/GitHub/vscode-pull-request-github)
+  (4.3.1+)
 * [GitLab Workflow](https://open-vsx.org/extension/GitLab/gitlab-workflow)
 * [GitLens — Git supercharged](https://open-vsx.org/extension/eamodio/gitlens)  
   :information_source: Pinned to version 11.7.0 due to unsolicited AI content (4.3.1+)
+* [hadolint](https://open-vsx.org/extension/exiasr/hadolint)  
+  :information_source: docker subtags (4.3.1+)
 * [Excel Viewer](https://open-vsx.org/extension/GrapeCity/gc-excelviewer)
 * [Jupyter](https://open-vsx.org/extension/ms-toolsai/jupyter)
 * [LaTeX Workshop](https://open-vsx.org/extension/James-Yu/latex-workshop)  
   :information_source: verse+ images
 * [markdownlint](https://open-vsx.org/extension/DavidAnson/vscode-markdownlint)
+  (4.3.2+)
 * [Path Intellisense](https://open-vsx.org/extension/christian-kohler/path-intellisense)
 * [Prettier - Code formatter](https://open-vsx.org/extension/esbenp/prettier-vscode)  
   :information_source: devtools subtags
@@ -87,6 +93,9 @@ The following extensions are pre-installed for **code-server**:
 * [Quarto](https://open-vsx.org/extension/quarto/quarto)  
   :information_source: verse+ images
 * [R](https://open-vsx.org/extension/Ikuyadeu/r)
+* Resource Monitor (4.3.0+)
+* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)
+  :information_source: devtools and docker subtags (4.3.1+)
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
 
 **Subtags**
