@@ -96,7 +96,7 @@ The following extensions are pre-installed for **code-server**:
   :information_source: verse+ images
 * [R](https://open-vsx.org/extension/Ikuyadeu/r)
 * Resource Monitor (4.3.0+)
-* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)
+* [ShellCheck](https://open-vsx.org/extension/timonwong/shellcheck)  
   :information_source: devtools and docker subtags (4.3.1+)
 * [YAML](https://open-vsx.org/extension/redhat/vscode-yaml)
 
