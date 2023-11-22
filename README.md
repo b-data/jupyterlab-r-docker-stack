@@ -230,7 +230,7 @@ current value of `${NB_UID}` and `${NB_GID}`.
 
 The server logs appear in the terminal.
 
-#### Using Podman (rootless mode, 4.3.1+)
+#### Using Podman (rootless mode, 4.3.2+)
 
 Create an empty home directory:
 
