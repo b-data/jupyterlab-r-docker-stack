@@ -37,7 +37,7 @@ if [ "$(id -u)" == 0 ] ; then
   RLU=$(su "$NB_USER" -c "Rscript -e \"cat(Sys.getenv('R_LIBS_USER'))\"")
   su "$NB_USER" -c "mkdir -p $RLU"
 
-  CS_USD="/home/$NB_USER/.local/share/code-server/User"
+  CS_USD="/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/code-server/User"
   # Install code-server settings
   su "$NB_USER" -c "mkdir -p $CS_USD"
   if [[ ! -f "$CS_USD/settings.json" ]]; then
@@ -58,22 +58,22 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   ## QGIS Desktop: Put inital settings in place
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS"
-  if [[ ! -f "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS"
+  if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
     su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
-      /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
-    chown :"$NB_GID" "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
+      /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
+    chown :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
   fi
 
   ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
-  su "$NB_USER" -c "mkdir -p /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
-  su "$NB_USER" -c "rm -rf /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen"
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+  su "$NB_USER" -c "rm -rf /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen"
   su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
-    /home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
-  chown -R :"$NB_GID" "/home/$NB_USER/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+    /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+  chown -R :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
 
   # Remove old .zcompdump files
-  rm -f "/home/$NB_USER/.zcompdump"*
+  rm -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.zcompdump"*
 else
   # Warn if the user wants to change the timezone but hasn't started the
   # container as root.

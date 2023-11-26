@@ -37,7 +37,7 @@ if [ "$(id -u)" == 0 ] ; then
   RLU=$(su "$NB_USER" -c "Rscript -e \"cat(Sys.getenv('R_LIBS_USER'))\"")
   su "$NB_USER" -c "mkdir -p $RLU"
 
-  CS_USD="/home/$NB_USER/.local/share/code-server/User"
+  CS_USD="/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/code-server/User"
   # Install code-server settings
   su "$NB_USER" -c "mkdir -p $CS_USD"
   if [[ ! -f "$CS_USD/settings.json" ]]; then
@@ -58,7 +58,7 @@ if [ "$(id -u)" == 0 ] ; then
   fi
 
   # Remove old .zcompdump files
-  rm -f "/home/$NB_USER/.zcompdump"*
+  rm -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.zcompdump"*
 else
   # Warn if the user wants to change the timezone but hasn't started the
   # container as root.
