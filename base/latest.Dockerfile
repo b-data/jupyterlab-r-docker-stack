@@ -250,6 +250,7 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     jupyterlab-git \
     jupyterlab-lsp \
     notebook \
+    nbclassic \
     nbconvert \
     ## Fix https://github.com/randy3k/radian/issues/446
     prompt-toolkit==3.0.39 \
