@@ -252,8 +252,6 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     notebook \
     nbclassic \
     nbconvert \
-    ## Fix https://github.com/randy3k/radian/issues/446
-    prompt-toolkit==3.0.39 \
     python-lsp-server[all] \
   ## Include custom fonts
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
