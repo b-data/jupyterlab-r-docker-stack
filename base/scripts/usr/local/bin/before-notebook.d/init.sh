@@ -33,6 +33,10 @@ if [ "$(id -u)" == 0 ] ; then
     update-locale --reset LANG="$LANG"
   fi
 
+  ## Create user's projects and workspaces folder
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/projects"
+  su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/workspaces"
+
   # Create R user package library
   RLU=$(su "$NB_USER" -c "Rscript -e \"cat(Sys.getenv('R_LIBS_USER'))\"")
   su "$NB_USER" -c "mkdir -p $RLU"
@@ -76,6 +80,10 @@ else
     echo "Resetting LANG to en_US.UTF-8"
     LANG=en_US.UTF-8
   fi
+
+  ## Create user's projects and workspaces folder
+  mkdir -p "$HOME/projects"
+  mkdir -p "$HOME/workspaces"
 
   # Create R user package library
   RLU=$(Rscript -e "cat(Sys.getenv('R_LIBS_USER'))")
