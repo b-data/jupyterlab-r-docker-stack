@@ -9,7 +9,7 @@ ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=4.0.2
 ARG JUPYTERLAB_VERSION=4.0.9
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.19.0
+ARG CODE_SERVER_VERSION=4.19.1
 ARG GIT_VERSION=2.43.0
 ARG GIT_LFS_VERSION=3.4.0
 ARG PANDOC_VERSION=3.1.1
@@ -30,7 +30,7 @@ COPY scripts /files
 
 RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Use standard R terminal for CUDA images
-  ## radian forces usage of /usr/bin/python
+  ## radian forces usage of /usr[/local]/bin/python
   && if [ ! -z "$CUDA_IMAGE" ]; then \
     sed -i 's|/usr/local/bin/radian|/usr/local/bin/R|g' \
       /files/var/backups/skel/.local/share/code-server/User/settings.json; \
