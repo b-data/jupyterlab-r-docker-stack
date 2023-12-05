@@ -3,6 +3,8 @@
     R_VERSION: "4.3.2"
     QGIS_VERSION: "3.34.1"
     OTB_VERSION: "8.1.2"
+    TAG_VERSION_MAJ_MIN: "true"
+    TAG_VERSION_MAJ: "false"
 
 .before-script-build: &before-script-build
   - |
@@ -267,7 +269,7 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker-root
-    - |
+      
       docker manifest create $CI_APP_REPO:latest $CI_MANIFEST_LIST
       docker manifest create $CI_APP_REPO:latest-root $CI_MANIFEST_LIST_ROOT
       docker manifest create $CI_APP_REPO:latest-docker $CI_MANIFEST_LIST_DOCKER
@@ -286,7 +288,7 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:latest-root
       docker manifest push $CI_APP_REPO:latest-docker
       docker manifest push $CI_APP_REPO:latest-docker-root
-    - |
+      
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN $CI_MANIFEST_LIST
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-root $CI_MANIFEST_LIST_ROOT
       docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-docker $CI_MANIFEST_LIST_DOCKER
@@ -305,7 +307,7 @@ build-manifest:latest-linux-multiarch:
       docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-root
       docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-docker
       docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root
-    - |
+      
       docker manifest create $CI_APP_REPO:$VERSION_MAJ $CI_MANIFEST_LIST
       docker manifest create $CI_APP_REPO:$VERSION_MAJ-root $CI_MANIFEST_LIST_ROOT
       docker manifest create $CI_APP_REPO:$VERSION_MAJ-docker $CI_MANIFEST_LIST_DOCKER
@@ -360,6 +362,48 @@ build-manifest:version-linux-multiarch:
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-root
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker
       docker manifest push $CI_APP_REPO:$CI_APP_TAG-docker-root
+      
+      if [[ "$TAG_VERSION_MAJ_MIN" == "true" ]]; then
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN $CI_MANIFEST_LIST
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-root $CI_MANIFEST_LIST_ROOT
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-docker $CI_MANIFEST_LIST_DOCKER
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root $CI_MANIFEST_LIST_DOCKER_ROOT
+        if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN \
+            $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-root \
+            $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-docker \
+            $CI_APP_REPO:$CI_APP_TAG-docker-linux-arm64v8
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root \
+            $CI_APP_REPO:$CI_APP_TAG-docker-root-linux-arm64v8
+        fi
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-root
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-docker
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ_MIN-docker-root
+      fi
+      
+      if [[ "$TAG_VERSION_MAJ" == "true" ]]; then
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ $CI_MANIFEST_LIST
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ-root $CI_MANIFEST_LIST_ROOT
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ-docker $CI_MANIFEST_LIST_DOCKER
+        docker manifest create $CI_APP_REPO:$VERSION_MAJ-docker-root $CI_MANIFEST_LIST_DOCKER_ROOT
+        if echo $OS_ARCH | grep "linux-arm64v8" >/dev/null ; then
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ \
+            $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ-root \
+            $CI_APP_REPO:$CI_APP_TAG-root-linux-arm64v8
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ-docker \
+            $CI_APP_REPO:$CI_APP_TAG-docker-linux-arm64v8
+          docker manifest annotate --variant v8 $CI_APP_REPO:$VERSION_MAJ-docker-root \
+            $CI_APP_REPO:$CI_APP_TAG-docker-root-linux-arm64v8
+        fi
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ-root
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ-docker
+        docker manifest push $CI_APP_REPO:$VERSION_MAJ-docker-root
+      fi
   rules:
     - if: $CI_COMMIT_BRANCH == "freeze-version" && $CI_PIPELINE_TRIGGERED
       changes:
