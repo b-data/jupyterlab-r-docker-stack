@@ -29,11 +29,8 @@ COPY conf/shell /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN cp -a /files/etc/skel /files/home/${NB_USER} \
-  && cp -a /files/etc/skel/. /files/var/backups/skel \
-  && chown -R ${NB_UID}:${NB_GID} \
-    /files/home/${NB_USER} \
-    /files/var/backups/skel \
+RUN cp -a /files/etc/skel/. /files/var/backups/skel \
+  && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Use standard R terminal for CUDA images
   ## radian forces usage of /usr[/local]/bin/python
   && if [ ! -z "$CUDA_IMAGE" ]; then \
