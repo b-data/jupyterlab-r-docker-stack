@@ -18,7 +18,8 @@ Images considered stable for R versions ≥ 4.2.0.
 :point_right: The current state may eventually be backported to versions ≥
 4.0.4.
 
-:microscope: Check out `jupyterlab/r/verse` at https://demo.jupyter.b-data.ch.
+:microscope: Check out `jupyterlab/r/verse` at
+https://demo.jupyter.b-data.ch.
 
 ![Screenshot](assets/screenshot.png)
 
@@ -124,6 +125,8 @@ The following extensions are pre-installed for **code-server**:
 * [Usage](#usage)
 * [Similar projects](#similar-projects)
 * [Contributing](#contributing)
+* [Support](#support)
+* [Sponsors](#sponsors)
 * [License](#license)
 
 ## Prerequisites

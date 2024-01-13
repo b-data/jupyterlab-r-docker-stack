@@ -11,8 +11,7 @@ GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 Images available for R versions ≥ 4.2.2.
 
 :microscope: Check out `jupyterlab/cuda/r/verse` at
-https://demo.cuda.jupyter.b-data.ch.  
-:point_right: You can ask [b-data](mailto:request@b-data.ch?subject=[CUDA%20Jupyter]%20Request%20to%20whitelist%20GitHub%20account) to whitelist your GitHub account for access.
+https://demo.cuda.jupyter.b-data.ch.
 
 ![CUDA screenshot](assets/cuda-screenshot.png)
 
