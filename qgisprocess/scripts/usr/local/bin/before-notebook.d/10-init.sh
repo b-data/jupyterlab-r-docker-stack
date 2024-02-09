@@ -61,7 +61,7 @@ if [ "$(id -u)" == 0 ] ; then
     su "$NB_USER" -c "mv $CS_USD/settings.json.bak $CS_USD/settings.json"
   fi
 
-  ## QGIS Desktop: Put inital settings in place
+  ## QGIS: Put inital settings in place
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS"
   if [[ ! -f "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
     su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
@@ -69,7 +69,7 @@ if [ "$(id -u)" == 0 ] ; then
     chown :"$NB_GID" "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
   fi
 
-  ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
+  ## QGIS: Copy plugin 'Processing Saga NextGen Provider'
   su "$NB_USER" -c "mkdir -p /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
   su "$NB_USER" -c "rm -rf /home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen"
   su "$NB_USER" -c "cp ${CP_OPTS:--a} /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
@@ -123,14 +123,14 @@ else
     mv "$CS_USD/settings.json.bak" "$CS_USD/settings.json"
   fi
 
-  ## QGIS Desktop: Put inital settings in place
+  ## QGIS: Put inital settings in place
   mkdir -p "$HOME/.local/share/QGIS/QGIS3/profiles/default/QGIS"
   if [[ ! -f "$HOME/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini" ]]; then
     cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini \
       "$HOME/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"
   fi
 
-  ## QGIS Desktop: Copy plugin 'Processing Saga NextGen Provider'
+  ## QGIS: Copy plugin 'Processing Saga NextGen Provider'
   mkdir -p "$HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
   rm -rf "$HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen"
   cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/processing_saga_nextgen \
