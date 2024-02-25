@@ -244,10 +244,6 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \
   && qgis_process plugins enable grassprovider \
-  && if [ "$(uname -m)" = "x86_64" ]; then \
-    ## QGIS: Enable OTB plugin
-    qgis_process plugins enable otbprovider; \
-  fi \
   ## Clean up
   && rm -rf \
     ${HOME}/.cache \
