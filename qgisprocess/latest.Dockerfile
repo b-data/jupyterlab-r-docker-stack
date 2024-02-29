@@ -6,6 +6,7 @@ ARG QGIS_VERSION
 
 ARG SAGA_VERSION
 ARG OTB_VERSION
+
 ARG PROC_SAGA_NG_VERSION
 
 FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS files
@@ -20,21 +21,7 @@ RUN mkdir /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN if [ "$(uname -m)" = "x86_64" ]; then \
-    ## QGIS: Set OTB application folder and OTB folder
-    qgis3Ini="/files/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"; \
-    echo "\n[Processing]" >> ${qgis3Ini}; \
-    if [ -z "${OTB_VERSION}" ]; then \
-      echo "Configuration\OTB_APP_FOLDER=/usr/lib/otb/applications" >> \
-        ${qgis3Ini}; \
-      echo "Configuration\OTB_FOLDER=/usr\n" >> ${qgis3Ini}; \
-    else \
-      echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
-        ${qgis3Ini}; \
-      echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis3Ini}; \
-    fi \
-  fi \
-  && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
@@ -133,6 +120,7 @@ RUN apt-get update \
     python3-pyqt5.qsci \
     python3-pyqt5.qtmultimedia \
     python3-pyqt5.qtpositioning \
+    python3-pyqt5.qtserialport \
     python3-pyqt5.qtsql \
     python3-pyqt5.qtsvg \
     python3-pyqt5.qtwebkit \
@@ -243,10 +231,6 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \
   && qgis_process plugins enable grassprovider \
-  && if [ "$(uname -m)" = "x86_64" ]; then \
-    ## QGIS: Enable OTB plugin
-    qgis_process plugins enable otbprovider; \
-  fi \
   ## Clean up
   && rm -rf \
     ${HOME}/.cache \

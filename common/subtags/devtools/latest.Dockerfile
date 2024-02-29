@@ -3,7 +3,7 @@ ARG BASE_IMAGE_TAG=12
 ARG BUILD_ON_IMAGE
 ARG R_VERSION
 
-ARG NODE_VERSION=18.18.2
+ARG NODE_VERSION=18.19.1
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 
 FROM glcr.b-data.ch/nodejs/nsi/${NODE_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS nsi
@@ -44,11 +44,11 @@ RUN apt-get update \
   && if [ -n "$PYTHON_VERSION" ]; then \
     ## make some useful symlinks that are expected to exist
     ## ("/usr/bin/python" and friends)
-    for src in pydoc3 python3; do \
+    for src in pydoc3 python3 python3-config; do \
       dst="$(echo "$src" | tr -d 3)"; \
-      [ -s "/usr/bin/$src" ]; \
-      [ ! -e "/usr/bin/$dst" ]; \
-      ln -svT "$src" "/usr/bin/$dst"; \
+      if [ -s "/usr/bin/$src" ] && [ ! -e "/usr/bin/$dst" ]; then \
+        ln -svT "$src" "/usr/bin/$dst"; \
+      fi \
     done; \
   fi \
   ## Clean up Node.js installation

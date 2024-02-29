@@ -4,6 +4,10 @@
 
 set -e
 
+function run_user_group() {
+  runuser -u "${NB_USER}" -g "$(id -gn "${NB_USER}")" -G "users" -- "$@"
+}
+
 # The _log function is used for everything this script wants to log. It will
 # always log errors and warnings, but can be silenced for other messages
 # by setting JUPYTER_DOCKER_STACKS_QUIET environment variable.
@@ -34,6 +38,16 @@ else
     cmd=( "$@" )
 fi
 
+# Backwards compatibility: `start.sh` is executed by default in ENTRYPOINT
+# so it should no longer be specified in CMD
+if [ "${_START_SH_EXECUTED}" = "1" ]; then
+    _log "WARNING: start.sh is the default ENTRYPOINT, do not include it in CMD"
+    _log "Executing the command:" "${cmd[@]}"
+    exec "${cmd[@]}"
+else
+    export _START_SH_EXECUTED=1
+fi
+
 # NOTE: This hook will run as the user the container was started with!
 # shellcheck disable=SC1091
 source /usr/local/bin/run-hooks.sh /usr/local/bin/start-notebook.d
@@ -58,15 +72,28 @@ if [ "$(id -u)" == 0 ] ; then
 
     # Refit the jovyan user to the desired the user (NB_USER)
     if id jovyan &> /dev/null ; then
-        if ! usermod --home "/home/${NB_USER}" --login "${NB_USER}" jovyan 2>&1 | grep "no changes" > /dev/null; then
+        if ! usermod --home "/home/${NB_USER}${DOMAIN:+@$DOMAIN}" --login "${NB_USER}" jovyan 2>&1 | grep "no changes" > /dev/null; then
             _log "Updated the jovyan user:"
             _log "- username: jovyan       -> ${NB_USER}"
-            _log "- home dir: /home/jovyan -> /home/${NB_USER}"
+            _log "- home dir: /home/jovyan -> /home/${NB_USER}${DOMAIN:+@$DOMAIN}"
         fi
     elif ! id -u "${NB_USER}" &> /dev/null; then
         _log "ERROR: Neither the jovyan user or '${NB_USER}' exists. This could be the result of stopping and starting, the container with a different NB_USER environment variable."
         exit 1
     fi
+
+    # If default user id (NB_UID) and group id (NB_GID) are supposed to be used:
+    # Reset both to the values the system (files and possibly sss) returns.
+    # If the system does not return any value, reset to default values
+    if [ "${NB_UID}" = "$(id -u jovyan 2>/dev/null)" ]; then
+        NB_UID=$(id -u "${NB_USER}" 2>/dev/null)
+        NB_UID=${NB_UID:-$(id -u jovyan 2>/dev/null)}
+    fi
+    if [ "${NB_GID}" = "$(id -g jovyan 2>/dev/null)" ]; then
+        NB_GID=$(id -g "${NB_USER}" 2>/dev/null)
+        NB_GID=${NB_GID:-$(id -g jovyan 2>/dev/null)}
+    fi
+
     # Ensure the desired user (NB_USER) gets its desired user id (NB_UID) and is
     # a member of the desired group (NB_GROUP, NB_GID)
     if [ "${NB_UID}" != "$(id -u "${NB_USER}")" ] || [ "${NB_GID}" != "$(id -g "${NB_USER}")" ]; then
@@ -77,12 +104,17 @@ if [ "$(id -u)" == 0 ] ; then
         fi
         # Recreate the desired user as we want it
         userdel "${NB_USER}"
-        useradd --no-log-init --home "/home/${NB_USER}" --shell "$(which zsh)" --uid "${NB_UID}" --gid "${NB_GID}" --groups 100 "${NB_USER}"
+        useradd --no-log-init --home "/home/${NB_USER}${DOMAIN:+@$DOMAIN}" --shell "$(which zsh)" --uid "${NB_UID}" --gid "${NB_GID}" --groups 100 "${NB_USER}"
+    else
+        # Otherwise, and if not the jovyan user, add it to the default group
+        if [[ "${NB_USER}" != "jovyan" ]]; then
+            usermod -a -G 100 "${NB_USER}"
+        fi
     fi
     # Update the home directory if the desired user (NB_USER) is root and the
     # desired user id (NB_UID) is 0 and the desired group id (NB_GID) is 0.
     if [ "${NB_USER}" = "root" ] && [ "${NB_UID}" = "$(id -u "${NB_USER}")" ] && [ "${NB_GID}" = "$(id -g "${NB_USER}")" ]; then
-        sed -i 's|/root|/home/root|g' /etc/passwd
+        sed -i "s|/root|/home/root|g" /etc/passwd
         # Do not preserve ownership in rootless mode
         CP_OPTS="-a --no-preserve=ownership"
         # Pip: Install packages to the user site
@@ -95,47 +127,85 @@ if [ "$(id -u)" == 0 ] ; then
     # directory if it doesn't already exist, and update the current working
     # directory to the new location if needed.
     if [[ "${NB_USER}" != "jovyan" ]]; then
-        if [[ ! -e "/home/${NB_USER}" ]]; then
-            _log "Attempting to copy /home/jovyan to /home/${NB_USER}..."
-            mkdir "/home/${NB_USER}"
-            if cp -a /home/jovyan/. "/home/${NB_USER}/"; then
+        if [[ ! -e "/home/${NB_USER}${DOMAIN:+@$DOMAIN}" ]]; then
+            _log "Attempting to copy /home/jovyan to /home/${NB_USER}${DOMAIN:+@$DOMAIN}..."
+            mkdir "/home/${NB_USER}${DOMAIN:+@$DOMAIN}"
+            # shellcheck disable=SC2086
+            if cp ${CP_OPTS:--a} /home/jovyan/. "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/"; then
                 _log "Success!"
             else
-                _log "Failed to copy data from /home/jovyan to /home/${NB_USER}!"
-                _log "Attempting to symlink /home/jovyan to /home/${NB_USER}..."
-                if ln -s /home/jovyan "/home/${NB_USER}"; then
+                _log "Failed to copy data from /home/jovyan to /home/${NB_USER}${DOMAIN:+@$DOMAIN}!"
+                _log "Attempting to symlink /home/jovyan to /home/${NB_USER}${DOMAIN:+@$DOMAIN}..."
+                if ln -s /home/jovyan "/home/${NB_USER}${DOMAIN:+@$DOMAIN}"; then
                     _log "Success creating symlink!"
                 else
-                    _log "ERROR: Failed copy data from /home/jovyan to /home/${NB_USER} or to create symlink!"
+                    _log "ERROR: Failed copy data from /home/jovyan to /home/${NB_USER}${DOMAIN:+@$DOMAIN} or to create symlink!"
                     exit 1
                 fi
             fi
-        # The home directory could be bind mounted. Populate it if it is empty
-        elif [[ "$(ls -A "/home/${NB_USER}" 2> /dev/null)" == "" ]]; then
-            _log "Populating home dir /home/${NB_USER}..."
-            # shellcheck disable=SC2086
-            if cp ${CP_OPTS:--a} /home/jovyan/. "/home/${NB_USER}/"; then
-                _log "Success!"
+        # The home directory could be bind mounted. Populate it.
+        elif [[ ! -f "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/.populated" ]]; then
+            # Create list of missing files (top level only)
+            fd="$(comm -13 <(cd  "/home/${NB_USER}${DOMAIN:+@$DOMAIN}"; ls -A) <(cd /home/jovyan; ls -A) \
+                | paste -sd ',' -)"
+            # Handle case when only marker is missing
+            if [[ "${fd}" == ".populated" ]]; then
+                sf="${fd}"
             else
-                _log "ERROR: Failed to copy data from /home/jovyan to /home/${NB_USER}!"
+                sf="{${fd}}"
+            fi
+            _log "Populating home dir: /home/${NB_USER}${DOMAIN:+@$DOMAIN}"
+            _log "Copying files/directories (recursively):"
+            _log "- ${fd}"
+            if eval "cp ${CP_OPTS:--a} /home/jovyan/${sf} /home/${NB_USER}${DOMAIN:+@$DOMAIN}"; then
+                date -uIseconds > "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/.populated"
+                _log "Done populating home dir"
+            else
+                _log "ERROR: Failed to copy data from /home/jovyan to /home/${NB_USER}${DOMAIN:+@$DOMAIN}!"
                 exit 1
             fi
         fi
         # Ensure the current working directory is updated to the new path
         if [[ "${PWD}/" == "/home/jovyan/"* ]]; then
-            new_wd="/home/${NB_USER}/${PWD:13}"
+            new_wd="/home/${NB_USER}${DOMAIN:+@$DOMAIN}/${PWD:13}"
             _log "Changing working directory to ${new_wd}"
             cd "${new_wd}"
-            export CODE_WORKDIR=/home/${NB_USER}/projects
+            export CODE_WORKDIR="/home/${NB_USER}${DOMAIN:+@$DOMAIN}/projects"
+        fi
+    fi
+
+    # Trigger changing ownership of the desired user's home folder
+    if [[ "${CP_OPTS}" == "" && "$(stat -c '%u:%g' "/home/${NB_USER}${DOMAIN:+@$DOMAIN}")" != "$(id -u "${NB_USER}"):$(id -g "${NB_USER}")" ]]; then
+        if [[ "${CHOWN_HOME}" != "1" && "${CHOWN_HOME}" != "yes" ]]; then
+            export CHOWN_HOME="1"
+            trg_msg="(Automatic) "
         fi
     fi
 
     # Optionally ensure the desired user get filesystem ownership of it's home
     # folder and/or additional folders
     if [[ "${CHOWN_HOME}" == "1" || "${CHOWN_HOME}" == "yes" ]]; then
-        _log "Ensuring /home/${NB_USER} is owned by ${NB_UID}:${NB_GID} ${CHOWN_HOME_OPTS:+(chown options: ${CHOWN_HOME_OPTS})}"
-        # shellcheck disable=SC2086
-        chown ${CHOWN_HOME_OPTS} "${NB_UID}:${NB_GID}" "/home/${NB_USER}"
+        _log "${trg_msg}Ensuring /home/${NB_USER}${DOMAIN:+@$DOMAIN} is owned by ${NB_UID}:${NB_GID} ${CHOWN_HOME_OPTS:+(chown options: ${CHOWN_HOME_OPTS})}"
+        if [[ ! -L "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt" || ("$(stat -c '%u:%g' "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt")" != "$(id -u "${NB_USER}"):$(id -g "${NB_USER}")") ]]; then
+            # shellcheck disable=SC2086
+            chown ${CHOWN_HOME_OPTS} "${NB_UID}:${NB_GID}" "/home/${NB_USER}${DOMAIN:+@$DOMAIN}"
+            # Symlink temporarily mounted filesystems to home directory
+            if [[ "$(ls -A /mnt 2> /dev/null)" != "" ]]; then
+                run_user_group ln -snf /mnt "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/mnt"
+            fi
+            # Symlink pam_mount configuration to home directory
+            if [[ -f /var/tmp/.pam_mount.conf.xml ]]; then
+                run_user_group ln -sf /var/tmp/.pam_mount.conf.xml "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/.pam_mount.conf.xml"
+            fi
+        fi
+    fi
+    if [[ "${CP_OPTS}" == "" && "${sf}" != "" ]]; then
+        if [[ "$(stat -c '%u:%g' "/home/${NB_USER}${DOMAIN:+@$DOMAIN}/.populated")" != "$(id -u "${NB_USER}"):$(id -g "${NB_USER}")" ]]; then
+            _log "(Automatic) Ensuring the following files/directories in /home/${NB_USER}${DOMAIN:+@$DOMAIN} are owned by ${NB_UID}:${NB_GID} (chown options: -R):"
+            _log "- ${fd}"
+            # shellcheck disable=SC2086
+            eval "chown -R ${NB_UID}:${NB_GID} /home/${NB_USER}${DOMAIN:+@$DOMAIN}/${sf}"
+        fi
     fi
     if [ -n "${CHOWN_EXTRA}" ]; then
         for extra_dir in $(echo "${CHOWN_EXTRA}" | tr ',' ' '); do
@@ -146,7 +216,7 @@ if [ "$(id -u)" == 0 ] ; then
     fi
     # Optionally change the mode of the user's home folder
     if [[ "${CHMOD_HOME}" == "1" || "${CHMOD_HOME}" == "yes" ]]; then
-        chmod "${CHMOD_HOME_MODE:-755}" "/home/${NB_USER}"
+        chmod "${CHMOD_HOME_MODE:-755}" "/home/${NB_USER}${DOMAIN:+@$DOMAIN}"
     fi
 
     # Optionally grant passwordless sudo rights for the desired user

@@ -7,12 +7,12 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=4.0.2
-ARG JUPYTERLAB_VERSION=3.6.6
+ARG JUPYTERLAB_VERSION=4.1.2
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.18.0
-ARG GIT_VERSION=2.42.0
-ARG GIT_LFS_VERSION=3.4.0
-ARG PANDOC_VERSION=3.1.1
+ARG CODE_SERVER_VERSION=4.21.1
+ARG GIT_VERSION=2.44.0
+ARG GIT_LFS_VERSION=3.4.1
+ARG PANDOC_VERSION=3.1.11
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
 
@@ -25,12 +25,14 @@ COPY assets /files
 COPY conf/ipython /files
 COPY conf/jupyter /files
 COPY conf/jupyterlab /files
+COPY conf/shell /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+RUN cp -a /files/etc/skel/. /files/var/backups/skel \
+  && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Use standard R terminal for CUDA images
-  ## radian forces usage of /usr/bin/python
+  ## radian forces usage of /usr[/local]/bin/python
   && if [ ! -z "$CUDA_IMAGE" ]; then \
     sed -i 's|/usr/local/bin/radian|/usr/local/bin/R|g' \
       /files/var/backups/skel/.local/share/code-server/User/settings.json; \
@@ -39,7 +41,8 @@ RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
   && find /files -type f -exec chmod 644 {} \; \
-  && find /files/usr/local/bin -type f -exec chmod 755 {} \;
+  && find /files/usr/local/bin -type f -exec chmod 755 {} \; \
+  && find /files/etc/profile.d -type f -exec chmod 755 {} \;
 
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} AS glfsi
@@ -119,6 +122,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     libclang-dev \
     man-db \
     nano \
+    ncdu \
     procps \
     psmisc \
     screen \
@@ -147,9 +151,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     ## ("/usr/bin/python" and friends)
     for src in pydoc3 python3 python3-config; do \
       dst="$(echo "$src" | tr -d 3)"; \
-      [ -s "/usr/bin/$src" ]; \
-      [ ! -e "/usr/bin/$dst" ]; \
-      ln -svT "$src" "/usr/bin/$dst"; \
+      if [ -s "/usr/bin/$src" ] && [ ! -e "/usr/bin/$dst" ]; then \
+        ln -svT "$src" "/usr/bin/$dst"; \
+      fi \
     done; \
   else \
     ## Force update pip, setuptools and wheel
@@ -188,6 +192,11 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   fi \
   ## Add user
   && useradd -l -m -s $(which zsh) -N -u ${NB_UID} ${NB_USER} \
+  ## Mark home directory as populated
+  && touch /home/${NB_USER}/.populated \
+  && chown ${NB_UID}:${NB_GID} /home/${NB_USER}/.populated \
+  && chmod go+w /home/${NB_USER}/.populated \
+  ## Create backup directory for home directory
   && mkdir -p /var/backups/skel \
   && chown ${NB_UID}:${NB_GID} /var/backups/skel \
   ## Install Tini
@@ -230,6 +239,7 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension redhat.vscode-yaml \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension DavidAnson.vscode-markdownlint \
   ## Create folders temp and tmp for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 temp \
@@ -248,8 +258,12 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     jupyterlab-git \
     jupyterlab-lsp \
     notebook \
+    nbclassic \
     nbconvert \
     python-lsp-server[all] \
+  ## Fix https://github.com/jupyterhub/jupyter-server-proxy/issues/445
+  && sed -i 's/subprotocols=self\.subprotocols/subprotocols=self\.subprotocols if self\.subprotocols else None/g' \
+    /usr/local/lib/python*/*-packages/jupyter_server_proxy/handlers.py \
   ## Include custom fonts
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Regular.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
   && sed -i 's|</head>|<link rel="preload" href="{{page_config.fullStaticUrl}}/assets/fonts/MesloLGS-NF-Italic.woff2" as="font" type="font/woff2" crossorigin="anonymous"></head>|g' /usr/local/share/jupyter/lab/static/index.html \
@@ -284,11 +298,20 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
+  ## Install httpgd
+  ## Archived on 2024-01-24 as check problems were not corrected in time.
+  && install2.r --error --skipinstalled -n $NCPUS \
+    later \
+    systemfonts \
+    cpp11 \
+    BH \
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_1.3.1.tar.gz \
+  && R CMD INSTALL httpgd_1.3.1.tar.gz \
+  && rm httpgd_1.3.1.tar.gz \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
-    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
   ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \
@@ -343,14 +366,16 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
   && git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${HOME}/.oh-my-zsh/custom/themes/powerlevel10k \
   && sed -i 's/ZSH="\/home\/jovyan\/.oh-my-zsh"/ZSH="$HOME\/.oh-my-zsh"/g' ${HOME}/.zshrc \
   && sed -i 's/ZSH_THEME="robbyrussell"/ZSH_THEME="powerlevel10k\/powerlevel10k"/g' ${HOME}/.zshrc \
-  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d \"\$HOME/bin\" ] && [[ \"\$PATH\" != *\"\$HOME/bin\"* ]] ; then\n    PATH=\"\$HOME/bin:\$PATH\"\nfi" >> ${HOME}/.zshrc \
-  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d \"\$HOME/.local/bin\" ] && [[ \"\$PATH\" != *\"\$HOME/.local/bin\"* ]] ; then\n    PATH=\"\$HOME/.local/bin:\$PATH\"\nfi" >> ${HOME}/.zshrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d \"\$HOME/bin\" ] && [[ \"\$PATH\" != *\"\$HOME/bin\"* ]] ; then\n    PATH=\"\$HOME/bin:\$PATH\"\nfi" | tee -a ${HOME}/.bashrc ${HOME}/.zshrc \
+  && echo "\n# set PATH so it includes user's private bin if it exists\nif [ -d \"\$HOME/.local/bin\" ] && [[ \"\$PATH\" != *\"\$HOME/.local/bin\"* ]] ; then\n    PATH=\"\$HOME/.local/bin:\$PATH\"\nfi" | tee -a ${HOME}/.bashrc ${HOME}/.zshrc \
   && echo "\n# Update last-activity timestamps while in screen/tmux session\nif [ ! -z \"\$TMUX\" -o ! -z \"\$STY\" ] ; then\n    busy &\nfi" >> ${HOME}/.bashrc \
   && echo "\n# Update last-activity timestamps while in screen/tmux session\nif [ ! -z \"\$TMUX\" -o ! -z \"\$STY\" ] ; then\n    setopt nocheckjobs\n    busy &\nfi" >> ${HOME}/.zshrc \
   && echo "\n# To customize prompt, run \`p10k configure\` or edit ~/.p10k.zsh." >> ${HOME}/.zshrc \
   && echo "[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh" >> ${HOME}/.zshrc \
   ## Create user's private bin
   && mkdir -p ${HOME}/.local/bin \
+  ## Record population timestamp
+  && date -uIseconds > ${HOME}/.populated \
   ## Create backup of home directory
   && cp -a ${HOME}/. /var/backups/skel
 
@@ -361,5 +386,5 @@ COPY --from=files /files/var/backups/skel ${HOME}
 EXPOSE 8888
 
 ## Configure container startup
-ENTRYPOINT ["tini", "-g", "--"]
+ENTRYPOINT ["tini", "-g", "--", "start.sh"]
 CMD ["start-notebook.sh"]

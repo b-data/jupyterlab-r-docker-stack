@@ -11,8 +11,9 @@ GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 Images available for R versions ≥ 4.2.2.
 
 :microscope: Check out `jupyterlab/cuda/r/verse` at
-https://demo.cuda.jupyter.b-data.ch.  
-:point_right: You can ask [b-data](mailto:request@b-data.ch?subject=[CUDA%20Jupyter]%20Request%20to%20whitelist%20GitHub%20account) to whitelist your GitHub account for access.
+https://demo.cuda.jupyter.b-data.ch.
+
+![CUDA screenshot](assets/cuda-screenshot.png)
 
 **Build chain**
 
@@ -79,7 +80,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/r/ver \
-  --build-arg R_VERSION=4.3.1 \
+  --build-arg R_VERSION=4.3.2 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base \
   -f latest.Dockerfile .
@@ -110,14 +111,11 @@ docker run --rm \
 ```
 
 It will be *bind mounted* as the JupyterLab user's home directory and
-automatically populated on first run.
+automatically populated.  
+:exclamation: *Bind mounting* a subfolder of the home directory is only possible
+for images with R version ≥ 4.3.2.
 
 ### Run container
-
-| :exclamation: Always mount the user's **entire** home directory.<br>Mounting a subfolder prevents the container from starting.[^1] |
-|:-----------------------------------------------------------------------------------------------------------------------------------|
-
-[^1]: The only exception is the use case described at [Jupyter Docker Stacks > Quick Start > Example 2](https://github.com/jupyter/docker-stacks#quick-start).
 
 self built:
 
@@ -171,7 +169,30 @@ current value of `${NB_UID}` and `${NB_GID}`.
 
 The server logs appear in the terminal.
 
-**Using Docker Desktop**
+#### Using Podman (rootless mode, 4.3.2+)
+
+Create an empty home directory:
+
+```bash
+mkdir "${PWD}/jupyterlab-root"
+```
+
+Use the following command to run the container as `root`:
+
+```bash
+podman run -it --rm \
+  --device 'nvidia.com/gpu=all' \
+  -p 8888:8888 \
+  -u root \
+  -v "${PWD}/jupyterlab-root":/home/root \
+  -e NB_USER=root \
+  -e NB_UID=0 \
+  -e NB_GID=0 \
+  -e NOTEBOOK_ARGS="--allow-root" \
+  IMAGE[:MAJOR[.MINOR[.PATCH]]]
+```
+
+#### Using Docker Desktop
 
 [Creating a home directory](#create-home-directory) *might* not be required.
 Also

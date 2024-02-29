@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.3.450
+ARG QUARTO_VERSION=1.4.550
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
@@ -75,9 +75,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && tar -xzf quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz -C /opt/quarto --no-same-owner --strip-components=1 \
   && rm quarto-${QUARTO_VERSION}-linux-${dpkgArch}.tar.gz \
   ## Remove quarto pandoc
-  && rm /opt/quarto/bin/tools/pandoc \
+  && rm /opt/quarto/bin/tools/$(uname -m)/pandoc \
   ## Link to system pandoc
-  && ln -s /usr/bin/pandoc /opt/quarto/bin/tools/pandoc \
+  && ln -s /usr/bin/pandoc /opt/quarto/bin/tools/$(uname -m)/pandoc \
   ## Tell APT about the TeX Live installation
   ## by building a dummy package using equivs
   && apt-get install -y --no-install-recommends equivs \
@@ -155,6 +155,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   ## Strip libraries of binary packages installed from PPM
   && strip $(R RHOME)/site-library/*/libs/*.so \
+  ## Update default PATH settings in /etc/profile.d/00-reset-path.sh
+  && sed -i 's|/opt/code-server/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin|g' /etc/profile.d/00-reset-path.sh \
+  && sed -i 's|/opt/code-server/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games|g' /etc/profile.d/00-reset-path.sh \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
