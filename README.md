@@ -264,6 +264,8 @@ docker run -it --rm \
   IMAGE[:MAJOR[.MINOR[.PATCH]]]
 ```
 
+*might* be sufficient.
+
 ### Credential storage
 
 **:exclamation: Keyring services are not available due to the difficulties of**
@@ -277,8 +279,6 @@ docker run -it --rm \
 | GitLab Workflow                 | `GITLAB_WORKFLOW_INSTANCE_URL`: GitLab instance URL (e.g. https://gitlab.com).<br>`GITLAB_WORKFLOW_TOKEN`: Personal access token with scopes `api` and `read_user`. |
 
 [^1]: *Device activation* may require a one-time login from the extension's sidebar.
-
-*might* be sufficient.
 
 ## Similar projects
 
