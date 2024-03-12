@@ -284,6 +284,7 @@ RUN apt-get update \
     libcurl4-openssl-dev \
     libfontconfig1-dev \
     libssl-dev \
+    libtiff-dev \
     libxml2-dev \
   ## Install radian
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
@@ -304,8 +305,11 @@ RUN apt-get update \
     languageserver \
     httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
-  ## Get rid of libcairo2-dev and its dependencies (incl. python3)
+  ## Get rid of libcairo2-dev
   && apt-get -y purge libcairo2-dev \
+  ## Get rid of libtiff-dev
+  && apt-get -y purge libtiff-dev \
+  ## and their dependencies (incl. python3)
   && apt-get -y autoremove \
   ## IRkernel: Enable 'image/svg+xml' instead of 'image/png' for plot display
   ## IRkernel: Enable 'application/pdf' for PDF conversion
