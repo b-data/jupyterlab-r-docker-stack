@@ -336,8 +336,9 @@ RUN apt-get update \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
   && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
-  ## Strip libraries of binary packages installed from PPM
-  && strip $(R RHOME)/site-library/*/libs/*.so \
+  ## Strip libraries of binary packages installed from PPPM
+  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
+  && strip ${RLS}/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
     /var/lib/apt/lists/* \

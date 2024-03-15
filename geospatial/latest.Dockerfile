@@ -69,8 +69,9 @@ RUN apt-get update \
     geosphere \
   ## from bioconductor
   && R -e "BiocManager::install('rhdf5', update = FALSE, ask = FALSE)" \
-  ## Strip libraries of binary packages installed from PPM
-  && strip $(R RHOME)/site-library/*/libs/*.so \
+  ## Strip libraries of binary packages installed from PPPM
+  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
+  && strip ${RLS}/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*

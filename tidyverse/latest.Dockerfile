@@ -45,8 +45,9 @@ RUN apt-get update \
   && apt-get -y purge libharfbuzz-dev \
   && apt-get -y autoremove \
   && apt-get -y install --no-install-recommends libharfbuzz-icu0 \
-  ## Strip libraries of binary packages installed from PPM
-  && strip $(R RHOME)/site-library/*/libs/*.so \
+  ## Strip libraries of binary packages installed from PPPM
+  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
+  && strip ${RLS}/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/*
