@@ -66,8 +66,10 @@ COPY --from=saga-gissi /usr /usr
 ## Install Orfeo Toolbox
 COPY --from=otbsi /usr/local /usr/local
 ENV GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
-    OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications}
-ENV OTB_APPLICATION_PATH=${OTB_APPLICATION_PATH:-/usr/lib/otb/applications}
+    OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications} \
+    OTB_INSTALL_DIR=${OTB_VERSION:+/usr/local}
+ENV OTB_APPLICATION_PATH=${OTB_APPLICATION_PATH:-/usr/lib/otb/applications} \
+    OTB_INSTALL_DIR=${OTB_INSTALL_DIR:-/usr}
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
