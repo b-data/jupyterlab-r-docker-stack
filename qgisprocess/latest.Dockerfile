@@ -157,6 +157,14 @@ RUN apt-get update \
         apt-get -y install --no-install-recommends \
           '^libopenthreads[0-9]+$' \
           libossim1; \
+      fi; \
+      ## Orfeo Toolbox: Clean up installation
+      bash -c 'rm -rf /usr/local/{otbenv.profile,recompile_bindings.sh,tools}'; \
+      if [ -f /usr/local/README ]; then \
+        mv /usr/local/README /usr/local/share/doc/otb; \
+      fi; \
+      if [ -f /usr/local/LICENSE ]; then \
+        mv /usr/local/LICENSE /usr/local/share/doc/otb; \
       fi \
     else \
       mkdir -p /usr/lib/otb; \
