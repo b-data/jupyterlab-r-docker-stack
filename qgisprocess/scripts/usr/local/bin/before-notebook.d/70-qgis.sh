@@ -23,9 +23,11 @@ if [ "$(id -u)" == 0 ] ; then
   
   # Copy plugin 'OrfeoToolbox Provider'
   if [[ ! -d "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider" ]]; then
-    run_user_group cp -a --no-preserve=ownership \
-      /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider \
-      "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+    if [[ -d /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider ]]; then
+      run_user_group cp -a --no-preserve=ownership \
+        /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider \
+        "/home/$NB_USER${DOMAIN:+@$DOMAIN}/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+    fi
   fi
 else
   # Put inital QGIS settings in place
@@ -44,7 +46,9 @@ else
   
   # Copy plugin 'OrfeoToolbox Provider'
   if [[ ! -d "$HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider" ]]; then
-    cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider \
-      "$HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+    if [[ -d /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider ]]; then
+      cp -a /var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/python/plugins/orfeoToolbox_provider \
+        "$HOME/.local/share/QGIS/QGIS3/profiles/default/python/plugins"
+    fi
   fi
 fi
