@@ -21,7 +21,21 @@ RUN mkdir /files
 COPY conf/user /files
 COPY scripts /files
 
-RUN chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+    ## QGIS: Set OTB application folder and OTB folder
+    qgis3Ini="/files/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini"; \
+    echo "\n[Processing]" >> ${qgis3Ini}; \
+    if [ -z "${OTB_VERSION}" ]; then \
+      echo "Configuration\OTB_APP_FOLDER=/usr/lib/otb/applications" >> \
+        ${qgis3Ini}; \
+      echo "Configuration\OTB_FOLDER=/usr\n" >> ${qgis3Ini}; \
+    else \
+      echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
+        ${qgis3Ini}; \
+      echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis3Ini}; \
+    fi \
+  fi \
+  && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
   && find /files -type d -exec chmod 755 {} \; \
@@ -238,10 +252,15 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
   && qgis-plugin-manager install 'Processing Saga NextGen Provider'=="${PROC_SAGA_NG_VERSION:-0.0.7}" \
-  && rm -rf .cache_qgis_plugin_manager \
   ## QGIS: Enable plugins
   && qgis_process plugins enable processing_saga_nextgen \
   && qgis_process plugins enable grassprovider \
+  && if [ "$(uname -m)" = "x86_64" ]; then \
+    ## QGIS: Install and enable OTB plugin
+    qgis-plugin-manager install 'OrfeoToolbox Provider'; \
+    qgis_process plugins enable orfeoToolbox_provider; \
+  fi \
+  && rm -rf .cache_qgis_plugin_manager \
   ## Clean up
   && rm -rf \
     ${HOME}/.cache \
