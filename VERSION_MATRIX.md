@@ -15,5 +15,5 @@ Topmost entry = Tag `latest`
 
 [^1]: R version ≥ 4.3.1  
 [^2]: verse+ images  
-[^3]: qgisprocess image  
-[^4]: `amd64` only; QGIS v3.36.0 w/o OTB provider
+[^3]: qgisprocess image; QGIS v3.36.0 w/o OTB provider  
+[^4]: `amd64` only
