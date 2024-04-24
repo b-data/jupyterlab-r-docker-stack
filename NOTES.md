@@ -28,12 +28,22 @@ The following startup hooks are put in place:
 
 * [/usr/local/bin/start-notebook.d/10-populate.sh](base/scripts/usr/local/bin/start-notebook.d/10-populate.sh)
   to populate a *bind mounted* home directory `/home/jovyan`.
-* [/usr/local/bin/before-notebook.d/10-init.sh](base/scripts/usr/local/bin/before-notebook.d/10-init.sh) to
+* [/usr/local/bin/before-notebook.d/10-env.sh](base/scripts/usr/local/bin/before-notebook.d/10-env.sh) to
   * update timezone according to environment variable `TZ`.
   * add locales according to environment variable `LANGS`.
   * set locale according to environment variable `LANG`.
-  * create R user library.
-  * update code-server settings.
+* [/usr/local/bin/before-notebook.d/11-home.sh](base/scripts/usr/local/bin/before-notebook.d/11-home.sh)
+  to create user's projects and workspaces folder.
+* [/usr/local/bin/before-notebook.d/12-r.sh](base/scripts/usr/local/bin/before-notebook.d/12-r.sh)
+  to create user's R package library.
+* [/usr/local/bin/before-notebook.d/13-update-cran.sh](base/scripts/usr/local/bin/before-notebook.d/13-update-cran.sh) to
+  * update CRAN mirror according to environment variable `CRAN`.
+  * use binary packages according to environment variable `R_BINARY_PACKAGES`.
+* [/usr/local/bin/before-notebook.d/30-code-server.sh](base/scripts/usr/local/bin/before-notebook.d/30-code-server.sh)
+  to update code-server settings.
+* [/usr/local/bin/before-notebook.d/70-qgis.sh](qgisprocess/scripts/usr/local/bin/before-notebook.d/70-qgis.sh) to
+  * put inital QGIS settings in place.
+  * copy plugin 'Processing Saga NextGen Provider'.
 * [/usr/local/bin/before-notebook.d/90-limits.sh](base/scripts/usr/local/bin/before-notebook.d/90-limits.sh)
   to set the *soft limit* for *the maximum amount of virtual memory* based on
   the amount of *physical* and *virtual memory* of the host.
@@ -50,6 +60,9 @@ unattended computations.
 ### Environment variables
 
 * `CRAN`: The CRAN mirror URL.
+* `R_BINARY_PACKAGES`: R package type to use.
+  * unset: Source packages. (default)
+  * `1`/`yes`: Binary packages.
 * `DOWNLOAD_STATIC_LIBV8=1`: R (V8): Installing V8 on Linux, the alternative
   way.
 * `RETICULATE_MINICONDA_ENABLED=0`: R (reticulate): Disable prompt to install
