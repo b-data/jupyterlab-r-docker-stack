@@ -1,9 +1,9 @@
 .env:
   variables:
-    R_VERSION: "4.3.3"
+    R_VERSION: "4.4.0"
     QGIS_VERSION: "3.36.2"
     OTB_VERSION: "9.0.0"
-    TAG_VERSION_MAJ_MIN: "true"
+    TAG_VERSION_MAJ_MIN: "false"
     TAG_VERSION_MAJ: "false"
 
 .before-script-build: &before-script-build

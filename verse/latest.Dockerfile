@@ -57,6 +57,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     librsvg2-bin \
     qpdf \
     texinfo \
+    ## Python: For h5py wheels (arm64)
+    libhdf5-dev \
   ## Install R package redland
   && install2.r --error --skipinstalled -n $NCPUS redland \
   ## Explicitly install runtime library sub-deps of librdf0-dev
