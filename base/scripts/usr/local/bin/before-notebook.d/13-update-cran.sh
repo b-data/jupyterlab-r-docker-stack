@@ -23,8 +23,6 @@ if [[ "$R_BINARY_PACKAGES" == "1" || "$R_BINARY_PACKAGES" == "yes" ]]; then
     CRAN=${CRAN//cran/"cran/__linux__/$VERSION_CODENAME"}
     export CRAN
     # Set options repos and HTTPUserAgent in Rprofile.site
-    [[ "$CRAN" == "$CRAN_ORIG_P3M" ]] && sed -i "s/packagemanager.posit.co/p3m.dev/g" \
-      "$(R RHOME)/etc/Rprofile.site"
     sed -i "s|cran|cran/__linux__/$VERSION_CODENAME|g" \
       "$(R RHOME)/etc/Rprofile.site"
     echo '# https://docs.rstudio.com/rspm/admin/serving-binaries/#binaries-r-configuration-linux' \
