@@ -32,8 +32,7 @@ base → tidyverse → verse → geospatial → qgisprocess
 
 * **JupyterLab**: A web-based interactive development environment for Jupyter
    notebooks, code, and data. The images include
-  * **code-server**: VS Code in the browser without MS
-    branding/telemetry/licensing.
+  * **code-server**: `Code - OSS` in the browser.
   * **Git**: A distributed version-control system for tracking changes in source
     code.
   * **Git LFS**: A Git extension for versioning large files.
@@ -70,7 +69,7 @@ The following extensions are pre-installed for **code-server**:
   :information_source: devtools subtags
 * [Docker](https://open-vsx.org/extension/ms-azuretools/vscode-docker)  
   :information_source: docker subtags
-* [EditorConfig for VS Code](https://open-vsx.org/extension/EditorConfig/EditorConfig)
+* [EditorConfig](https://open-vsx.org/extension/EditorConfig/EditorConfig)
   (4.3.0+)
 * [ESLint](https://open-vsx.org/extension/dbaeumer/vscode-eslint)  
   :information_source: devtools subtags
@@ -297,7 +296,7 @@ docker run -it --rm \
    :information_source: CUDA-enabled images are Ubuntu-based.
 1. IDE: [code-server](https://github.com/coder/code-server) instead of
    [RStudio](https://github.com/rstudio/rstudio)  
-   :information_source: code-server = VS Code in the browser.
+   :information_source: code-server = `Code - OSS` in the browser.
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
 
@@ -305,7 +304,8 @@ See [Notes](NOTES.md) for tweaks, settings, etc.
 
 ## Contributing
 
-PRs accepted.
+PRs accepted. Please submit to the
+[GitLab repository](https://gitlab.com/b-data/jupyterlab/r-project/docker-stack).
 
 This project follows the
 [Contributor Covenant](https://www.contributor-covenant.org)
