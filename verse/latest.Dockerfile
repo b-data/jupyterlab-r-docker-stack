@@ -151,6 +151,15 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
+  && if [ -n "${RSTUDIO_VERSION}" ]; then \
+    ## Check for quarto redundancy
+    if [ -d /opt/quarto ]; then \
+      ## Remove RStudio quarto
+      rm -rf /usr/lib/rstudio-server/bin/quarto; \
+      ## Link to system quarto
+      ln -s /opt/quarto /usr/lib/rstudio-server/bin/quarto; \
+    fi \
+  fi \
   ## Strip libraries of binary packages installed from PPPM
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \

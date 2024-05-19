@@ -10,11 +10,14 @@ ARG JUPYTERHUB_VERSION=4.1.5
 ARG JUPYTERLAB_VERSION=4.2.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_VERSION=4.89.1
+ARG RSTUDIO_VERSION
 ARG GIT_VERSION=2.45.1
 ARG GIT_LFS_VERSION=3.5.1
 ARG PANDOC_VERSION=3.1.11
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
+
+ARG RSTUDIO_VERSION
 
 ARG NB_UID
 ENV NB_GID=100
@@ -25,6 +28,7 @@ COPY assets /files
 COPY conf/ipython /files
 COPY conf/jupyter /files
 COPY conf/jupyterlab /files
+COPY conf/rstudio /files
 COPY conf/shell /files
 COPY conf/user /files
 COPY scripts /files
@@ -38,6 +42,11 @@ RUN cp -a /files/etc/skel/. /files/var/backups/skel \
     /files/usr/local/share/jupyter/lab/static/assets \
   && cp -a /files/opt/code-server/src/browser/media/fonts \
     /files/usr/local/share/jupyter/lab/static/assets \
+  && mkdir -p /files/etc/rstudio/fonts \
+  && cp "/files/opt/code-server/src/browser/media/fonts/MesloLGS NF Regular.woff" \
+    "/files/etc/rstudio/fonts/MesloLGS NF.woff" \
+  && cp "/files/opt/code-server/src/browser/media/fonts/MesloLGS NF Regular.woff2" \
+    "/files/etc/rstudio/fonts/MesloLGS NF.woff2" \
   && if [ -n "${CUDA_VERSION}" ]; then \
     ## Use standard R terminal for CUDA images
     ## radian forces usage of /usr[/local]/bin/python
@@ -50,6 +59,11 @@ RUN cp -a /files/etc/skel/. /files/var/backups/skel \
       /files/usr/local/bin/entrypoint.d/99-start.sh; \
     mv /files/usr/local/bin/nvidia_entrypoint.sh \
       /files/usr/local/bin/start.sh; \
+  fi \
+  && if [ -z "${RSTUDIO_VERSION}" ]; then \
+    rm -rf /files/etc/rstudio \
+      /files/usr/local/bin/before-notebook.d/*-rstudio.sh \
+      /files/var/backups/skel/.config; \
   fi \
   ## Ensure file modes are correct when using CI
   ## Otherwise set to 777 in the target image
@@ -75,6 +89,7 @@ ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG CODE_SERVER_VERSION
+ARG RSTUDIO_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
@@ -99,6 +114,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMA
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
+    RSTUDIO_VERSION=${RSTUDIO_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
@@ -270,6 +286,58 @@ RUN mkdir /opt/code-server \
     ${HOME}/.config \
     ${HOME}/.local
 
+## Install RStudio
+RUN if [ -n "${RSTUDIO_VERSION}" ]; then \
+    dpkgArch="$(dpkg --print-architecture)"; \
+    . /etc/os-release; \
+    apt-get update; \
+    ## Install lsb-release
+    if [ "$ID" = "debian" ]; then \
+      dpkg --compare-versions "$VERSION_ID" lt "12"; \
+      condDebian=$?; \
+    fi; \
+    if [ "$ID" = "ubuntu" ]; then \
+      dpkg --compare-versions "$VERSION_ID" lt "23.04"; \
+      condUbuntu=$?; \
+    fi; \
+    if [ "$condDebian" = "0" ] || [ "$condUbuntu" = "0" ]; then \
+      curl -sL \
+        http://mirrors.kernel.org/debian/pool/main/l/lsb-release-minimal/lsb-release_12.0-2_all.deb \
+        -o lsb-release.deb; \
+      dpkg -i lsb-release.deb; \
+      rm lsb-release.deb; \
+    else \
+      apt-get -y install --no-install-recommends lsb-release; \
+    fi; \
+    ## Map Ubuntu codename
+    if [ "$ID" = "debian" ]; then \
+      case "$VERSION_CODENAME" in \
+        bullseye) UBUNTU_CODENAME="focal" ;; \
+        bookworm) UBUNTU_CODENAME="jammy" ;; \
+        *) echo "error: Debian $VERSION unsupported"; exit 1 ;; \
+      esac; \
+    fi; \
+    ## Install RStudio
+    apt-get -y install --no-install-recommends \
+      libapparmor1 \
+      libpq5 \
+      libssl-dev; \
+    rm -rf /var/lib/apt/lists/*; \
+    DOWNLOAD_FILE=rstudio-server-$(echo $RSTUDIO_VERSION | tr + -)-$dpkgArch.deb; \
+    wget --progress=dot:mega \
+      "https://download2.rstudio.org/server/$UBUNTU_CODENAME/$dpkgArch/$DOWNLOAD_FILE" || \
+      wget --progress=dot:mega \
+      "https://s3.amazonaws.com/rstudio-ide-build/server/$UBUNTU_CODENAME/$dpkgArch/$DOWNLOAD_FILE"; \
+    dpkg -i "$DOWNLOAD_FILE"; \
+    rm "$DOWNLOAD_FILE"; \
+    ## Enable rstudio-server and rserver system-wide
+    ln -fs /usr/lib/rstudio-server/bin/rstudio-server /usr/local/bin; \
+    ln -fs /usr/lib/rstudio-server/bin/rserver /usr/local/bin; \
+    ## Copy custom fonts
+    cp "/opt/code-server/src/browser/media/fonts/MesloLGS NF Regular.ttf" \
+      "/etc/rstudio/fonts/MesloLGS NF.ttf"; \
+  fi
+
 ## Install JupyterLab
 RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install \
@@ -282,6 +350,7 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     nbclassic \
     nbconvert \
     python-lsp-server[all] \
+    ${RSTUDIO_VERSION:+jupyter-rsession-proxy} \
   ## Jupyter Server Proxy: Set maximum allowed HTTP body size to 10 GiB
   && sed -i 's/AsyncHTTPClient(/AsyncHTTPClient(max_body_size=10737418240, /g' \
     /usr/local/lib/python*/*-packages/jupyter_server_proxy/handlers.py \
