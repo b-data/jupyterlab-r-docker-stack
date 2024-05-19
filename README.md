@@ -32,7 +32,8 @@ base → tidyverse → verse → geospatial → qgisprocess
 
 * **JupyterLab**: A web-based interactive development environment for Jupyter
    notebooks, code, and data. The images include
-  * **code-server**: `Code - OSS` in the browser.
+  * **code-server**: [`Code - OSS`](https://github.com/microsoft/vscode) in the
+    browser.
   * **Git**: A distributed version-control system for tracking changes in source
     code.
   * **Git LFS**: A Git extension for versioning large files.
@@ -296,7 +297,8 @@ docker run -it --rm \
    :information_source: CUDA-enabled images are Ubuntu-based.
 1. IDE: [code-server](https://github.com/coder/code-server) instead of
    [RStudio](https://github.com/rstudio/rstudio)  
-   :information_source: code-server = `Code - OSS` in the browser.
+   :information_source: code-server =
+   [`Code - OSS`](https://github.com/microsoft/vscode) in the browser.
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
 
