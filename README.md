@@ -51,6 +51,7 @@ base → tidyverse → verse → geospatial → qgisprocess
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
     :information_source: verse+ images
   * **R**: A language and environment for statistical computing and graphics.
+  * **RStudio** (optional): An integrated development environment (IDE) for R.
   * **SAGA GIS**: A Geographic Information System (GIS) software with immense
     capabilities for geodata processing and analysis.  
     :information_source: qgisprocess image

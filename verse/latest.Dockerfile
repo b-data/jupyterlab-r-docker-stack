@@ -160,7 +160,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
       ln -s /opt/quarto /usr/lib/rstudio-server/bin/quarto; \
     fi \
   fi \
-  ## Strip libraries of binary packages installed from PPPM
+  ## Strip libraries of binary packages installed from P3M
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Update default PATH settings in /etc/profile.d/00-reset-path.sh

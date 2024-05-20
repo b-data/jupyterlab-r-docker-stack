@@ -437,7 +437,7 @@ RUN apt-get update \
   ## Change ownership and permission of $(R RHOME)/etc/*.site
   && chown :"$NB_GID" "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   && chmod g+w "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
-  ## Strip libraries of binary packages installed from PPPM
+  ## Strip libraries of binary packages installed from P3M
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Clean up
