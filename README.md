@@ -131,6 +131,7 @@ The following extensions are pre-installed for **code-server**:
 * [Support](#support)
 * [Sponsors](#sponsors)
 * [License](#license)
+* [Trademarks](#trademarks)
 
 ## Prerequisites
 
