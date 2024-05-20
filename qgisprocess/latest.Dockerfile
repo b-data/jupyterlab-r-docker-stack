@@ -263,7 +263,8 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && rm -rf .cache_qgis_plugin_manager \
   ## Clean up
   && rm -rf \
-    ${HOME}/.cache \
+    ${HOME}/.cache/QGIS \
+    ${HOME}/.cache/qgis_process_ \
     ${HOME}/.config \
     ${HOME}/.grass* \
   ## Create backup of QGIS settings
