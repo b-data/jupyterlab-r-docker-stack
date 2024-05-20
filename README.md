@@ -51,7 +51,9 @@ base → tidyverse → verse → geospatial → qgisprocess
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
     :information_source: verse+ images
   * **R**: A language and environment for statistical computing and graphics.
-  * **RStudio** (optional): An integrated development environment (IDE) for R.
+  * **radian**: An alternative console for R with multiline editing and rich
+    syntax highlight.
+  * **RStudio**: An integrated development environment (IDE) for R. (4.4.0+)
   * **SAGA GIS**: A Geographic Information System (GIS) software with immense
     capabilities for geodata processing and analysis.  
     :information_source: qgisprocess image
@@ -296,7 +298,7 @@ docker run -it --rm \
 1. Base image: [Debian](https://hub.docker.com/_/debian) instead of
    [Ubuntu](https://hub.docker.com/_/ubuntu)  
    :information_source: CUDA-enabled images are Ubuntu-based.
-1. IDE: [code-server](https://github.com/coder/code-server) instead of
+1. IDE: [code-server](https://github.com/coder/code-server) next to
    [RStudio](https://github.com/rstudio/rstudio)  
    :information_source: code-server =
    [`Code - OSS`](https://github.com/microsoft/vscode) in the browser.
@@ -343,3 +345,9 @@ Work partially funded by
 ## License
 
 [MIT](LICENSE) © 2020 b-data GmbH
+
+## Trademarks
+
+RStudio® is a trademark of Posit Software, PBC, all rights reserved, and may be registered in the United States Patent and Trademark Office and in other countries.
+
+The use of the trademarked term RStudio® and the distribution of the RStudio binaries through the images hosted on b-data's GitLab Container Registry (`glcr.b-data.ch`) has been granted by explicit permission of Posit Software, PBC. Please review [Posit’s Trademark Guidelines](https://posit.co/about/trademark-guidelines/) and address inquiries about further distribution to [permissions@posit.co](mailto:permissions@posit.co).
