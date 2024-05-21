@@ -345,10 +345,20 @@ Work partially funded by
 
 ## License
 
-[MIT](LICENSE) © 2020 b-data GmbH
+Copyright © 2020 b-data GmbH
+
+Distributed under the terms of the [MIT License](LICENSE), with exceptions.
 
 ## Trademarks
 
-RStudio® is a trademark of Posit Software, PBC, all rights reserved, and may be registered in the United States Patent and Trademark Office and in other countries.
+RStudio® is a trademark of Posit Software, PBC, all rights reserved, and may be
+registered in the United States Patent and Trademark Office and in other
+countries.
 
-The use of the trademarked term RStudio® and the distribution of the RStudio binaries through the images hosted on b-data's GitLab Container Registry (`glcr.b-data.ch`) has been granted by explicit permission of Posit Software, PBC. Please review [Posit’s Trademark Guidelines](https://posit.co/about/trademark-guidelines/) and address inquiries about further distribution to [permissions@posit.co](mailto:permissions@posit.co).
+The use of the trademarked term RStudio® and the distribution of the RStudio
+binaries through the images hosted on b-data's GitLab Container Registry
+(`glcr.b-data.ch`) has been granted by explicit permission of Posit Software,
+PBC. Please review
+[Posit’s Trademark Guidelines](https://posit.co/about/trademark-guidelines/) and
+address inquiries about further distribution to
+[permissions@posit.co](mailto:permissions@posit.co).
