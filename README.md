@@ -1,7 +1,7 @@
 [![minimal-readme compliant](https://img.shields.io/badge/readme%20style-minimal-brightgreen.svg)](https://github.com/RichardLitt/standard-readme/blob/master/example-readmes/minimal-readme.md) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) <a href="https://liberapay.com/benz0li/donate"><img src="https://liberapay.com/assets/widgets/donate.svg" alt="Donate using Liberapay" height="20"></a>
 
-| See the [CUDA-enabled JupyterLab R docker stack](CUDA.md) for GPU accelerated docker images. |
-|:---------------------------------------------------------------------------------------------|
+| See the [CUDA-based JupyterLab R docker stack](CUDA.md) for GPU accelerated docker images. |
+|:-------------------------------------------------------------------------------------------|
 
 # JupyterLab R docker stack
 
@@ -298,7 +298,7 @@ docker run -it --rm \
    :information_source: Runs on Apple M series using Docker Desktop.
 1. Base image: [Debian](https://hub.docker.com/_/debian) instead of
    [Ubuntu](https://hub.docker.com/_/ubuntu)  
-   :information_source: CUDA-enabled images are Ubuntu-based.
+   :information_source: CUDA-based images use Ubuntu.
 1. IDE: [code-server](https://github.com/coder/code-server) next to
    [RStudio](https://github.com/rstudio/rstudio)  
    :information_source: code-server =
