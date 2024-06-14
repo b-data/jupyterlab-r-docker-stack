@@ -192,7 +192,6 @@ are installed.
   * Valid figure formats: `png`, `retina`, `jpeg`, `svg`, `pdf`.
 * JupyterLab: Settings > Advanced Settings Editor
 * code-server: Manage > Settings
-
 * Zsh
   * Oh My Zsh: Edit `~/.zshrc`.
   * Powerlevel10k: Run `p10k configure` or edit `~/.p10k.zsh`.
