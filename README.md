@@ -1,7 +1,7 @@
 [![minimal-readme compliant](https://img.shields.io/badge/readme%20style-minimal-brightgreen.svg)](https://github.com/RichardLitt/standard-readme/blob/master/example-readmes/minimal-readme.md) [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) <a href="https://liberapay.com/benz0li/donate"><img src="https://liberapay.com/assets/widgets/donate.svg" alt="Donate using Liberapay" height="20"></a>
 
-| See the [CUDA-enabled JupyterLab R docker stack](CUDA.md) for GPU accelerated docker images. |
-|:---------------------------------------------------------------------------------------------|
+| See the [CUDA-based JupyterLab R docker stack](CUDA.md) for GPU accelerated docker images. |
+|:-------------------------------------------------------------------------------------------|
 
 # JupyterLab R docker stack
 
@@ -32,8 +32,8 @@ base → tidyverse → verse → geospatial → qgisprocess
 
 * **JupyterLab**: A web-based interactive development environment for Jupyter
    notebooks, code, and data. The images include
-  * **code-server**: VS Code in the browser without MS
-    branding/telemetry/licensing.
+  * **code-server**: [`Code - OSS`](https://github.com/microsoft/vscode) in the
+    browser.
   * **Git**: A distributed version-control system for tracking changes in source
     code.
   * **Git LFS**: A Git extension for versioning large files.
@@ -51,6 +51,9 @@ base → tidyverse → verse → geospatial → qgisprocess
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
     :information_source: verse+ images
   * **R**: A language and environment for statistical computing and graphics.
+  * **radian**: An alternative console for R with multiline editing and rich
+    syntax highlight.
+  * **RStudio**: An integrated development environment (IDE) for R. (4.4.0+)
   * **SAGA GIS**: A Geographic Information System (GIS) software with immense
     capabilities for geodata processing and analysis.  
     :information_source: qgisprocess image
@@ -70,7 +73,7 @@ The following extensions are pre-installed for **code-server**:
   :information_source: devtools subtags
 * [Docker](https://open-vsx.org/extension/ms-azuretools/vscode-docker)  
   :information_source: docker subtags
-* [EditorConfig for VS Code](https://open-vsx.org/extension/EditorConfig/EditorConfig)
+* [EditorConfig](https://open-vsx.org/extension/EditorConfig/EditorConfig)
   (4.3.0+)
 * [ESLint](https://open-vsx.org/extension/dbaeumer/vscode-eslint)  
   :information_source: devtools subtags
@@ -128,6 +131,7 @@ The following extensions are pre-installed for **code-server**:
 * [Support](#support)
 * [Sponsors](#sponsors)
 * [License](#license)
+* [Trademarks](#trademarks)
 
 ## Prerequisites
 
@@ -148,7 +152,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.3.3 \
+  --build-arg R_VERSION=4.4.0 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```
@@ -294,10 +298,11 @@ docker run -it --rm \
    :information_source: Runs on Apple M series using Docker Desktop.
 1. Base image: [Debian](https://hub.docker.com/_/debian) instead of
    [Ubuntu](https://hub.docker.com/_/ubuntu)  
-   :information_source: CUDA-enabled images are Ubuntu-based.
-1. IDE: [code-server](https://github.com/coder/code-server) instead of
+   :information_source: CUDA-based images use Ubuntu.
+1. IDE: [code-server](https://github.com/coder/code-server) next to
    [RStudio](https://github.com/rstudio/rstudio)  
-   :information_source: code-server = VS Code in the browser.
+   :information_source: code-server =
+   [`Code - OSS`](https://github.com/microsoft/vscode) in the browser.
 1. Just Python – no [Conda](https://github.com/conda/conda) /
    [Mamba](https://github.com/mamba-org/mamba)
 
@@ -305,7 +310,8 @@ See [Notes](NOTES.md) for tweaks, settings, etc.
 
 ## Contributing
 
-PRs accepted.
+PRs accepted. Please submit to the
+[GitLab repository](https://gitlab.com/b-data/jupyterlab/r-project/docker-stack).
 
 This project follows the
 [Contributor Covenant](https://www.contributor-covenant.org)
@@ -339,4 +345,20 @@ Work partially funded by
 
 ## License
 
-[MIT](LICENSE) © 2020 b-data GmbH
+Copyright © 2020 b-data GmbH
+
+Distributed under the terms of the [MIT License](LICENSE), with exceptions.
+
+## Trademarks
+
+RStudio® is a trademark of Posit Software, PBC, all rights reserved, and may be
+registered in the United States Patent and Trademark Office and in other
+countries.
+
+The use of the trademarked term RStudio® and the distribution of the RStudio
+binaries through the images hosted on b-data's GitLab Container Registry
+(`glcr.b-data.ch`) has been granted by explicit permission of Posit Software,
+PBC. Please review
+[Posit’s Trademark Guidelines](https://posit.co/about/trademark-guidelines/) and
+address inquiries about further distribution to
+[permissions@posit.co](mailto:permissions@posit.co).

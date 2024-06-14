@@ -220,7 +220,7 @@ RUN apt-get update \
     $(which qgis_process) \
   ## Install qgisprocess, the R interface to QGIS
   && install2.r --error --skipinstalled -n $NCPUS qgisprocess \
-  ## Strip libraries of binary packages installed from PPPM
+  ## Strip libraries of binary packages installed from P3M
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Clean up
@@ -263,7 +263,8 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && rm -rf .cache_qgis_plugin_manager \
   ## Clean up
   && rm -rf \
-    ${HOME}/.cache \
+    ${HOME}/.cache/QGIS \
+    ${HOME}/.cache/qgis_process_ \
     ${HOME}/.config \
     ${HOME}/.grass* \
   ## Create backup of QGIS settings

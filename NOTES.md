@@ -81,6 +81,7 @@ unattended computations.
 * `GIT_LFS_VERSION`
 * `PANDOC_VERSION`
 * `QUARTO_VERSION` (verse+ images)
+* `RSTUDIO_VERSION`
 
 **Miscellaneous**
 
@@ -102,7 +103,7 @@ Current situation regarding *frozen* images:
 * 4.2.2 ≤ R version < 4.3.1: No CRAN snapshots available.
     * Use [renv](https://rstudio.github.io/renv/) to create **r**eproducible
       **env**ironments for your R projects.
-* R version ≥ 4.3.1: CRAN snapshots reinstated (PPM).
+* R version ≥ 4.3.1: CRAN snapshots reinstated (P3M).
 
 ### Shell
 

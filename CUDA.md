@@ -1,4 +1,4 @@
-# CUDA-enabled JupyterLab R docker stack
+# CUDA-based JupyterLab R docker stack
 
 GPU accelerated, multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
@@ -59,6 +59,11 @@ The same as the
 * NVIDIA Linux driver
 * NVIDIA Container Toolkit
 
+Use driver version 535
+([Long Term Support Branch](https://docs.nvidia.com/datacenter/tesla/drivers/index.html#lifecycle))
+to ensure
+[forward compatibility](https://docs.nvidia.com/deploy/cuda-compatibility/index.html#forward-compatibility)
+until June 2026.  
 :information_source: The host running the GPU accelerated images only requires
 the NVIDIA driver, the CUDA toolkit does not have to be installed.
 
@@ -80,7 +85,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/r/ver \
-  --build-arg R_VERSION=4.3.3 \
+  --build-arg R_VERSION=4.4.0 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base \
   -f latest.Dockerfile .
@@ -210,12 +215,13 @@ docker run -it --rm \
 ## Similar projects
 
 * [iot-salzburg/gpu-jupyter](https://github.com/iot-salzburg/gpu-jupyter)
+* [pangeo-data/pangeo-docker-images](https://github.com/pangeo-data/pangeo-docker-images)
 * [prp/jupyter-stack](https://gitlab.nrp-nautilus.io/prp/jupyter-stack)
 
 **What makes this project different:**
 
 1. Multi-arch: `linux/amd64`, `linux/arm64/v8`
-1. Derived from [`nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04`](https://hub.docker.com/r/nvidia/cuda/tags?page=1&name=11.8.0-cudnn8-devel-ubuntu22.04)
+1. Derived from [`nvidia/cuda:12.5.0-devel-ubuntu22.04`](https://hub.docker.com/r/nvidia/cuda/tags?page=1&name=12.5.0-devel-ubuntu22.04)
     * including development libraries and headers
 1. TensortRT and TensorRT plugin libraries
     * including development libraries and headers
