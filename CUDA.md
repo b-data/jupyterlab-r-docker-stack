@@ -85,7 +85,7 @@ cd base && docker build \
   --build-arg BASE_IMAGE=ubuntu \
   --build-arg BASE_IMAGE_TAG=22.04 \
   --build-arg BUILD_ON_IMAGE=glcr.b-data.ch/cuda/r/ver \
-  --build-arg R_VERSION=4.4.0 \
+  --build-arg R_VERSION=4.4.1 \
   --build-arg CUDA_IMAGE_FLAVOR=devel \
   -t jupyterlab/cuda/r/base \
   -f latest.Dockerfile .
