@@ -45,8 +45,14 @@ The following startup hooks are put in place:
   * put inital QGIS settings in place.
   * copy plugin 'Processing Saga NextGen Provider'.
 * [/usr/local/bin/before-notebook.d/90-limits.sh](base/scripts/usr/local/bin/before-notebook.d/90-limits.sh)
-  to set the *soft limit* for *the maximum amount of virtual memory* based on
-  the amount of *physical* and *virtual memory* of the host.
+  * *soft* limit the *address space* based on the amount of *physical* and
+    *virtual memory* of the host. (default: command `ulimit -v`)
+  * limit the number of *file descriptors* according to environment variable
+    `NOFILE_LIMIT`. (default: command `ulimit -n`)
+  * limit the number of *processes* according to environment variable
+    `NPROC_LIMIT`. (default: command `ulimit -u`)
+  * limit the number of *pending signals* according to environment variable
+    `SIGPEN_LIMIT`. (default: command `ulimit -i`)
 
 ### Custom scripts
 
