@@ -44,6 +44,8 @@ The following startup hooks are put in place:
 * [/usr/local/bin/before-notebook.d/70-qgis.sh](qgisprocess/scripts/usr/local/bin/before-notebook.d/70-qgis.sh) to
   * put inital QGIS settings in place.
   * copy plugin 'Processing Saga NextGen Provider'.
+* [/usr/local/bin/before-notebook.d/71-tensorboard.sh](base/scripts/usr/local/bin/before-notebook.d/71-tensorboard.sh)
+  to use Jupyter Server Proxy for TensorBoard.
 * [/usr/local/bin/before-notebook.d/90-limits.sh](base/scripts/usr/local/bin/before-notebook.d/90-limits.sh)
   * *soft* limit the *address space* based on the amount of *physical* and
     *virtual memory* of the host. (default: command `ulimit -v`)
