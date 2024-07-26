@@ -41,6 +41,10 @@ The following startup hooks are put in place:
   * use binary packages according to environment variable `R_BINARY_PACKAGES`.
 * [/usr/local/bin/before-notebook.d/30-code-server.sh](base/scripts/usr/local/bin/before-notebook.d/30-code-server.sh)
   to update code-server settings.
+* [/usr/local/bin/before-notebook.d/50-rstudio.sh](base/scripts/usr/local/bin/before-notebook.d/50-rstudio.sh) to
+  * set environment variables in `$(R RHOME)/etc/Renviron.site`.
+  * put inital RStudio settings in place.
+  * create user's working folder.
 * [/usr/local/bin/before-notebook.d/70-qgis.sh](qgisprocess/scripts/usr/local/bin/before-notebook.d/70-qgis.sh) to
   * put inital QGIS settings in place.
   * copy plugin 'Processing Saga NextGen Provider'.
@@ -55,6 +59,8 @@ The following startup hooks are put in place:
     `NPROC_LIMIT`. (default: command `ulimit -u`)
   * limit the number of *pending signals* according to environment variable
     `SIGPEN_LIMIT`. (default: command `ulimit -i`)
+* [/usr/local/bin/before-notebook.d/95-misc.sh](base/scripts/usr/local/bin/before-notebook.d/95-misc.sh)
+  to export environment variables to `/tmp/environment`.
 
 ### Custom scripts
 
