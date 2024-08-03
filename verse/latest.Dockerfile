@@ -164,8 +164,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Update default PATH settings in /etc/profile.d/00-reset-path.sh
-  && sed -i 's|/opt/code-server/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin|g' /etc/profile.d/00-reset-path.sh \
-  && sed -i 's|/opt/code-server/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games|g' /etc/profile.d/00-reset-path.sh \
+  && sed -i 's|/opt/code-server/bin|/opt/TinyTeX/bin/linux:/opt/quarto/bin:/opt/code-server/bin|g' /etc/profile.d/00-reset-path.sh \
   ## Clean up
   && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
