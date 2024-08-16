@@ -14,13 +14,13 @@ ARG BUILD_ON_IMAGE
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG QUARTO_VERSION
 ARG CTAN_REPO
+ARG CTAN_REPO_BUILD_LATEST
 ARG BUILD_START
 
 USER root
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
     QUARTO_VERSION=${QUARTO_VERSION} \
-    CTAN_REPO=${CTAN_REPO} \
     BUILD_DATE=${BUILD_START}
 
 ENV HOME=/root \
@@ -90,7 +90,10 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && dpkg -i texlive-local.deb \
   && apt-get -y purge equivs \
   && apt-get -y autoremove \
-  ## Admin-based install of TinyTeX:
+  ## Admin-based install of TinyTeX
+  && CTAN_REPO_ORIG=${CTAN_REPO} \
+  && CTAN_REPO=${CTAN_REPO_BUILD_LATEST:-$CTAN_REPO} \
+  && export CTAN_REPO \
   && wget -qO- "https://yihui.org/tinytex/install-unx.sh" \
     | sh -s - --admin --no-path \
   && mv ${HOME}/.TinyTeX /opt/TinyTeX \
@@ -117,6 +120,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     oberdiek \
     titling \
   && tlmgr path add \
+  && tlmgr option repository ${CTAN_REPO_ORIG} \
   && Rscript -e "tinytex::r_texmf()" \
   && chown -R root:${NB_GID} /opt/TinyTeX \
   && chmod -R g+w /opt/TinyTeX \
@@ -175,6 +179,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
+
+ENV CTAN_REPO=${CTAN_REPO}
 
 ENV HOME=/home/${NB_USER}
 
