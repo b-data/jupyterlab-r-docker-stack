@@ -11,6 +11,7 @@ ARG JUPYTERLAB_VERSION=4.2.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_VERSION=4.92.2
 ARG RSTUDIO_VERSION=2024.04.2+764
+ARG NEOVIM_VERSION=0.10.1
 ARG GIT_VERSION=2.46.0
 ARG GIT_LFS_VERSION=3.5.1
 ARG PANDOC_VERSION=3.2
@@ -73,6 +74,7 @@ RUN cp -a /files/etc/skel/. /files/var/backups/skel \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \; \
   && find /files/etc/profile.d -type f -exec chmod 755 {} \;
 
+FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} AS glfsi
 
@@ -91,6 +93,7 @@ ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG CODE_SERVER_VERSION
 ARG RSTUDIO_VERSION
+ARG NEOVIM_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
@@ -116,6 +119,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMA
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
     RSTUDIO_VERSION=${RSTUDIO_VERSION} \
+    NEOVIM_VERSION=${NEOVIM_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
@@ -130,6 +134,8 @@ ENV DOWNLOAD_STATIC_LIBV8=1
 ## Disable prompt to install miniconda
 ENV RETICULATE_MINICONDA_ENABLED=0
 
+## Install Neovim
+COPY --from=nvsi /usr/local /usr/local
 ## Install Git
 COPY --from=gsi /usr/local /usr/local
 ## Install Git LFS
@@ -169,6 +175,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     vim-tiny \
     wget \
     zsh \
+    ## Neovim: Additional runtime recommendations
+    ripgrep \
     ## Git: Additional runtime dependencies
     libcurl3-gnutls \
     liberror-perl \

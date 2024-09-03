@@ -39,6 +39,7 @@ base → tidyverse → verse → geospatial → qgisprocess
   * **Git LFS**: A Git extension for versioning large files.
   * **GRASS GIS**: A free and open source Geographic Information System (GIS).  
     :information_source: qgisprocess image
+  * **Neovim**: Vim-fork focused on extensibility and usability. (4.4.1+)
   * **Orfeo Toolbox**: An open-source project for state-of-the-art remote
     sensing.  
     :information_source: qgisprocess image (amd64 only)
