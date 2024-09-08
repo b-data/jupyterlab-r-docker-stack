@@ -154,7 +154,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     imagemagick \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop@9.20.1 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension James-Yu.latex-workshop \
   && if [ -n "${RSTUDIO_VERSION}" ]; then \
     ## Check for quarto redundancy
     if [ -d /opt/quarto ]; then \
