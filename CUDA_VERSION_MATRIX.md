@@ -23,10 +23,10 @@ Topmost entry = Tag `latest`
 
 | Python | CUDA | PyTorch[^4]    | TensorFlow[^5]        |
 |:-------|:-----|:---------------|:----------------------|
-| 3.12   | 12.6 | 2.2 ≤ version  | 2.16 ≤ version        |
-| 3.12   | 12.5 | 2.2 ≤ version  | 2.16 ≤ version        |
-| 3.11   | 11.8 | 2.0 ≤ version  | 2.12 ≤ version < 2.15 |
-| 3.10   | 11.8 | 1.12 ≤ version | 2.8  ≤ version < 2.15 |
+| 3.12   | 12.6 | version ≥ 2.2  | version ≥ 2.16        |
+| 3.12   | 12.5 | version ≥ 2.2  | version ≥ 2.16        |
+| 3.11   | 11.8 | version ≥ 2.0  | 2.15 ≥ version > 2.12 |
+| 3.10   | 11.8 | version ≥ 1.12 | 2.15 ≥ version > 2.8  |
 
 [^4]: Installs its own CUDA binaries
 [^5]: The expected TensorRT version is symlinked to the installed TensorRT
@@ -53,11 +53,12 @@ Only works with
 
 | CUDA   | Driver version 535[^7] | Driver version 470[^8] |
 |:-------|:----------------------:|:----------------------:|
-| 12.6.2 | 🟢                      | 🟢                      |
-| 12.5.0 | 🟢                      | 🟢                      |
+| 12.6.2 | 🟢                      | 🔵                      |
+| 12.5.0 | 🟢                      | 🔵                      |
 | 11.8.0 | 🟡                      | 🟢                      |
 
-🟢: Works due to the CUDA forward compat package  
+🔵: Supported due to the CUDA forward compat package  
+🟢: Supported due to minor-version compatibility  
 🟡: Supported due to backward compatibility
 
 [^7]: EOL: June 2026  
