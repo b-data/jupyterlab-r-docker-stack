@@ -8,7 +8,7 @@
 Multi-arch (`linux/amd64`, `linux/arm64/v8`) docker images:
 
 * [`glcr.b-data.ch/jupyterlab/r/base`](https://gitlab.b-data.ch/jupyterlab/r/base/container_registry)
-  * [`glcr.b-data.ch/jupyterlab/r/r-ver`](https://gitlab.b-data.ch/jupyterlab/r/r-ver/container_registry) (4.0.4 ≤ version < 4.2.0)
+  * [`glcr.b-data.ch/jupyterlab/r/r-ver`](https://gitlab.b-data.ch/jupyterlab/r/r-ver/container_registry) (4.2.0 ≥ version > 4.0.4)
 * [`glcr.b-data.ch/jupyterlab/r/tidyverse`](https://gitlab.b-data.ch/jupyterlab/r/tidyverse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/verse`](https://gitlab.b-data.ch/jupyterlab/r/verse/container_registry)
 * [`glcr.b-data.ch/jupyterlab/r/geospatial`](https://gitlab.b-data.ch/jupyterlab/r/geospatial/container_registry)
@@ -39,6 +39,7 @@ base → tidyverse → verse → geospatial → qgisprocess
   * **Git LFS**: A Git extension for versioning large files.
   * **GRASS GIS**: A free and open source Geographic Information System (GIS).  
     :information_source: qgisprocess image
+  * **Neovim**: Vim-fork focused on extensibility and usability. (4.4.1+)
   * **Orfeo Toolbox**: An open-source project for state-of-the-art remote
     sensing.  
     :information_source: qgisprocess image (amd64 only)
@@ -126,6 +127,7 @@ The following extensions are pre-installed for **code-server**:
 * [Prerequisites](#prerequisites)
 * [Install](#install)
 * [Usage](#usage)
+* [Misc](#misc)
 * [Similar projects](#similar-projects)
 * [Contributing](#contributing)
 * [Support](#support)
@@ -152,7 +154,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.4.0 \
+  --build-arg R_VERSION=4.4.1 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```
@@ -284,6 +286,27 @@ docker run -it --rm \
 
 [^1]: *Device activation* may require a one-time login from the extension's sidebar.
 
+## Misc
+
+### marimo
+
+To add a JupyterLab Launcher icon for marimo:
+
+1. Terminal: Install [marimo](https://marimo.io) and click
+
+   ```bash
+   pip install marimo click
+   ```
+
+1. Terminal: Install
+   [jupyter-marimo-proxy](https://github.com/b-data/jupyter-marimo-proxy/tree/jupyterlab-docker-stack)
+
+   ```bash
+   pip install git+https://github.com/b-data/jupyter-marimo-proxy.git@jupyterlab-docker-stack
+   ```
+
+1. Restart the container
+
 ## Similar projects
 
 * [jupyter/docker-stacks](https://github.com/jupyter/docker-stacks)
@@ -319,7 +342,9 @@ This project follows the
 
 ## Support
 
-For commercial support, please contact b-data by email: <support@b-data.ch>.
+Community support: Open a new discussion
+[here](https://github.com/orgs/b-data/discussions). Commercial support: Contact
+b-data by [email](mailto:support@b-data.ch).
 
 b-data tailors the JupyterLab images to your needs, e.g.
 

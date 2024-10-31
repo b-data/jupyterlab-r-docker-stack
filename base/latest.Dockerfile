@@ -6,14 +6,15 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.0.0
-ARG JUPYTERLAB_VERSION=4.2.2
+ARG JUPYTERHUB_VERSION=5.2.1
+ARG JUPYTERLAB_VERSION=4.2.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.90.0
-ARG RSTUDIO_VERSION=2024.04.2+764
-ARG GIT_VERSION=2.45.2
+ARG CODE_SERVER_VERSION=4.93.1
+ARG RSTUDIO_VERSION=2024.09.0+375
+ARG NEOVIM_VERSION=0.10.2
+ARG GIT_VERSION=2.47.0
 ARG GIT_LFS_VERSION=3.5.1
-ARG PANDOC_VERSION=3.1.11
+ARG PANDOC_VERSION=3.2
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
 
@@ -30,6 +31,7 @@ COPY conf/jupyter /files
 COPY conf/jupyterlab /files
 COPY conf/rstudio /files
 COPY conf/shell /files
+COPY conf${CUDA_IMAGE:+/cuda}/shell /files
 COPY conf/user /files
 COPY scripts /files
 
@@ -72,6 +74,7 @@ RUN cp -a /files/etc/skel/. /files/var/backups/skel \
   && find /files/usr/local/bin -type f -exec chmod 755 {} \; \
   && find /files/etc/profile.d -type f -exec chmod 755 {} \;
 
+FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} AS glfsi
 
@@ -90,6 +93,7 @@ ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG CODE_SERVER_VERSION
 ARG RSTUDIO_VERSION
+ARG NEOVIM_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
@@ -115,6 +119,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMA
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
     RSTUDIO_VERSION=${RSTUDIO_VERSION} \
+    NEOVIM_VERSION=${NEOVIM_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
@@ -129,6 +134,8 @@ ENV DOWNLOAD_STATIC_LIBV8=1
 ## Disable prompt to install miniconda
 ENV RETICULATE_MINICONDA_ENABLED=0
 
+## Install Neovim
+COPY --from=nvsi /usr/local /usr/local
 ## Install Git
 COPY --from=gsi /usr/local /usr/local
 ## Install Git LFS
@@ -168,6 +175,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     vim-tiny \
     wget \
     zsh \
+    ## Neovim: Additional runtime recommendations
+    ripgrep \
     ## Git: Additional runtime dependencies
     libcurl3-gnutls \
     liberror-perl \
@@ -193,12 +202,10 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     done; \
   else \
     ## Force update pip, setuptools and wheel
-    curl -sLO https://bootstrap.pypa.io/get-pip.py; \
-    python get-pip.py \
+    pip install --upgrade --force-reinstall \
       pip \
       setuptools \
       wheel; \
-    rm get-pip.py; \
   fi \
   ## Install font MesloLGS NF
   && mkdir -p /usr/share/fonts/truetype/meslo \
@@ -218,8 +225,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && dpkg -i pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   && rm pandoc-${PANDOC_VERSION}-1-${dpkgArch}.deb \
   ## Delete potential user with UID 1000
-  && if $(grep -q 1000 /etc/passwd); then \
-    userdel $(id -un 1000); \
+  && if grep -q 1000 /etc/passwd; then \
+    userdel --remove $(id -un 1000); \
   fi \
   ## Do not set user limits for sudo/sudo-i
   && sed -i 's/.*pam_limits.so/#&/g' /etc/pam.d/sudo \
@@ -300,9 +307,15 @@ RUN if [ -n "${RSTUDIO_VERSION}" ]; then \
       dpkg --compare-versions "$VERSION_ID" lt "23.04"; \
       condUbuntu=$?; \
     fi; \
-    if [ "$condDebian" = "0" ] || [ "$condUbuntu" = "0" ]; then \
+    if [ "$condDebian" = "0" ]; then \
       curl -sL \
-        http://mirrors.kernel.org/debian/pool/main/l/lsb-release-minimal/lsb-release_12.0-2_all.deb \
+        http://mirrors.kernel.org/debian/pool/main/l/lsb-release-minimal/lsb-release_12.0-1_all.deb \
+        -o lsb-release.deb; \
+      dpkg -i lsb-release.deb; \
+      rm lsb-release.deb; \
+    elif [ "$condUbuntu" = "0" ]; then \
+      curl -sL \
+        http://mirrors.kernel.org/ubuntu/pool/main/l/lsb-release-minimal/lsb-release_12.0-2_all.deb \
         -o lsb-release.deb; \
       dpkg -i lsb-release.deb; \
       rm lsb-release.deb; \
@@ -403,11 +416,8 @@ RUN apt-get update \
     languageserver \
     httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
-  ## Get rid of libcairo2-dev
+  ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \
-  ## Get rid of libtiff-dev
-  && apt-get -y purge libtiff-dev \
-  ## and their dependencies (incl. python3)
   && apt-get -y autoremove \
   ## IRkernel: Enable 'image/svg+xml' instead of 'image/png' for plot display
   ## IRkernel: Enable 'application/pdf' for PDF conversion
