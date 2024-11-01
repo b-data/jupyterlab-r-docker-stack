@@ -31,6 +31,11 @@ RUN apt-get update \
     libxtst6 \
     unixodbc-dev \
   && install2.r --error --skipinstalled -n $NCPUS BiocManager \
+  ## Rcpp 1.0.13 build error with R 4.4.2 (VECTOR_PTR_RO)
+  ## https://github.com/RcppCore/Rcpp/issues/1341
+  && install2.r --error --skipinstalled -n $NCPUS remotes \
+  && Rscript -e "remotes::install_github('RcppCore/Rcpp', ref = '3ae789b', upgrade = 'never')" \
+  ## Install tidyverse packages
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     tidyverse \
     dplyr \
