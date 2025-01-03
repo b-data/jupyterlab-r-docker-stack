@@ -7,7 +7,7 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.2.1
-ARG JUPYTERLAB_VERSION=4.2.6
+ARG JUPYTERLAB_VERSION=4.3.4
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 ARG CODE_SERVER_VERSION=4.96.2
 ARG RSTUDIO_VERSION=2024.12.0+467
@@ -354,7 +354,6 @@ RUN if [ -n "${RSTUDIO_VERSION}" ]; then \
 ## Install JupyterLab
 RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install \
-    httpx==0.27.2 \
     jupyter-server-proxy \
     jupyterhub==${JUPYTERHUB_VERSION} \
     jupyterlab==${JUPYTERLAB_VERSION} \
