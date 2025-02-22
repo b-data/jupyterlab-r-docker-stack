@@ -209,15 +209,6 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends python3-pip \
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && /usr/bin/pip install qgis-plugin-manager \
-  ## QGIS: Make sure qgis_mapserver and qgis_process find the qgis module
-  && cp -a $(which qgis_mapserver) $(which qgis_mapserver)_ \
-  && echo '#!/bin/bash' > $(which qgis_mapserver) \
-  && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_mapserver)_ \"\${@}\"" >> \
-    $(which qgis_mapserver) \
-  && cp -a $(which qgis_process) $(which qgis_process)_ \
-  && echo '#!/bin/bash' > $(which qgis_process) \
-  && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_process)_ \"\${@}\"" >> \
-    $(which qgis_process) \
   ## Install qgisprocess, the R interface to QGIS
   && install2.r --error --skipinstalled -n $NCPUS qgisprocess \
   ## Strip libraries of binary packages installed from P3M
