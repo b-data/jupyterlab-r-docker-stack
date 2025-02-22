@@ -45,7 +45,7 @@ The following startup hooks are put in place:
   * set environment variables in `$(R RHOME)/etc/Renviron.site`.
   * put inital RStudio settings in place.
   * create user's working folder.
-* [/usr/local/bin/before-notebook.d/70-qgis.sh](qgisprocess/scripts/usr/local/bin/before-notebook.d/70-qgis.sh) to
+* [/usr/local/bin/before-notebook.d/70-qgis.sh](qgisprocess/scripts/usr/local/bin/before-notebook.d/70-qgis.sh) (qgisprocess images) to
   * put inital QGIS settings in place.
   * copy plugin 'Processing Saga NextGen Provider'.
 * [/usr/local/bin/before-notebook.d/71-tensorboard.sh](base/scripts/usr/local/bin/before-notebook.d/71-tensorboard.sh)
@@ -172,6 +172,13 @@ are installed.
   * Application > Telemetry: Telemetry Level: off
   * Features > Terminal > Integrated: Font Family: MesloLGS NF
   * Workbench > Appearance > Color Theme: Default Dark+
+* [QGIS](qgisprocess/conf/user/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini) (qgisprocess images):
+  * Append `/usr/lib/python3/dist-packages` to `PYTHONPATH`.  
+    :information_source: One distro refused to find the Python bindings to QGIS
+    (at `/usr/lib/python3/dist-packages/qgis`)... Kept for backwards
+    compatibility.
+  * Set UI Theme to 'Night Mapping'.
+  * Set OTB application folder and OTB folder.
 * Zsh
   * Oh My Zsh: `~/.zshrc`
     * Set PATH so it includes user's private bin if it exists
