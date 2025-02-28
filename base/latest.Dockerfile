@@ -7,14 +7,14 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.2.1
-ARG JUPYTERLAB_VERSION=4.2.5
+ARG JUPYTERLAB_VERSION=4.3.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.93.1
-ARG RSTUDIO_VERSION=2024.09.0+375
-ARG NEOVIM_VERSION=0.10.2
-ARG GIT_VERSION=2.47.0
-ARG GIT_LFS_VERSION=3.5.1
-ARG PANDOC_VERSION=3.2
+ARG CODE_SERVER_VERSION=4.97.2
+ARG RSTUDIO_VERSION
+ARG NEOVIM_VERSION=0.10.4
+ARG GIT_VERSION=2.48.1
+ARG GIT_LFS_VERSION=3.6.1
+ARG PANDOC_VERSION=3.4
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
 
@@ -78,7 +78,18 @@ FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} AS glfsi
 
-FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR}
+FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS base
+
+FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS base-rstudio
+
+ARG RSTUDIO_VERSION
+
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION}
+
+## Connect to RStudio via unix socket
+ENV JUPYTER_RSESSION_PROXY_USE_SOCKET=1
+
+FROM base${RSTUDIO_VERSION:+-rstudio}
 
 ARG NCPUS=1
 
@@ -92,7 +103,6 @@ ARG JUPYTERHUB_VERSION
 ARG JUPYTERLAB_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR
 ARG CODE_SERVER_VERSION
-ARG RSTUDIO_VERSION
 ARG NEOVIM_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
@@ -118,7 +128,6 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMA
     JUPYTERHUB_VERSION=${JUPYTERHUB_VERSION} \
     JUPYTERLAB_VERSION=${JUPYTERLAB_VERSION} \
     CODE_SERVER_VERSION=${CODE_SERVER_VERSION} \
-    RSTUDIO_VERSION=${RSTUDIO_VERSION} \
     NEOVIM_VERSION=${NEOVIM_VERSION} \
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
@@ -410,6 +419,14 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
+  ## Install httpgd
+  ## Archived on 2025-02-14 as requires archived package 'unigd'.
+  && install2.r --error --skipinstalled -n $NCPUS \
+    unigd \
+    AsioHeaders \
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_2.0.2.tar.gz \
+  && R CMD INSTALL httpgd_2.0.2.tar.gz \
+  && rm httpgd_2.0.2.tar.gz \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
@@ -491,7 +508,10 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
 COPY --from=files /files /
 COPY --from=files /files/var/backups/skel ${HOME}
 
-EXPOSE 8888
+ARG JUPYTER_PORT=8888
+ENV JUPYTER_PORT=${JUPYTER_PORT}
+
+EXPOSE $JUPYTER_PORT
 
 ## Configure container startup
 ENTRYPOINT ["tini", "-g", "--", "start.sh"]
