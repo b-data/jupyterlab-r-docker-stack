@@ -1,6 +1,6 @@
 .env:
   variables:
-    R_VERSION: "4.4.2"
+    R_VERSION: "4.4.3"
     QGIS_VERSION: "3.42.0"
     OTB_VERSION: "9.1.0"
     TAG_VERSION_MAJ_MIN: "false"
