@@ -431,7 +431,6 @@ RUN apt-get update \
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
-    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
   ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \
