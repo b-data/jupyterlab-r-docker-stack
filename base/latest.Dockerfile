@@ -7,12 +7,12 @@ ARG CUDA_IMAGE_FLAVOR
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 ARG JUPYTERHUB_VERSION=5.2.1
-ARG JUPYTERLAB_VERSION=4.3.5
+ARG JUPYTERLAB_VERSION=4.3.6
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.97.2
+ARG CODE_SERVER_VERSION=4.99.2
 ARG RSTUDIO_VERSION
-ARG NEOVIM_VERSION=0.10.4
-ARG GIT_VERSION=2.48.1
+ARG NEOVIM_VERSION=0.11.0
+ARG GIT_VERSION=2.49.0
 ARG GIT_LFS_VERSION=3.6.1
 ARG PANDOC_VERSION=3.4
 
@@ -266,6 +266,9 @@ ENV PATH=/opt/code-server/bin:$PATH \
 RUN mkdir /opt/code-server \
   && cd /opt/code-server \
   && curl -sL https://github.com/coder/code-server/releases/download/v${CODE_SERVER_VERSION}/code-server-${CODE_SERVER_VERSION}-linux-$(dpkg --print-architecture).tar.gz | tar zxf - --no-same-owner --strip-components=1 \
+  ## Exempt code-server from address space limit
+  && sed -i 's/exec/exec prlimit --as=unlimited:/g' \
+    /opt/code-server/bin/code-server \
   ## Copy custom fonts
   && mkdir -p /opt/code-server/src/browser/media/fonts \
   && cp -a /usr/share/fonts/truetype/meslo/*.ttf /opt/code-server/src/browser/media/fonts \
@@ -293,6 +296,9 @@ RUN mkdir /opt/code-server \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension grapecity.gc-excelviewer \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension editorconfig.editorconfig \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension DavidAnson.vscode-markdownlint \
+  ## Fix permissions for Python Debugger extension
+  && chown :${NB_GID} /opt/code-server/lib/vscode/extensions/ms-python.debugpy-* \
+  && chmod g+w /opt/code-server/lib/vscode/extensions/ms-python.debugpy-* \
   ## Create folders temp and tmp for Jupyter extension
   && cd /opt/code-server/lib/vscode/extensions/ms-toolsai.jupyter-* \
   && mkdir -m 1777 temp \
@@ -419,18 +425,11 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
-  ## Install httpgd
-  ## Archived on 2025-02-14 as requires archived package 'unigd'.
-  && install2.r --error --skipinstalled -n $NCPUS \
-    unigd \
-    AsioHeaders \
-  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_2.0.2.tar.gz \
-  && R CMD INSTALL httpgd_2.0.2.tar.gz \
-  && rm httpgd_2.0.2.tar.gz \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
+    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
   ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \

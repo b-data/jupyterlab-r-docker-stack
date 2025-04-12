@@ -51,14 +51,16 @@ The following startup hooks are put in place:
 * [/usr/local/bin/before-notebook.d/71-tensorboard.sh](base/scripts/usr/local/bin/before-notebook.d/71-tensorboard.sh)
   to use Jupyter Server Proxy for TensorBoard.
 * [/usr/local/bin/before-notebook.d/90-limits.sh](base/scripts/usr/local/bin/before-notebook.d/90-limits.sh)
-  * *soft* limit the *address space* based on the amount of *physical* and
-    *virtual memory* of the host. (default: command `ulimit -v`)
+  * *soft* limit the *address space* based on the amount of *physical memory*
+    (`MEM_LIMIT`) and *virtual memory* (`SWAP_ENABLE`, `SWAP_FACTOR`). (default:
+    command `prlimit -v`)
+    * Do not limit if `NO_AS_LIMIT` or `NO_MEM_LIMIT` is set to `1` or `yes`.
   * limit the number of *file descriptors* according to environment variable
-    `NOFILE_LIMIT`. (default: command `ulimit -n`)
+    `NOFILE_LIMIT`. (default: command `prlimit -n`)
   * limit the number of *processes* according to environment variable
-    `NPROC_LIMIT`. (default: command `ulimit -u`)
+    `NPROC_LIMIT`. (default: command `prlimit -u`)
   * limit the number of *pending signals* according to environment variable
-    `SIGPEN_LIMIT`. (default: command `ulimit -i`)
+    `SIGPEN_LIMIT`. (default: command `prlimit -i`)
 * [/usr/local/bin/before-notebook.d/95-misc.sh](base/scripts/usr/local/bin/before-notebook.d/95-misc.sh)
   to export environment variables to `/tmp/environment`.
 
@@ -183,26 +185,27 @@ are installed.
   * Oh My Zsh: `~/.zshrc`
     * Set PATH so it includes user's private bin if it exists
     * Update last-activity timestamps while in screen/tmux session
-  * [Powerlevel10k](base/conf/user/var/backups/skel/.p10k.zsh): `p10k configure`
-    * Does this look like a diamond (rotated square)?: (y)  Yes.
-    * Does this look like a lock?: (y)  Yes.
-    * Does this look like an upwards arrow?: (y)  Yes.
-    * Do all these icons fit between the crosses?: (y)  Yes.
-    * Prompt Style: (3)  Rainbow.
-    * Character Set: (1)  Unicode.
-    * Show current time?: (2)  24-hour format.
-    * Prompt Separators: (1)  Angled.
-    * Prompt Heads: (3)  Sharp.
-    * Prompt Tails: (1)  Flat.
-    * Prompt Height: (2)  Two lines.
-    * Prompt Connection: (2)  Dotted.
-    * Prompt Frame: (2)  Left.
-    * Connection & Frame Color: (2)  Light.
-    * Prompt Spacing: (2)  Sparse.
-    * Icons: (2)  Many icons.
-    * Prompt Flow: (1)  Concise.
-    * Enable Transient Prompt?: (n)  No.
-    * Instant Prompt Mode: (3)  Off.
+  * [Powerlevel10k](base/conf/user/var/backups/skel/.p10k.zsh) wizard options:
+    * nerdfont-v3 + powerline
+    * small icons
+    * rainbow
+    * unicode
+    * 24h time
+    * angled separators
+    * sharp heads
+    * flat tails
+    * 2 lines
+    * dotted
+    * left frame
+    * light-ornaments
+    * sparse
+    * many icons
+    * concise
+    * instant_prompt=off
+* Bash: [/etc/profile.d/00-reset-path.sh](base/conf/shell/etc/profile.d/00-reset-path.sh)
+  and [/etc/skel/.profile](base/conf/shell/etc/skel/.profile)
+  * Update `PATH` for login shells, e.g. when started as a server associated
+    with JupyterHub.
 
 ### Customise
 
