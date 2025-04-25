@@ -425,11 +425,18 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
-  ## Install the R kernel for Jupyter, languageserver and httpgd
+  ## Install httpgd
+  ## Archived on 2025-04-23 as issues were not corrected in time.
+  && install2.r --error --skipinstalled -n $NCPUS \
+    unigd \
+    AsioHeaders \
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_2.0.4.tar.gz \
+  && R CMD INSTALL httpgd_2.0.4.tar.gz \
+  && rm httpgd_2.0.4.tar.gz \
+  ## Install the R kernel for Jupyter and languageserver
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
-    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
   ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \
