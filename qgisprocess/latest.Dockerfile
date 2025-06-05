@@ -253,6 +253,7 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   fi \
   && rm -rf .cache_qgis_plugin_manager \
   ## Clean up
+  && rm -rf /tmp/* \
   && rm -rf \
     ${HOME}/.cache/QGIS \
     ${HOME}/.cache/qgis_process_ \
