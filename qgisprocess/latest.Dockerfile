@@ -208,7 +208,8 @@ RUN apt-get update \
   ## Install QGIS-Plugin-Manager
   && apt-get -y install --no-install-recommends python3-pip \
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
-  && /usr/bin/pip install qgis-plugin-manager \
+  && /usr/bin/pip install \
+    git+https://github.com/benz0li/qgis-plugin-manager.git@1.6.5 \
   ## Install qgisprocess, the R interface to QGIS
   && install2.r --error --skipinstalled -n $NCPUS qgisprocess \
   ## Strip libraries of binary packages installed from P3M
