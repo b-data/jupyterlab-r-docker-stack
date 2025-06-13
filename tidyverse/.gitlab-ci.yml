@@ -1,7 +1,7 @@
 .env:
   variables:
-    R_VERSION: "4.4.3"
-    TAG_VERSION_MAJ_MIN: "true"
+    R_VERSION: "4.5.0"
+    TAG_VERSION_MAJ_MIN: "false"
     TAG_VERSION_MAJ: "false"
 
 .before-script-build: &before-script-build

@@ -219,6 +219,7 @@ RUN apt-get update \
     apt-get -y purge python3-pip; \
     apt-get -y autoremove; \
   fi \
+  && rm -rf /tmp/* \
   && rm -rf /var/lib/apt/lists/* \
     ${HOME}/.cache \
     ${HOME}/.config \
@@ -253,9 +254,10 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   fi \
   && rm -rf .cache_qgis_plugin_manager \
   ## Clean up
+  && rm -rf /tmp/* \
   && rm -rf \
     ${HOME}/.cache/QGIS \
-    ${HOME}/.cache/qgis_process_ \
+    ${HOME}/.cache/qgis_process* \
     ${HOME}/.config \
     ${HOME}/.grass* \
   ## Create backup of QGIS settings
