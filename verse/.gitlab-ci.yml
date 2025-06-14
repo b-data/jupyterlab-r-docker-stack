@@ -1,6 +1,6 @@
 .env:
   variables:
-    R_VERSION: "4.5.0"
+    R_VERSION: "4.5.1"
     CTAN_REPO_BUILD_LATEST: "https://mirror.init7.net/ctan/systems/texlive/tlnet"
     TAG_VERSION_MAJ_MIN: "false"
     TAG_VERSION_MAJ: "false"

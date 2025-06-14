@@ -1,6 +1,6 @@
 .env:
   variables:
-    R_VERSION: "4.5.0"
+    R_VERSION: "4.5.1"
     RSTUDIO_VERSION: "2025.05.1+513"
     TAG_VERSION_MAJ_MIN: "false"
     TAG_VERSION_MAJ: "false"
