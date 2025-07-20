@@ -7,7 +7,7 @@ set -e
 # Set environment variables in Renviron.site
 exclude_vars="HOME LD_LIBRARY_PATH OLDPWD PATH PWD RSTUDIO_VERSION SHLVL"
 for var in $(compgen -e); do
-  [[ ! $exclude_vars =~ $var ]] && echo "$var=${!var}" \
+  [[ ! $exclude_vars =~ $var ]] && echo "$var='${!var//\'/\'\\\'\'}'" \
     >> "$(R RHOME)/etc/Renviron.site"
 done
 
