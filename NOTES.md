@@ -161,19 +161,29 @@ are installed.
   * R LSP Server: Example settings according to [jupyter-lsp/jupyterlab-lsp > Installation > Configuring the servers](https://github.com/jupyter-lsp/jupyterlab-lsp#configuring-the-servers)
 * [code-server](base/conf/user/var/backups/skel/.local/share/code-server/User/settings.json)
   * Text Editor > Tab Size: 2
+  * Extensions > GitLab Workflow
+    * GitLab Duo Pro > Duo Code Suggestions: false
+    * GitLab Duo Pro > Duo Chat: false
+    * GitLab Duo Pro > Duo Agent Platform: false
+    * GitLab Duo Pro > Enabled Without Gitlab Project: false
   * Extensions > GitLens — Git supercharged
     * General > Show Welcome On Install: false
     * General > Show Whats New After Upgrade: false
     * Graph commands disabled where possible
+  * Extensions > Python
+    * Language Server: Jedi
   * Extensions > R
     * Bracketed Paste: true
     * Plot: Use Httpgd: true
     * Rterm: Linux: `/usr/local/bin/radian`
     * Rterm: Option: `["--no-save", "--no-restore"]`
     * Workspace Viewer: Show Object Size: true
+  * Extensions > Resource Monitor Configuration
+    * Show: Battery: false
+    * Show: Cpufreq: false
   * Application > Telemetry: Telemetry Level: off
   * Features > Terminal > Integrated: Font Family: MesloLGS NF
-  * Workbench > Appearance > Color Theme: Default Dark+
+  * Workbench > Appearance > Color Theme: Default Dark Modern
 * [QGIS](qgisprocess/conf/user/var/backups/skel/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini) (qgisprocess images):
   * Append `/usr/lib/python3/dist-packages` to `PYTHONPATH`.  
     :information_source: One distro refused to find the Python bindings to QGIS
