@@ -17,7 +17,6 @@ USER root
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
-    cmake \
     default-libmysqlclient-dev \
     #libxml2-dev \
     libfribidi-dev \
@@ -37,12 +36,8 @@ RUN apt-get update \
     devtools \
     formatR \
   ## dplyr database backends
-  ## Install arrow from archive as v21.0.0 does not build on Debian 12.
-  && install2.r --error --skipinstalled -n $NCPUS assertthat \
-  && curl -sLO https://cran.r-project.org/src/contrib/Archive/arrow/arrow_20.0.0.2.tar.gz \
-  && R CMD INSTALL arrow_20.0.0.2.tar.gz \
-  && rm arrow_20.0.0.2.tar.gz \
   && install2.r --error --skipinstalled -n $NCPUS \
+    arrow \
     duckdb \
     fst \
   ## Get rid of libharfbuzz-dev and its dependencies (incl. python3)
