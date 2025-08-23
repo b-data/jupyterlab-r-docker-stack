@@ -107,7 +107,6 @@ RUN apt-get update \
     libqt5quickwidgets5 \
     libqt5serialport5 \
     libqt5sql5 \
-    libqt5webkit5 \
     libqt5widgets5 \
     libqt5xml5 \
     libqwt-qt5-6 \
@@ -139,10 +138,17 @@ RUN apt-get update \
     python3-pyqt5.qtserialport \
     python3-pyqt5.qtsql \
     python3-pyqt5.qtsvg \
-    python3-pyqt5.qtwebkit \
-    python3-sip \
     python3-yaml \
     qttools5-dev-tools \
+  && if $(grep -q "trixie" /etc/os-release); then \
+    apt-get -y install --no-install-recommends \
+      python3-pyqt5.sip; \
+  else \
+    apt-get -y install --no-install-recommends \
+      libqt5webkit5 \
+      python3-pyqt5.qtwebkit \
+      python3-sip; \
+  fi \
     ## QGIS: Additional runtime recommendations
     grass \
     ## QGIS: Additional runtime suggestions
@@ -209,6 +215,15 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends python3-pip \
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && /usr/bin/pip install qgis-plugin-manager \
+  ## QGIS: Make sure qgis_mapserver and qgis_process find the qgis module
+  && cp -a $(which qgis_mapserver) $(which qgis_mapserver)_ \
+  && echo '#!/bin/bash' > $(which qgis_mapserver) \
+  && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_mapserver)_ \"\${@}\"" >> \
+    $(which qgis_mapserver) \
+  && cp -a $(which qgis_process) $(which qgis_process)_ \
+  && echo '#!/bin/bash' > $(which qgis_process) \
+  && echo "PYTHONPATH=/usr/lib/python3/dist-packages $(which qgis_process)_ \"\${@}\"" >> \
+    $(which qgis_process) \
   ## Install qgisprocess, the R interface to QGIS
   && install2.r --error --skipinstalled -n $NCPUS qgisprocess \
   ## Strip libraries of binary packages installed from P3M
