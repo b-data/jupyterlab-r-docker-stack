@@ -154,7 +154,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## and their dependencies (incl. python3)
   && apt-get -y autoremove \
   && apt-get -y install --no-install-recommends \
-    '^libmagick\+\+-6.q16-[0-9]+$' \
+    '^libmagick\+\+-[0-9].q16-[0-9]+$' \
     imagemagick \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \
