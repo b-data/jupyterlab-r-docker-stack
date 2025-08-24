@@ -149,6 +149,7 @@ RUN apt-get update \
       python3-pyqt5.qtwebkit \
       python3-sip; \
   fi \
+  && apt-get -y install --no-install-recommends \
     ## QGIS: Additional runtime recommendations
     grass \
     ## QGIS: Additional runtime suggestions
