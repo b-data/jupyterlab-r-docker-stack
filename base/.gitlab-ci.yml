@@ -5,6 +5,14 @@
     TAG_VERSION_MAJ_MIN: "false"
     TAG_VERSION_MAJ: "false"
 
+workflow:
+  rules:
+    - if: $CUDA_BASE_IMAGE == "ubuntu"
+      variables:
+        BASE_IMAGE: "$CUDA_BASE_IMAGE"
+        BASE_IMAGE_TAG: "$CUDA_BASE_IMAGE_TAG"
+    - if: $CI_COMMIT_BRANCH
+
 .before-script-build: &before-script-build
   - |
     if [[ ! -z "$CI_BUILD_PLATFORMS" ]]; then
