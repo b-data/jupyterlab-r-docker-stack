@@ -215,7 +215,7 @@ RUN apt-get update \
   ## Install QGIS-Plugin-Manager
   && apt-get -y install --no-install-recommends python3-pip \
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
-  && /usr/bin/pip install qgis-plugin-manager \
+  && /usr/bin/pip install qgis-plugin-manager==1.6.5 \
   ## QGIS: Make sure qgis_mapserver and qgis_process find the qgis module
   && cp -a $(which qgis_mapserver) $(which qgis_mapserver)_ \
   && echo '#!/bin/bash' > $(which qgis_mapserver) \
