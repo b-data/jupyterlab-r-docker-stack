@@ -23,6 +23,11 @@ Topmost entry = Tag `latest`
 [^2]: amd64/arm64  
 [^3]: `amd64` only
 
+## Breaking changes
+
+* Python 3.13: Drop TensorRT
+  * <https://github.com/tensorflow/tensorflow/pull/68303>
+
 ## PyTorch/TensorFlow compatibility
 
 | Python | CUDA | PyTorch[^4]                  | TensorFlow[^5]        |
