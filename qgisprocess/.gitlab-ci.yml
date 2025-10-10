@@ -1,10 +1,9 @@
-.env:
-  variables:
-    R_VERSION: "4.5.1"
-    QGIS_VERSION: "3.44.3"
-    OTB_VERSION: "9.1.1"
-    TAG_VERSION_MAJ_MIN: "false"
-    TAG_VERSION_MAJ: "false"
+variables:
+  R_VERSION: "4.5.1"
+  QGIS_VERSION: "3.44.3"
+  OTB_VERSION: "9.1.1"
+  TAG_VERSION_MAJ_MIN: "false"
+  TAG_VERSION_MAJ: "false"
 
 workflow:
   rules:
@@ -39,7 +38,6 @@ workflow:
 
 .build:
   image: glcr.b-data.ch/docker/docker:dind
-  extends: .env
   services:
     - name: glcr.b-data.ch/docker/docker:dind
       alias: docker
@@ -54,7 +52,6 @@ workflow:
 .post:
   image: glcr.b-data.ch/docker/docker:dind
   stage: .post
-  extends: .env
 
 stages:
   - .pre
