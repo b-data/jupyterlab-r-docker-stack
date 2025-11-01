@@ -154,7 +154,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.5.0 \
+  --build-arg R_VERSION=4.5.1 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```
@@ -272,19 +272,17 @@ docker run -it --rm \
 
 *might* be sufficient.
 
-### Credential storage
+### code-server settings
 
-**:exclamation: Keyring services are not available due to the difficulties of**
-**setting them up in containers.**  
-**Therefore, provide login credentials for the following extensions as**
-**environment variables (`-e`):**
+Some extension features enabled *by default* are intentionally disabled, i.e.
+[set to `false`](NOTES.md#default).
 
-| Extension                       | Environment variable                                                                                                                                                |
-|:--------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| GitHub Pull Requests and Issues | `GITHUB_TOKEN`: Personal access token with scopes `repo` and `user`.[^1]                                                                                            |
-| GitLab Workflow                 | `GITLAB_WORKFLOW_INSTANCE_URL`: GitLab instance URL (e.g. https://gitlab.com).<br>`GITLAB_WORKFLOW_TOKEN`: Personal access token with scopes `api` and `read_user`. |
+To enable one of these features, explicitly set it to `true` under
+'Command Palette...' > 'Preferences: Open User Settings (JSON)'.
 
-[^1]: *Device activation* may require a one-time login from the extension's sidebar.
+Enabling these via the GUI is not sufficient. Such default settings are
+overwritten upon restart by the
+[Juypter startup hook](NOTES.md#jupyter-startup-hooks) `30-code-server.sh`.
 
 ## Misc
 

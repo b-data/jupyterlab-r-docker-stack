@@ -1,8 +1,7 @@
-.env:
-  variables:
-    R_VERSION: "4.5.0"
-    TAG_VERSION_MAJ_MIN: "false"
-    TAG_VERSION_MAJ: "false"
+variables:
+  R_VERSION: "4.5.1"
+  TAG_VERSION_MAJ_MIN: "false"
+  TAG_VERSION_MAJ: "false"
 
 .before-script-build: &before-script-build
   - |
@@ -29,7 +28,6 @@
 
 .build:
   image: glcr.b-data.ch/docker/docker:dind
-  extends: .env
   services:
     - name: glcr.b-data.ch/docker/docker:dind
       alias: docker
@@ -44,7 +42,6 @@
 .post:
   image: glcr.b-data.ch/docker/docker:dind
   stage: .post
-  extends: .env
 
 stages:
   - .pre

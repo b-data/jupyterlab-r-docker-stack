@@ -1,9 +1,16 @@
-.env:
-  variables:
-    R_VERSION: "4.5.0"
-    RSTUDIO_VERSION: "2025.05.1+513"
-    TAG_VERSION_MAJ_MIN: "false"
-    TAG_VERSION_MAJ: "false"
+variables:
+  R_VERSION: "4.5.1"
+  RSTUDIO_VERSION: "2025.09.2+418"
+  TAG_VERSION_MAJ_MIN: "false"
+  TAG_VERSION_MAJ: "false"
+
+workflow:
+  rules:
+    - if: $CUDA_BASE_IMAGE == "ubuntu"
+      variables:
+        BASE_IMAGE: "$CUDA_BASE_IMAGE"
+        BASE_IMAGE_TAG: "$CUDA_BASE_IMAGE_TAG"
+    - if: $CI_COMMIT_BRANCH
 
 .before-script-build: &before-script-build
   - |
@@ -30,7 +37,6 @@
 
 .build:
   image: glcr.b-data.ch/docker/docker:dind
-  extends: .env
   services:
     - name: glcr.b-data.ch/docker/docker:dind
       alias: docker
@@ -45,7 +51,6 @@
 .post:
   image: glcr.b-data.ch/docker/docker:dind
   stage: .post
-  extends: .env
 
 stages:
   - .pre

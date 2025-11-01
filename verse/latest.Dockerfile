@@ -1,7 +1,7 @@
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/tidyverse
 ARG R_VERSION
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG QUARTO_VERSION=1.7.31
+ARG QUARTO_VERSION=1.8.25
 ARG CTAN_REPO=https://mirror.ctan.org/systems/texlive/tlnet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
@@ -87,7 +87,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## by building a dummy package using equivs
   && apt-get install -y --no-install-recommends equivs \
   && cd /tmp \
-  && wget https://github.com/scottkosty/install-tl-ubuntu/raw/master/debian-control-texlive-in.txt \
+  && wget https://raw.githubusercontent.com/scottkosty/install-tl-ubuntu/master/debian-control-texlive-in.txt \
   && equivs-build debian-* \
   && mv texlive-local*.deb texlive-local.deb \
   && dpkg -i texlive-local.deb \
@@ -154,7 +154,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   ## and their dependencies (incl. python3)
   && apt-get -y autoremove \
   && apt-get -y install --no-install-recommends \
-    '^libmagick\+\+-6.q16-[0-9]+$' \
+    '^libmagick\+\+-[0-9].q16-[0-9]+$' \
     imagemagick \
   ## Install code-server extensions
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension quarto.quarto \

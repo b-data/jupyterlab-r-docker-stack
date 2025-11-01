@@ -2,6 +2,8 @@ ARG BUILD_ON_IMAGE
 
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
 
+FROM ghcr.io/hadolint/hadolint:latest as hsi
+
 FROM ${BUILD_ON_IMAGE}
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -30,21 +32,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     docker-ce-cli \
     docker-buildx-plugin \
     docker-compose-plugin \
-    "$(test "$dpkgArch" = "amd64" && echo docker-scan-plugin)" \
   && ln -s /usr/libexec/docker/cli-plugins/docker-compose \
     /usr/local/bin/docker-compose \
-  ## Install hadolint
-  && case "$dpkgArch" in \
-    amd64) tarArch="x86_64" ;; \
-    arm64) tarArch="arm64" ;; \
-    *) echo "error: Architecture $dpkgArch unsupported"; exit 1 ;; \
-  esac \
-  && apiResponse="$(curl -sSL \
-    https://api.github.com/repos/hadolint/hadolint/releases/latest)" \
-  && downloadUrl="$(echo "$apiResponse" | grep \
-    "browser_download_url.*Linux-$tarArch\"" | cut -d : -f 2,3 | tr -d \")" \
-  && echo "$downloadUrl" | xargs curl -sSLo /usr/local/bin/hadolint \
-  && chmod 755 /usr/local/bin/hadolint \
   ## Install code-server extensions
   && code-server --extensions-dir "$CODE_BUILTIN_EXTENSIONS_DIR" \
     --install-extension exiasr.hadolint \
@@ -59,6 +48,9 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && rm -rf /var/lib/apt/lists/* \
     "$HOME/.config" \
     "$HOME/.local"
+
+## Install Haskell Dockerfile Linter
+COPY --from=hsi /bin/hadolint /usr/local/bin
 
 ## Switch back to ${NB_USER} to avoid accidental container runs as root
 USER ${NB_USER}
