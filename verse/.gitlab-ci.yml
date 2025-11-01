@@ -1,5 +1,5 @@
 variables:
-  R_VERSION: "4.5.1"
+  R_VERSION: "4.5.2"
   CTAN_REPO_BUILD_LATEST: "https://www.texlive.info/CTAN/systems/texlive/tlnet"
   TAG_VERSION_MAJ_MIN: "false"
   TAG_VERSION_MAJ: "false"
