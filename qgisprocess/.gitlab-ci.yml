@@ -1,6 +1,6 @@
 variables:
   R_VERSION: "4.5.2"
-  QGIS_VERSION: "3.44.4"
+  QGIS_VERSION: "3.44.5"
   OTB_VERSION: "9.1.1"
   TAG_VERSION_MAJ_MIN: "false"
   TAG_VERSION_MAJ: "false"
