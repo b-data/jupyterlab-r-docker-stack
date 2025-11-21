@@ -31,15 +31,15 @@ Topmost entry = Tag `latest`
 
 ## PyTorch/TensorFlow compatibility
 
-| Python | CUDA | PyTorch[^4]                  | TensorFlow[^5]        |
-|:-------|:-----|:-----------------------------|:----------------------|
-| 3.13   | 13.0 | version ≥ 2.5 (experimental) | n/a                   |
-| 3.12   | 12.9 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.8 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.6 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.5 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.11   | 11.8 | version ≥ 2.0                | 2.16 > version ≥ 2.12 |
-| 3.10   | 11.8 | version ≥ 1.12               | 2.16 > version ≥ 2.9  |
+| Python | CUDA | PyTorch[^4]    | TensorFlow[^5]        |
+|:-------|:-----|:---------------|:----------------------|
+| 3.13   | 13.0 | version ≥ 2.9  | n/a                   |
+| 3.12   | 12.9 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.8 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.6 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.5 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.11   | 11.8 | version ≥ 2.0  | 2.16 > version ≥ 2.12 |
+| 3.10   | 11.8 | version ≥ 1.12 | 2.16 > version ≥ 2.9  |
 
 [^4]: Installs its own CUDA dependencies
 [^5]: The expected TensorRT version is symlinked to the installed TensorRT
