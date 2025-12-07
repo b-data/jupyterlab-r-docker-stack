@@ -24,6 +24,13 @@ Topmost entry = Tag `latest`
 | 4.2.1 | 3.9.2   | 2.3.1       | 3.5.0       | 4.8.1 (1.72.1)     | n/a           | n/a    | 2.38.1 | 3.2.0   | 2.19.2 | n/a        | Debian 11    |
 | 4.2.0 | 3.9.2   | 2.3.1       | 3.4.3       | 4.4.0 (1.66.2)     | n/a           | n/a    | 2.36.1 | 3.2.0   | 2.18   | n/a        | Debian 11    |
 
+### Bugs
+
+* Version 4.5.2: \[vscode-shellcheck/vscode-shellcheck\] ShellCheck is not
+  installed or not working
+  * Cross reference: <https://github.com/vscode-shellcheck/vscode-shellcheck/issues/1708>
+    * Cross reference: <https://github.com/microsoft/vscode/issues/276673>
+
 ## verse+ images
 
 | R     | CTAN date  | Quarto      |
