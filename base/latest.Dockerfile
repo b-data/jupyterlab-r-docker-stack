@@ -432,11 +432,14 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
+  ## Install unigd
+  ## Archived on 2026-02-06 as issues were not corrected in time.
+  && install2.r --error --skipinstalled -n $NCPUS AsioHeaders \
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/unigd/unigd_0.1.3.tar.gz \
+  && R CMD INSTALL unigd_0.1.3.tar.gz \
+  && rm unigd_0.1.3.tar.gz \
   ## Install httpgd
   ## Archived on 2025-04-23 as issues were not corrected in time.
-  && install2.r --error --skipinstalled -n $NCPUS \
-    unigd \
-    AsioHeaders \
   && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_2.0.4.tar.gz \
   && R CMD INSTALL httpgd_2.0.4.tar.gz \
   && rm httpgd_2.0.4.tar.gz \
