@@ -6,13 +6,13 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.4.2
-ARG JUPYTERLAB_VERSION=4.4.10
+ARG JUPYTERHUB_VERSION=5.4.3
+ARG JUPYTERLAB_VERSION=4.5.5
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.105.1
+ARG CODE_SERVER_VERSION=4.110.1
 ARG RSTUDIO_VERSION
-ARG NEOVIM_VERSION=0.11.4
-ARG GIT_VERSION=2.51.2
+ARG NEOVIM_VERSION=0.11.6
+ARG GIT_VERSION=2.53.0
 ARG GIT_LFS_VERSION=3.7.1
 ARG PANDOC_VERSION=3.6.3
 
@@ -85,9 +85,6 @@ FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} A
 ARG RSTUDIO_VERSION
 
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION}
-
-## Connect to RStudio via unix socket
-ENV JUPYTER_RSESSION_PROXY_USE_SOCKET=1
 
 FROM base${RSTUDIO_VERSION:+-rstudio}
 
@@ -435,18 +432,11 @@ RUN apt-get update \
       >> $(which radian)_; \
     echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
   fi \
-  ## Install httpgd
-  ## Archived on 2025-04-23 as issues were not corrected in time.
-  && install2.r --error --skipinstalled -n $NCPUS \
-    unigd \
-    AsioHeaders \
-  && curl -sLO https://cran.r-project.org/src/contrib/Archive/httpgd/httpgd_2.0.4.tar.gz \
-  && R CMD INSTALL httpgd_2.0.4.tar.gz \
-  && rm httpgd_2.0.4.tar.gz \
-  ## Install the R kernel for Jupyter and languageserver
+  ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
     languageserver \
+    httpgd \
   && Rscript -e "IRkernel::installspec(user = FALSE, displayname = paste('R', Sys.getenv('R_VERSION')))" \
   ## Get rid of libcairo2-dev and its dependencies (incl. python3)
   && apt-get -y purge libcairo2-dev \

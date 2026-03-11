@@ -6,6 +6,7 @@ Topmost entry = Tag `latest`
 
 | R     | Python  | SAGA[^1] | CUDA   | cuBLAS    | cuDNN     | NCCL   | TensorRT[^2]             | Linux distro |
 |:------|:--------|:---------|:-------|:----------|:----------|:-------|:-------------------------|:-------------|
+| 4.5.2 | 3.13.11 | 9.3.1    | 13.1.1 | 13.2.0.9  | 9.19.1.2  | 2.29.3 | n/a                      | Ubuntu 24.04 |
 | 4.5.1 | 3.13.9  | 9.3.1    | 13.0.1 | 13.0.2.14 | 9.14.0.64 | 2.28.3 | n/a                      | Ubuntu 24.04 |
 | 4.5.0 | 3.12.11 | 7.3.0    | 12.9.0 | 12.9.0.13 | 8.9.7.29  | 2.26.5 | 10.11.0.33/<br>10.3.0.26 | Ubuntu 22.04 |
 | 4.4.3 | 3.12.10 | 7.3.0    | 12.8.1 | 12.8.4.1  | 8.9.7.29  | 2.25.1 | 10.9.0.34/<br>10.3.0.26  | Ubuntu 22.04 |
@@ -30,15 +31,16 @@ Topmost entry = Tag `latest`
 
 ## PyTorch/TensorFlow compatibility
 
-| Python | CUDA | PyTorch[^4]                  | TensorFlow[^5]        |
-|:-------|:-----|:-----------------------------|:----------------------|
-| 3.13   | 13.0 | version ≥ 2.5 (experimental) | n/a                   |
-| 3.12   | 12.9 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.8 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.6 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.12   | 12.5 | version ≥ 2.4                | 2.18 > version ≥ 2.16 |
-| 3.11   | 11.8 | version ≥ 2.0                | 2.16 > version ≥ 2.12 |
-| 3.10   | 11.8 | version ≥ 1.12               | 2.16 > version ≥ 2.9  |
+| Python | CUDA | PyTorch[^4]    | TensorFlow[^5]        |
+|:-------|:-----|:---------------|:----------------------|
+| 3.13   | 13.1 | version ≥ 2.9  | n/a                   |
+| 3.13   | 13.0 | version ≥ 2.9  | n/a                   |
+| 3.12   | 12.9 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.8 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.6 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.12   | 12.5 | version ≥ 2.4  | 2.18 > version ≥ 2.16 |
+| 3.11   | 11.8 | version ≥ 2.0  | 2.16 > version ≥ 2.12 |
+| 3.10   | 11.8 | version ≥ 1.12 | 2.16 > version ≥ 2.9  |
 
 [^4]: Installs its own CUDA dependencies
 [^5]: The expected TensorRT version is symlinked to the installed TensorRT
@@ -46,12 +48,12 @@ version.
 ❗️ This relies on backwards compatibility of TensorRT, which may not always be
 given.
 
-## Recommended NVIDIA driver (Regular)
+## Recommended NVIDIA driver (NFB/PB)
 
 | CUDA   | Linux driver version | Windows driver version[^6] |
 |:-------|:---------------------|:---------------------------|
+| 13.1.1 | ≥ 590.48.01          | n/a                        |
 | 13.0.1 | ≥ 580.82.07          | n/a                        |
-| 12.9.1 | ≥ 575.57.08          | ≥ 576.57                   |
 | 12.9.0 | ≥ 575.51.03          | ≥ 576.02                   |
 | 12.8.1 | ≥ 570.124.06         | ≥ 572.61                   |
 | 12.8.0 | ≥ 570.117            | ≥ 572.30                   |
@@ -70,8 +72,8 @@ Only works with
 
 | CUDA   | Driver version 580[^7] | Driver version 535[^8] | Driver version 470[^9] |
 |:-------|:----------------------:|:----------------------:|:----------------------:|
+| 13.1.1 | 🟢                      | 🔵                      | 🔴                      |
 | 13.0.1 | 🟢                      | 🔵                      | 🔴                      |
-| 12.9.1 | 🟡                      | 🟢                      | 🔵                      |
 | 12.9.0 | 🟡                      | 🟢                      | 🔵                      |
 | 12.8.1 | 🟡                      | 🟢                      | 🔵                      |
 | 12.8.0 | 🟡                      | 🟢                      | 🔵                      |
