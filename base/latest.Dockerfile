@@ -419,6 +419,8 @@ RUN apt-get update \
     libssl-dev \
     libtiff-dev \
     libxml2-dev \
+    ## Required for R package fs
+    libuv1-dev \
   ## Install radian
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && pip install radian \
