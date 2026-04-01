@@ -467,7 +467,7 @@ RUN apt-get update \
   && echo "    sep = .Platform\$path.sep))}" \
     >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r@2.8.6 \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   ## REditorSupport.r: Disable help panel and revert to old behaviour
   && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
   ## Change ownership and permission of $(R RHOME)/etc/*.site
