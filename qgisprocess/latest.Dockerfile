@@ -3,6 +3,7 @@ ARG BASE_IMAGE_TAG=13
 ARG BUILD_ON_IMAGE=glcr.b-data.ch/jupyterlab/r/geospatial
 ARG R_VERSION
 ARG QGIS_VERSION
+ARG PDAL_VERSION
 
 ARG SAGA_VERSION
 ARG OTB_VERSION
@@ -54,6 +55,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 ARG BUILD_ON_IMAGE
 ARG QGIS_VERSION
+ARG PDAL_VERSION
 ARG SAGA_VERSION
 ARG OTB_VERSION
 ARG PROC_SAGA_NG_VERSION
@@ -61,6 +63,7 @@ ARG BUILD_START
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
     QGIS_VERSION=${QGIS_VERSION} \
+    PDAL_VERSION=${PDAL_VERSION} \
     SAGA_VERSION=${SAGA_VERSION} \
     OTB_VERSION=${OTB_VERSION} \
     BUILD_DATE=${BUILD_START}
@@ -140,6 +143,8 @@ RUN apt-get update \
     python3-pyqt5.qtsvg \
     python3-yaml \
     qttools5-dev-tools \
+    ## PDAL: Additional runtime dependencies
+    '^libhdf5-cpp-[0-9]+.*$' \
   && if $(grep -q "trixie" /etc/os-release); then \
     apt-get -y install --no-install-recommends \
       python3-pyqt5.sip; \
@@ -216,6 +221,11 @@ RUN apt-get update \
   && apt-get -y install --no-install-recommends python3-pip \
   && export PIP_BREAK_SYSTEM_PACKAGES=1 \
   && /usr/bin/pip install qgis-plugin-manager \
+  ## Install PDAL Python support and plugins
+  && apt-get -y install --no-install-recommends python3-dev \
+  && /usr/bin/pip install pdal pdal-plugins \
+  && mv /usr/local/lib/python*/dist-packages/pdal* \
+    /usr/lib/python3/dist-packages \
   ## QGIS: Make sure qgis_mapserver and qgis_process find the qgis module
   && cp -a $(which qgis_mapserver) $(which qgis_mapserver)_ \
   && echo '#!/bin/bash' > $(which qgis_mapserver) \
@@ -232,7 +242,7 @@ RUN apt-get update \
   && strip ${RLS}/*/libs/*.so \
   ## Clean up
   && if [ ! -z "$PYTHON_VERSION" ]; then \
-    apt-get -y purge python3-pip; \
+    apt-get -y purge python3-pip python3-dev; \
     apt-get -y autoremove; \
   fi \
   && rm -rf /tmp/* \
