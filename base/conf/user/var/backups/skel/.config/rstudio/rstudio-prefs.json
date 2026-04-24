@@ -1,4 +1,5 @@
 {
+    "assistant": "copilot",
     "auto_append_newline": true,
     "check_arguments_to_r_function_calls": true,
     "check_for_updates": false,
