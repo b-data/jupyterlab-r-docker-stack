@@ -1,6 +1,7 @@
 variables:
-  R_VERSION: "4.5.2"
-  QGIS_VERSION: "3.44.7"
+  R_VERSION: "4.5.3"
+  QGIS_VERSION: "3.44.9"
+  PDAL_VERSION: "2.10.1"
   OTB_VERSION: "9.1.1"
   TAG_VERSION_MAJ_MIN: "false"
   TAG_VERSION_MAJ: "false"
@@ -75,6 +76,7 @@ build:latest-linux-amd64:
       --build-arg BUILD_ON_IMAGE
       --build-arg R_VERSION
       --build-arg QGIS_VERSION
+      --build-arg PDAL_VERSION
       --build-arg SAGA_VERSION
       --build-arg OTB_VERSION
       --build-arg PROC_SAGA_NG_VERSION
@@ -124,6 +126,7 @@ build:latest-linux-arm64v8:
       --build-arg BUILD_ON_IMAGE
       --build-arg R_VERSION
       --build-arg QGIS_VERSION
+      --build-arg PDAL_VERSION
       --build-arg SAGA_VERSION
       --build-arg PROC_SAGA_NG_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
