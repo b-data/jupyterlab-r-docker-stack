@@ -432,6 +432,17 @@ RUN apt-get update \
   && curl -sL https://github.com/eitsupi/arf/releases/download/v"${ARF_VERSION}"/arf-console-"$(uname -m)"-unknown-linux-gnu.tar.xz \
     | tar xJf - --no-same-owner --strip-components=1 \
   && mv arf /usr/local/bin \
+  ## Provide NVBLAS-enabled arf_
+  ## Enabled at runtime and only if nvidia-smi and at least one GPU are present
+  && if [ ! -z "$CUDA_IMAGE" ]; then \
+    nvblasLib="$(cd $CUDA_HOME/lib* && ls libnvblas.so* | head -n 1)"; \
+    touch $(which arf)_; \
+    echo '#!/bin/bash' > $(which arf)_; \
+    echo "command -v nvidia-smi >/dev/null && nvidia-smi -L | grep 'GPU[[:space:]]\?[[:digit:]]\+' >/dev/null && export LD_PRELOAD=$nvblasLib" \
+      >> $(which arf)_; \
+    echo "exec $(which arf) \"\${@}\"" >> $(which arf)_; \
+    chmod +x $(which arf)_; \
+  fi \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
