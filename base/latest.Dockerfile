@@ -389,7 +389,7 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     nbclassic \
     nbconvert \
     python-lsp-server[all] \
-    ${RSTUDIO_VERSION:+jupyter-rsession-proxy} \
+    ${RSTUDIO_VERSION:+jupyter-rsession-proxy==2.4.0} \
   ## Jupyter Server Proxy: Set maximum allowed HTTP body size to 10 GiB
   && sed -i 's/AsyncHTTPClient(/AsyncHTTPClient(max_body_size=10737418240, /g' \
     /usr/local/lib/python*/*-packages/jupyter_server_proxy/handlers.py \
