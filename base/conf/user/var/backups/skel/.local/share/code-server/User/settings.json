@@ -23,7 +23,7 @@
   "python.languageServer": "Jedi",
   "r.bracketedPaste": true,
   "r.plot.useHttpgd": true,
-  "r.rterm.linux": "/usr/local/bin/radian",
+  "r.rterm.linux": "/usr/local/bin/arf",
   "r.rterm.option": [
     "--no-save",
     "--no-restore"

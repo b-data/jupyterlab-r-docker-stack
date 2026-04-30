@@ -15,6 +15,7 @@ ARG NEOVIM_VERSION=0.12.2
 ARG GIT_VERSION=2.54.0
 ARG GIT_LFS_VERSION=3.7.1
 ARG PANDOC_VERSION=3.8.3
+ARG ARF_VERSION=0.3.1
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
 
@@ -34,6 +35,7 @@ COPY conf/shell /files
 COPY conf${CUDA_IMAGE:+/cuda}/shell /files
 COPY conf/user /files
 COPY scripts /files
+COPY scripts${CUDA_IMAGE:+/cuda}/usr/local/bin /files/usr/local/bin
 
   ## Copy content of skel directory to backup
 RUN cp -a /files/etc/skel/. /files/var/backups/skel \
@@ -104,6 +106,7 @@ ARG NEOVIM_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
+ARG ARF_VERSION
 ARG BUILD_START
 
 ARG CODE_WORKDIR
@@ -129,6 +132,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMA
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
+    ARF_VERSION=${ARF_VERSION} \
     BUILD_DATE=${BUILD_START}
 
 ENV NB_GID=100
@@ -423,19 +427,11 @@ RUN apt-get update \
     libxml2-dev \
     ## Required for R package fs
     libuv1-dev \
-  ## Install radian
-  && export PIP_BREAK_SYSTEM_PACKAGES=1 \
-  && pip install radian \
-  ## Provide NVBLAS-enabled radian_
-  ## Enabled at runtime and only if nvidia-smi and at least one GPU are present
-  && if [ ! -z "$CUDA_IMAGE" ]; then \
-    nvblasLib="$(cd $CUDA_HOME/lib* && ls libnvblas.so* | head -n 1)"; \
-    cp -a $(which radian) $(which radian)_; \
-    echo '#!/bin/bash' > $(which radian)_; \
-    echo "command -v nvidia-smi >/dev/null && nvidia-smi -L | grep 'GPU[[:space:]]\?[[:digit:]]\+' >/dev/null && export LD_PRELOAD=$nvblasLib" \
-      >> $(which radian)_; \
-    echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
-  fi \
+  ## Install arf
+  && cd /tmp \
+  && curl -sL https://github.com/eitsupi/arf/releases/download/v"${ARF_VERSION}"/arf-console-"$(uname -m)"-unknown-linux-gnu.tar.xz \
+    | tar xJf - --no-same-owner --strip-components=1 \
+  && mv arf /usr/local/bin \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
     IRkernel \
@@ -465,6 +461,19 @@ RUN apt-get update \
   && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), '.local', 'bin'), Sys.getenv('PATH')," \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "    sep = .Platform\$path.sep))}" \
+    >> $(R RHOME)/etc/Rprofile.site \
+  ## Temporary workaround
+  && echo '# https://github.com/REditorSupport/vscode-R/issues/1696' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo 'if (interactive() && Sys.getenv("RSTUDIO") == "" &&' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  Sys.getenv("TERM_PROGRAM") == "vscode" &&' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  dir.exists(file.path(Sys.getenv("HOME"), ".vscode-R"))) {' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  .First.sys()}' \
     >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
