@@ -79,7 +79,6 @@ build:latest-linux-amd64:
       --build-arg PDAL_VERSION
       --build-arg SAGA_VERSION
       --build-arg OTB_VERSION
-      --build-arg PROC_SAGA_NG_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
@@ -128,7 +127,6 @@ build:latest-linux-arm64v8:
       --build-arg QGIS_VERSION
       --build-arg PDAL_VERSION
       --build-arg SAGA_VERSION
-      --build-arg PROC_SAGA_NG_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
@@ -175,7 +173,6 @@ build:version-linux-amd64:
       --build-arg BUILD_ON_IMAGE
       --build-arg SAGA_VERSION
       --build-arg OTB_VERSION
-      --build-arg PROC_SAGA_NG_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-amd64
@@ -217,7 +214,6 @@ build:version-linux-arm64v8:
       --build-arg BASE_IMAGE_TAG
       --build-arg BUILD_ON_IMAGE
       --build-arg SAGA_VERSION
-      --build-arg PROC_SAGA_NG_VERSION
       --build-arg NCPUS=$((`nproc`/2+1))
       --build-arg BUILD_START=$(date -uIseconds)
       -t $CI_APP_REPO:$CI_APP_TAG-linux-arm64v8
