@@ -77,6 +77,7 @@ RUN cp -a /files/etc/skel/. /files/var/backups/skel \
 FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} AS glfsi
+FROM glcr.b-data.ch/vscode-extensions/ms-python.python:latest-python-env-tools AS pet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS base
 
@@ -86,7 +87,7 @@ ARG RSTUDIO_VERSION
 
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION}
 
-FROM base${RSTUDIO_VERSION:+-rstudio}
+FROM base${RSTUDIO_VERSION:+-rstudio} AS jupyterlab-r-base
 
 ARG NCPUS=1
 
@@ -385,7 +386,7 @@ RUN export PIP_BREAK_SYSTEM_PACKAGES=1 \
     nbclassic \
     nbconvert \
     python-lsp-server[all] \
-    ${RSTUDIO_VERSION:+jupyter-rsession-proxy} \
+    ${RSTUDIO_VERSION:+jupyter-rsession-proxy==2.4.0} \
   ## Jupyter Server Proxy: Set maximum allowed HTTP body size to 10 GiB
   && sed -i 's/AsyncHTTPClient(/AsyncHTTPClient(max_body_size=10737418240, /g' \
     /usr/local/lib/python*/*-packages/jupyter_server_proxy/handlers.py \
@@ -513,9 +514,23 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
   ## Create backup of home directory
   && cp -a ${HOME}/. /var/backups/skel
 
+FROM files AS files-pet
+
+COPY --from=jupyterlab-r-base /opt/code-server/lib/vscode/extensions /tmp/extensions
+COPY --from=pet /python-env-tools /tmp/python-env-tools
+
+## Add missing Python environment tools to Python extension
+RUN extensionBasename="$(basename /tmp/extensions/ms-python.python-*)" \
+  && mkdir -p "/files/opt/code-server/lib/vscode/extensions/$extensionBasename" \
+  && cp -r /tmp/python-env-tools \
+    /files/opt/code-server/lib/vscode/extensions/ms-python.python-*-universal \
+  && rm -rf /tmp/*
+
+FROM jupyterlab-r-base
+
 ## Copy files as late as possible to avoid cache busting
-COPY --from=files /files /
-COPY --from=files /files/var/backups/skel ${HOME}
+COPY --from=files-pet /files /
+COPY --from=files-pet /files/var/backups/skel ${HOME}
 
 ARG JUPYTER_PORT=8888
 ENV JUPYTER_PORT=${JUPYTER_PORT}
