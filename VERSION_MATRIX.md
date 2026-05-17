@@ -28,6 +28,7 @@ Topmost entry = Tag `latest`
 
 ### Bugs
 
+* Version 4.5.2: VS Code Python extension: Python environment tools are missing
 * Versions 4.5.{0,1,2}: \[rstudio/rstudio\] RStudio freezes when restoring
   session with large console history
   * Cross reference: <https://github.com/rstudio/rstudio/issues/16766>
