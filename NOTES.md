@@ -176,7 +176,9 @@ are installed.
   * Extensions > R
     * Bracketed Paste: true
     * Plot: Use Httpgd: true
-    * Rterm: Linux: `/usr/local/bin/radian`
+    * Rterm: Linux: `/usr/local/bin/radian`  
+      :information_source: For versions ≥ 4.6.0, it can also be set to
+      `/usr/local/bin/arf`.
     * Rterm: Option: `["--no-save", "--no-restore"]`
     * Workspace Viewer: Show Object Size: true
   * Extensions > Resource Monitor Configuration

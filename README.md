@@ -23,6 +23,11 @@ https://demo.jupyter.b-data.ch.
 
 ![Screenshot](assets/screenshot.png)
 
+Due to ongoing DDoS attacks, access to b-data's IT infrastructure has been
+blocked for all Chinese servers.  
+:information_source: For any requests to unblock individual Chinese IPs or CIDR
+blocks, please contact <olivier.benz@b-data.ch>.
+
 **Build chain**
 
 base → tidyverse → verse → geospatial → qgisprocess  
@@ -52,8 +57,7 @@ base → tidyverse → verse → geospatial → qgisprocess
   * **Quarto**: A scientific and technical publishing system built on Pandoc.  
     :information_source: verse+ images
   * **R**: A language and environment for statistical computing and graphics.
-  * **radian**: An alternative console for R with multiline editing and rich
-    syntax highlight.
+  * **arf**: An alternative R frontend — a modern R console written in Rust.
   * **RStudio**: An integrated development environment (IDE) for R. (4.4.0+)
   * **SAGA GIS**: A Geographic Information System (GIS) software with immense
     capabilities for geodata processing and analysis.  
@@ -154,7 +158,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.5.3 \
+  --build-arg R_VERSION=4.6.0 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```

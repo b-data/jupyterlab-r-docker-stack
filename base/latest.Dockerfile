@@ -6,15 +6,16 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.4.4
-ARG JUPYTERLAB_VERSION=4.5.6
+ARG JUPYTERHUB_VERSION=5.5.0
+ARG JUPYTERLAB_VERSION=4.6.0
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.117.0
+ARG CODE_SERVER_VERSION=4.125.0
 ARG RSTUDIO_VERSION
-ARG NEOVIM_VERSION=0.12.2
+ARG NEOVIM_VERSION=0.12.3
 ARG GIT_VERSION=2.54.0
 ARG GIT_LFS_VERSION=3.7.1
 ARG PANDOC_VERSION=3.8.3
+ARG ARF_VERSION=0.4.1
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
 
@@ -34,6 +35,7 @@ COPY conf/shell /files
 COPY conf${CUDA_IMAGE:+/cuda}/shell /files
 COPY conf/user /files
 COPY scripts /files
+COPY scripts${CUDA_IMAGE:+/cuda}/usr/local/bin /files/usr/local/bin
 
   ## Copy content of skel directory to backup
 RUN cp -a /files/etc/skel/. /files/var/backups/skel \
@@ -77,6 +79,7 @@ RUN cp -a /files/etc/skel/. /files/var/backups/skel \
 FROM glcr.b-data.ch/neovim/nvsi:${NEOVIM_VERSION} AS nvsi
 FROM glcr.b-data.ch/git/gsi/${GIT_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS gsi
 FROM glcr.b-data.ch/git-lfs/glfsi:${GIT_LFS_VERSION} AS glfsi
+FROM glcr.b-data.ch/vscode-extensions/ms-python.python:latest-python-env-tools AS pet
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS base
 
@@ -86,7 +89,7 @@ ARG RSTUDIO_VERSION
 
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION}
 
-FROM base${RSTUDIO_VERSION:+-rstudio}
+FROM base${RSTUDIO_VERSION:+-rstudio} AS jupyterlab-r-base
 
 ARG NCPUS=1
 
@@ -104,6 +107,7 @@ ARG NEOVIM_VERSION
 ARG GIT_VERSION
 ARG GIT_LFS_VERSION
 ARG PANDOC_VERSION
+ARG ARF_VERSION
 ARG BUILD_START
 
 ARG CODE_WORKDIR
@@ -129,6 +133,7 @@ ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMA
     GIT_VERSION=${GIT_VERSION} \
     GIT_LFS_VERSION=${GIT_LFS_VERSION} \
     PANDOC_VERSION=${PANDOC_VERSION} \
+    ARF_VERSION=${ARF_VERSION} \
     BUILD_DATE=${BUILD_START}
 
 ENV NB_GID=100
@@ -368,6 +373,12 @@ RUN if [ -n "${RSTUDIO_VERSION}" ]; then \
     ## Enable rstudio-server and rserver system-wide
     ln -fs /usr/lib/rstudio-server/bin/rstudio-server /usr/local/bin; \
     ln -fs /usr/lib/rstudio-server/bin/rserver /usr/local/bin; \
+    ## Remove the secure-cookie-key
+    ## https://github.com/rocker-org/rocker-versioned2/issues/137
+    rm -f /var/lib/rstudio-server/secure-cookie-key; \
+    ## Remove the session-rpc-key
+    ## https://github.com/rocker-org/ml/issues/42
+    rm -f /var/lib/rstudio-server/session-rpc-key; \
     ## Copy custom fonts
     cp "/opt/code-server/src/browser/media/fonts/MesloLGS NF Regular.ttf" \
       "/etc/rstudio/fonts/MesloLGS NF.ttf"; \
@@ -423,18 +434,21 @@ RUN apt-get update \
     libxml2-dev \
     ## Required for R package fs
     libuv1-dev \
-  ## Install radian
-  && export PIP_BREAK_SYSTEM_PACKAGES=1 \
-  && pip install radian \
-  ## Provide NVBLAS-enabled radian_
+  ## Install arf
+  && cd /tmp \
+  && curl -sL https://github.com/eitsupi/arf/releases/download/v"${ARF_VERSION}"/arf-console-"$(uname -m)"-unknown-linux-gnu.tar.xz \
+    | tar xJf - --no-same-owner --strip-components=1 \
+  && mv arf /usr/local/bin \
+  ## Provide NVBLAS-enabled arf_
   ## Enabled at runtime and only if nvidia-smi and at least one GPU are present
   && if [ ! -z "$CUDA_IMAGE" ]; then \
     nvblasLib="$(cd $CUDA_HOME/lib* && ls libnvblas.so* | head -n 1)"; \
-    cp -a $(which radian) $(which radian)_; \
-    echo '#!/bin/bash' > $(which radian)_; \
+    touch $(which arf)_; \
+    echo '#!/bin/bash' > $(which arf)_; \
     echo "command -v nvidia-smi >/dev/null && nvidia-smi -L | grep 'GPU[[:space:]]\?[[:digit:]]\+' >/dev/null && export LD_PRELOAD=$nvblasLib" \
-      >> $(which radian)_; \
-    echo "$(which radian) \"\${@}\"" >> $(which radian)_; \
+      >> $(which arf)_; \
+    echo "exec $(which arf) \"\${@}\"" >> $(which arf)_; \
+    chmod +x $(which arf)_; \
   fi \
   ## Install the R kernel for Jupyter, languageserver and httpgd
   && install2.r --error --deps TRUE --skipinstalled -n $NCPUS \
@@ -465,6 +479,19 @@ RUN apt-get update \
   && echo "  Sys.setenv(PATH = paste(file.path(Sys.getenv('HOME'), '.local', 'bin'), Sys.getenv('PATH')," \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "    sep = .Platform\$path.sep))}" \
+    >> $(R RHOME)/etc/Rprofile.site \
+  ## Temporary workaround
+  && echo '# https://github.com/REditorSupport/vscode-R/issues/1696' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo 'if (interactive() && Sys.getenv("RSTUDIO") == "" &&' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  Sys.getenv("TERM_PROGRAM") == "vscode" &&' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  dir.exists(file.path(Sys.getenv("HOME"), ".vscode-R"))) {' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' \
+    >> $(R RHOME)/etc/Rprofile.site \
+  && echo '  .First.sys()}' \
     >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
@@ -513,9 +540,23 @@ RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master
   ## Create backup of home directory
   && cp -a ${HOME}/. /var/backups/skel
 
+FROM files AS files-pet
+
+COPY --from=jupyterlab-r-base /opt/code-server/lib/vscode/extensions /tmp/extensions
+COPY --from=pet /python-env-tools /tmp/python-env-tools
+
+## Add missing Python environment tools to Python extension
+RUN extensionBasename="$(basename /tmp/extensions/ms-python.python-*)" \
+  && mkdir -p "/files/opt/code-server/lib/vscode/extensions/$extensionBasename" \
+  && cp -r /tmp/python-env-tools \
+    /files/opt/code-server/lib/vscode/extensions/ms-python.python-*-universal \
+  && rm -rf /tmp/*
+
+FROM jupyterlab-r-base
+
 ## Copy files as late as possible to avoid cache busting
-COPY --from=files /files /
-COPY --from=files /files/var/backups/skel ${HOME}
+COPY --from=files-pet /files /
+COPY --from=files-pet /files/var/backups/skel ${HOME}
 
 ARG JUPYTER_PORT=8888
 ENV JUPYTER_PORT=${JUPYTER_PORT}
