@@ -158,7 +158,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.6.0 \
+  --build-arg R_VERSION=4.6.1 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```
