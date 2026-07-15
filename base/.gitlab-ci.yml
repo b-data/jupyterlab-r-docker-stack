@@ -1,6 +1,6 @@
 variables:
   R_VERSION: "4.6.1"
-  RSTUDIO_VERSION: "2026.06.0+242"
+  RSTUDIO_VERSION: "2026.07.0+139"
   TAG_VERSION_MAJ_MIN: "false"
   TAG_VERSION_MAJ: "false"
 
