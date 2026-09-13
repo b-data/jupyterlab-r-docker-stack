@@ -42,17 +42,19 @@ RUN apt-get update \
     #unixodbc-dev
   && install2.r --error --skipinstalled -n $NCPUS \
     #RColorBrewer \
+    BH \
+    RcppArmadillo \
     RNetCDF \
     classInt \
     deldir \
     gstat \
     hdf5r \
-    lidR \
     mapdata \
     mapview \
     ncdf4 \
     proj4 \
     raster \
+    rgl \
     rlas \
     sf \
     sfarrow \
@@ -67,6 +69,10 @@ RUN apt-get update \
     tmap \
     geoR \
     geosphere \
+  ## lidR: Archived on 2026-06-09 as requires archived package 'rlas'.
+  && curl -sLO https://cran.r-project.org/src/contrib/Archive/lidR/lidR_4.3.2.tar.gz \
+  && R CMD INSTALL lidR_4.3.2.tar.gz \
+  && rm lidR_4.3.2.tar.gz \
   ## from bioconductor
   && R -e "BiocManager::install('rhdf5', update = FALSE, ask = FALSE)" \
   ## Strip libraries of binary packages installed from P3M
