@@ -480,23 +480,11 @@ RUN apt-get update \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "    sep = .Platform\$path.sep))}" \
     >> $(R RHOME)/etc/Rprofile.site \
-  ## Temporary workaround
-  && echo '# https://github.com/REditorSupport/vscode-R/issues/1696' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo 'if (interactive() && Sys.getenv("RSTUDIO") == "" &&' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  Sys.getenv("TERM_PROGRAM") == "vscode" &&' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  dir.exists(file.path(Sys.getenv("HOME"), ".vscode-R"))) {' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  .First.sys()}' \
-    >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
-  ## REditorSupport.r: Disable help panel and revert to old behaviour
-  && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
+  && R --silent --no-echo --no-save --no-restore \
+    -f $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*-universal/R/install_sess.R) \
+    --args $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*-universal/sess) $CRAN \
   ## Change ownership and permission of $(R RHOME)/etc/*.site
   && chown :"$NB_GID" "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   && chmod g+w "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \

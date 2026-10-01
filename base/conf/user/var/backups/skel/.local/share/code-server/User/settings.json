@@ -21,6 +21,11 @@
   "gitlens.showWhatsNewAfterUpgrades": false,
   "python.languageServer": "Jedi",
   "r.bracketedPaste": true,
+  "r.consolePath": "/usr/local/bin/radian",
+  "r.consoleArgs": [
+    "--no-save",
+    "--no-restore"
+  ],
   "r.plot.useHttpgd": true,
   "r.rterm.linux": "/usr/local/bin/radian",
   "r.rterm.option": [
