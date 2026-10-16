@@ -486,8 +486,8 @@ RUN apt-get update \
   && R --silent --no-echo --no-save --no-restore \
     --file=$(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/R/install_sess.R) \
     --args $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/dist/resources/sess) \
-      ${RLS} \
       ${CRAN} \
+      ${RLS} \
   ## Change ownership and permission of $(R RHOME)/etc/*.site
   && chown :"$NB_GID" "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   && chmod g+w "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
