@@ -481,15 +481,17 @@ RUN apt-get update \
   && echo "    sep = .Platform\$path.sep))}" \
     >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
+  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
   && R --silent --no-echo --no-save --no-restore \
-    -f $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*-universal/R/install_sess.R) \
-    --args $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*-universal/sess) $CRAN \
+    --file=$(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/R/install_sess.R) \
+    --args $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/dist/resources/sess) \
+      ${RLS} \
+      ${CRAN} \
   ## Change ownership and permission of $(R RHOME)/etc/*.site
   && chown :"$NB_GID" "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   && chmod g+w "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   ## Strip libraries of binary packages installed from P3M
-  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
