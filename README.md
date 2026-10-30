@@ -23,11 +23,6 @@ https://demo.jupyter.b-data.ch.
 
 ![Screenshot](assets/screenshot.png)
 
-Due to ongoing DDoS attacks, access to b-data's IT infrastructure has been
-blocked for all Chinese servers.  
-:information_source: For any requests to unblock individual Chinese IPs or CIDR
-blocks, please contact <olivier.benz@b-data.ch>.
-
 **Build chain**
 
 base → tidyverse → verse → geospatial → qgisprocess  
@@ -158,7 +153,7 @@ To install docker, follow the instructions for your platform:
 
 ```bash
 cd base && docker build \
-  --build-arg R_VERSION=4.6.0 \
+  --build-arg R_VERSION=4.6.1 \
   -t jupyterlab/r/base \
   -f latest.Dockerfile .
 ```

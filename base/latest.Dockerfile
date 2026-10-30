@@ -6,16 +6,16 @@ ARG CUDA_IMAGE_FLAVOR
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
-ARG JUPYTERHUB_VERSION=5.5.0
-ARG JUPYTERLAB_VERSION=4.6.0
+ARG JUPYTERHUB_VERSION=6.1.1
+ARG JUPYTERLAB_VERSION=4.6.4
 ARG CODE_BUILTIN_EXTENSIONS_DIR=/opt/code-server/lib/vscode/extensions
-ARG CODE_SERVER_VERSION=4.125.0
+ARG CODE_SERVER_VERSION=4.143.1
 ARG RSTUDIO_VERSION
-ARG NEOVIM_VERSION=0.12.3
-ARG GIT_VERSION=2.54.0
-ARG GIT_LFS_VERSION=3.7.1
-ARG PANDOC_VERSION=3.8.3
-ARG ARF_VERSION=0.4.1
+ARG NEOVIM_VERSION=0.12.6
+ARG GIT_VERSION=2.56.0
+ARG GIT_LFS_VERSION=3.8.1
+ARG PANDOC_VERSION=3.10
+ARG ARF_VERSION=0.5.3
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}${CUDA_IMAGE_FLAVOR:+-}${CUDA_IMAGE_FLAVOR} AS files
 
@@ -480,28 +480,18 @@ RUN apt-get update \
     >> $(R RHOME)/etc/Rprofile.site \
   && echo "    sep = .Platform\$path.sep))}" \
     >> $(R RHOME)/etc/Rprofile.site \
-  ## Temporary workaround
-  && echo '# https://github.com/REditorSupport/vscode-R/issues/1696' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo 'if (interactive() && Sys.getenv("RSTUDIO") == "" &&' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  Sys.getenv("TERM_PROGRAM") == "vscode" &&' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  dir.exists(file.path(Sys.getenv("HOME"), ".vscode-R"))) {' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  source(file.path(Sys.getenv("HOME"), ".vscode-R", "init.R"))' \
-    >> $(R RHOME)/etc/Rprofile.site \
-  && echo '  .First.sys()}' \
-    >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
+  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
-  ## REditorSupport.r: Disable help panel and revert to old behaviour
-  && echo "options(vsc.helpPanel = FALSE)" >> $(R RHOME)/etc/Rprofile.site \
+  && R --silent --no-echo --no-save --no-restore \
+    --file=$(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/R/install_sess.R) \
+    --args $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/dist/resources/sess) \
+      ${CRAN} \
+      ${RLS} \
   ## Change ownership and permission of $(R RHOME)/etc/*.site
   && chown :"$NB_GID" "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   && chmod g+w "$(R RHOME)/etc" "$(R RHOME)/etc/"*.site \
   ## Strip libraries of binary packages installed from P3M
-  && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Clean up
   && rm -rf /tmp/* \
