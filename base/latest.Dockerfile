@@ -482,7 +482,7 @@ RUN apt-get update \
     >> $(R RHOME)/etc/Rprofile.site \
   ## Install code-server extension
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
-  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r \
+  && code-server --extensions-dir ${CODE_BUILTIN_EXTENSIONS_DIR} --install-extension REditorSupport.r@3.2.0 \
   && R --silent --no-echo --no-save --no-restore \
     --file=$(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/R/install_sess.R) \
     --args $(realpath ${CODE_BUILTIN_EXTENSIONS_DIR}/reditorsupport.r-*/dist/resources/sess) \
