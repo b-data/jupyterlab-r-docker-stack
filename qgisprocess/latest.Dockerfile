@@ -241,7 +241,7 @@ RUN apt-get update \
   && RLS=$(Rscript -e "cat(Sys.getenv('R_LIBS_SITE'))") \
   && strip ${RLS}/*/libs/*.so \
   ## Clean up
-  && if [ ! -z "$PYTHON_VERSION" ]; then \
+  && if [ -n "$PYTHON_VERSION" ]; then \
     apt-get -y purge python3-pip python3-dev; \
     apt-get -y autoremove; \
   fi \
