@@ -38,6 +38,7 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
     hugo \
     lbzip2 \
     libbz2-dev \
+    libcairo2-dev \
     libglpk-dev \
     libgmp3-dev \
     libgl1-mesa-dev \
@@ -147,6 +148,8 @@ RUN dpkgArch="$(dpkg --print-architecture)" \
   && install2.r --error --skipinstalled -n $NCPUS \
     Cairo \
     magick \
+  ## Get rid of libcairo2-dev
+  && apt-get -y purge libcairo2-dev \
   ## Get rid of libharfbuzz-dev
   && apt-get -y purge libharfbuzz-dev \
   ## Get rid of libmagick++-dev
