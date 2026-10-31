@@ -92,32 +92,44 @@ RUN apt-get update \
     ## QGIS: Additional runtime dependencies
     '^libexiv2-[0-9]+$' \
     '^libgdal[0-9]+$' \
+    '^libgeographiclib[0-9]+$' \
     libgeos-c1v5 \
     '^libgsl[0-9]+$' \
     libjs-jquery \
     libjs-leaflet \
     '^libprotobuf-lite[0-9]+$' \
-    libqca-qt5-2-plugins \
-    '^libqscintilla2-qt5-[0-9]+$' \
-    libqt5core5a \
-    libqt5gui5 \
-    libqt5keychain1 \
-    libqt5multimediawidgets5 \
-    libqt5network5 \
-    libqt5quickwidgets5 \
-    libqt5serialport5 \
-    libqt5sql5 \
-    libqt5widgets5 \
-    libqt5xml5 \
-    libqwt-qt5-6 \
+    libqca-qt6-plugins \
+    '^libqscintilla2-qt6-[0-9]+$' \
+    libqt6core6t64 \
+    libqt6gui6 \
+    libqt6keychain1 \
+    libqt6multimediawidgets6 \
+    libqt6network6 \
+    libqt6quickcontrols2-6 \
+    libqt6quickwidgets6 \
+    libqt6serialport6 \
+    libqt6sql6 \
+    libqt6widgets6 \
+    libqt6xml6 \
+    '^libsfcgal[0-9]+$' \
     '^libspatialindex[0-9]+$' \
     '^libzip[0-9]+$' \
     ocl-icd-libopencl1 \
-    qt3d-assimpsceneimport-plugin \
-    qt3d-defaultgeometryloader-plugin \
-    qt3d-gltfsceneio-plugin \
-    qt3d-scene2d-plugin \
-    qt5-image-formats-plugins \
+    ## https://github.com/qgis/QGIS/pull/63784
+    pyqt6-dev-tools \
+    ## QGIS 4 depends on libpython3.x (the shared Python runtime library)
+    ## The following package is installed for a lightweight integration
+    python3-pyqt6.qtqml \
+    qml6-module-qtcharts \
+    qml6-module-qtquick-controls \
+    qml6-module-qtquick-effects \
+    qml6-module-qtquick-layouts \
+    qt6-3d-assimpsceneimport-plugin \
+    qt6-3d-defaultgeometryloader-plugin \
+    qt6-3d-gltfsceneio-plugin \
+    qt6-3d-scene2d-plugin \
+    qt6-image-formats-plugins \
+    qt6-svg-plugins \
     ## QGIS: Python 3 Support
     gdal-bin \
     libfcgi0ldbl \
@@ -131,26 +143,17 @@ RUN apt-get update \
     python3-psycopg2 \
     python3-pygments \
     python3-pyproj \
-    python3-pyqt5 \
-    python3-pyqt5.qsci \
-    python3-pyqt5.qtmultimedia \
-    python3-pyqt5.qtpositioning \
-    python3-pyqt5.qtserialport \
-    python3-pyqt5.qtsql \
-    python3-pyqt5.qtsvg \
+    python3-pyqt6 \
+    python3-pyqt6.qsci \
+    python3-pyqt6.qtmultimedia \
+    python3-pyqt6.qtpositioning \
+    python3-pyqt6.qtserialport \
+    python3-pyqt6.qtsvg \
+    python3-pyqt6.sip \
     python3-yaml \
-    qttools5-dev-tools \
+    qt6-tools-dev-tools \
     ## PDAL: Additional runtime dependencies
     '^libhdf5-cpp-[0-9]+.*$' \
-  && if $(grep -q "trixie" /etc/os-release); then \
-    apt-get -y install --no-install-recommends \
-      python3-pyqt5.sip; \
-  else \
-    apt-get -y install --no-install-recommends \
-      libqt5webkit5 \
-      python3-pyqt5.qtwebkit \
-      python3-sip; \
-  fi \
   && apt-get -y install --no-install-recommends \
     ## QGIS: Additional runtime recommendations
     grass \
