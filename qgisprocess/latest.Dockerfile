@@ -44,7 +44,6 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
 FROM glcr.b-data.ch/qgis/qgissi/${QGIS_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} AS qgissi
 FROM glcr.b-data.ch/saga-gis/saga-gissi${SAGA_VERSION:+/}${SAGA_VERSION:-:none}${SAGA_VERSION:+/$BASE_IMAGE}${SAGA_VERSION:+:$BASE_IMAGE_TAG} AS saga-gissi
 FROM glcr.b-data.ch/orfeotoolbox/otbsi${OTB_VERSION:+/}${OTB_VERSION:-:none}${OTB_VERSION:+/$BASE_IMAGE}${OTB_VERSION:+:$BASE_IMAGE_TAG} AS otbsi
-FROM glcr.b-data.ch/qgis-plugins/processing-saga-nextgen:1.0.0-qgis${QGIS_VERSION%%.*} AS processing-saga-nextgen
 
 FROM ${BUILD_ON_IMAGE}:${R_VERSION}
 
@@ -261,16 +260,12 @@ WORKDIR ${HOME}
 ## Copy files as late as possible to avoid cache busting
 COPY --from=files /files /
 COPY --from=files /files/var/backups/skel ${HOME}
-COPY --from=processing-saga-nextgen --chown=${NB_UID}:${NB_GID} / /tmp
 
-  ## QGIS: Install plugin 'Processing Saga NextGen Provider'
 RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && cd ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
-  && cp -r /tmp/processing_saga_nextgen . \
   ## QGIS: Enable plugins
-  && qgis_process plugins enable processing_saga_nextgen \
   && qgis_process plugins enable grassprovider \
   && if [ "$(uname -m)" = "x86_64" ]; then \
     ## QGIS: Install and enable OTB plugin
