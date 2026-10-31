@@ -24,11 +24,7 @@ RUN if [ "$(uname -m)" = "x86_64" ]; then \
     ## QGIS: Set OTB application folder and OTB folder
     qgis4Ini="/files/var/backups/skel/.local/share/QGIS/QGIS4/profiles/default/QGIS/QGIS4.ini"; \
     echo "\n[Processing]" >> ${qgis4Ini}; \
-    if [ -z "${OTB_VERSION}" ]; then \
-      echo "Configuration\OTB_APP_FOLDER=/usr/lib/otb/applications" >> \
-        ${qgis4Ini}; \
-      echo "Configuration\OTB_FOLDER=/usr\n" >> ${qgis4Ini}; \
-    else \
+    if [ -n "${OTB_VERSION}" ]; then \
       echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
         ${qgis4Ini}; \
       echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis4Ini}; \
@@ -45,7 +41,26 @@ FROM glcr.b-data.ch/qgis/qgissi/${QGIS_VERSION}/${BASE_IMAGE}:${BASE_IMAGE_TAG} 
 FROM glcr.b-data.ch/saga-gis/saga-gissi${SAGA_VERSION:+/}${SAGA_VERSION:-:none}${SAGA_VERSION:+/$BASE_IMAGE}${SAGA_VERSION:+:$BASE_IMAGE_TAG} AS saga-gissi
 FROM glcr.b-data.ch/orfeotoolbox/otbsi${OTB_VERSION:+/}${OTB_VERSION:-:none}${OTB_VERSION:+/$BASE_IMAGE}${OTB_VERSION:+:$BASE_IMAGE_TAG} AS otbsi
 
-FROM ${BUILD_ON_IMAGE}:${R_VERSION}
+FROM ${BUILD_ON_IMAGE}:${R_VERSION} AS pre-env1
+
+FROM ${BUILD_ON_IMAGE}:${R_VERSION} AS pre-env1-saga
+
+ARG SAGA_VERSION
+
+ENV SAGA_VERSION=${SAGA_VERSION}
+
+FROM pre-env1${SAGA_VERSION:+-saga} AS pre-env2
+
+FROM pre-env1${SAGA_VERSION:+-saga} AS pre-env2-otb
+
+ARG OTB_VERSION
+
+ENV OTB_VERSION=${OTB_VERSION} \
+    GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
+    OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications} \
+    OTB_INSTALL_DIR=${OTB_VERSION:+/usr/local}
+
+FROM pre-env2${OTB_VERSION:+-otb} AS build
 
 ARG NCPUS=1
 
@@ -54,15 +69,11 @@ ARG DEBIAN_FRONTEND=noninteractive
 ARG BUILD_ON_IMAGE
 ARG QGIS_VERSION
 ARG PDAL_VERSION
-ARG SAGA_VERSION
-ARG OTB_VERSION
 ARG BUILD_START
 
 ENV PARENT_IMAGE=${BUILD_ON_IMAGE}:${R_VERSION} \
     QGIS_VERSION=${QGIS_VERSION} \
     PDAL_VERSION=${PDAL_VERSION} \
-    SAGA_VERSION=${SAGA_VERSION} \
-    OTB_VERSION=${OTB_VERSION} \
     BUILD_DATE=${BUILD_START}
 
 USER root
@@ -79,11 +90,6 @@ COPY --from=qgissi /usr /usr
 COPY --from=saga-gissi /usr /usr
 ## Install Orfeo Toolbox
 COPY --from=otbsi /usr/local /usr/local
-ENV GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
-    OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications} \
-    OTB_INSTALL_DIR=${OTB_VERSION:+/usr/local}
-ENV OTB_APPLICATION_PATH=${OTB_APPLICATION_PATH:-/usr/lib/otb/applications} \
-    OTB_INSTALL_DIR=${OTB_INSTALL_DIR:-/usr}
 
 RUN apt-get update \
   && apt-get -y install --no-install-recommends \
@@ -176,9 +182,8 @@ RUN apt-get update \
       libmuparserx4.* \
       '^libopencv-core[0-9][0-9.][0-9][a-z]?$' \
       '^libopencv-ml[0-9][0-9.][0-9][a-z]?$' \
-      libtinyxml-dev \
-      $(test -z "${OTB_VERSION}" && echo "otb-* monteverdi"); \
-    if [ ! -z "${OTB_VERSION}" ]; then \
+      libtinyxml-dev; \
+    if [ -n "${OTB_VERSION}" ]; then \
       if [ "$(echo ${OTB_VERSION} | cut -c 1)" -lt "8" ]; then \
         apt-get -y install --no-install-recommends \
           '^libopenthreads[0-9]+$' \
@@ -281,4 +286,10 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS4/profiles/default/python/plugins \
   ## Create backup of QGIS settings
   && cp -a ${HOME}/.local/share/QGIS /var/backups/skel/.local/share
 
+FROM build AS post-env
+
+FROM build AS post-env-otb
+
 ENV PYTHONPATH=${PYTHONPATH:+$PYTHONPATH:}${OTB_VERSION:+/usr/local/lib/otb/python}
+
+FROM post-env${OTB_VERSION:+-otb} AS qgisprocess
