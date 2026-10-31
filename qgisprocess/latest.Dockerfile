@@ -267,11 +267,6 @@ RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS3/profiles/default/python/plugins \
   && qgis-plugin-manager update \
   ## QGIS: Enable plugins
   && qgis_process plugins enable grassprovider \
-  && if [ "$(uname -m)" = "x86_64" ]; then \
-    ## QGIS: Install and enable OTB plugin
-    qgis-plugin-manager install 'OrfeoToolbox Provider'; \
-    qgis_process plugins enable orfeoToolbox_provider; \
-  fi \
   && rm -rf .cache_qgis_plugin_manager \
   ## Clean up
   && rm -rf /tmp/* \
