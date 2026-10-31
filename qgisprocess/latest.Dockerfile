@@ -23,8 +23,8 @@ COPY scripts /files
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
     ## QGIS: Set OTB application folder and OTB folder
     qgis4Ini="/files/var/backups/skel/.local/share/QGIS/QGIS4/profiles/default/QGIS/QGIS4.ini"; \
-    echo "\n[Processing]" >> ${qgis4Ini}; \
     if [ -n "${OTB_VERSION}" ]; then \
+      echo "\n[Processing]" >> ${qgis4Ini}; \
       echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
         ${qgis4Ini}; \
       echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis4Ini}; \
@@ -56,9 +56,9 @@ FROM pre-env1${SAGA_VERSION:+-saga} AS pre-env2-otb
 ARG OTB_VERSION
 
 ENV OTB_VERSION=${OTB_VERSION} \
-    GDAL_DRIVER_PATH=${OTB_VERSION:+disable} \
-    OTB_APPLICATION_PATH=${OTB_VERSION:+/usr/local/lib/otb/applications} \
-    OTB_INSTALL_DIR=${OTB_VERSION:+/usr/local}
+    GDAL_DRIVER_PATH=disable \
+    OTB_APPLICATION_PATH=/usr/local/lib/otb/applications \
+    OTB_INSTALL_DIR=/usr/local
 
 FROM pre-env2${OTB_VERSION:+-otb} AS build
 
@@ -290,6 +290,6 @@ FROM build AS post-env
 
 FROM build AS post-env-otb
 
-ENV PYTHONPATH=${PYTHONPATH:+$PYTHONPATH:}${OTB_VERSION:+/usr/local/lib/otb/python}
+ENV PYTHONPATH=${PYTHONPATH:+$PYTHONPATH:}/usr/local/lib/otb/python
 
 FROM post-env${OTB_VERSION:+-otb} AS qgisprocess
