@@ -1,5 +1,4 @@
 {
-  "black-formatter.importStrategy": "fromEnvironment",
   "chat.disableAIFeatures": true,
   "editor.tabSize": 2,
   "gitlab.duo.enabledWithoutGitlabProject": false,
