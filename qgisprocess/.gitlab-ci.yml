@@ -1,6 +1,6 @@
 variables:
   R_VERSION: "4.6.2"
-  QGIS_VERSION: "4.2.3"
+  QGIS_VERSION: "4.4.0"
   PDAL_VERSION: "2.10.2"
   TAG_VERSION_MAJ_MIN: "false"
   TAG_VERSION_MAJ: "false"
