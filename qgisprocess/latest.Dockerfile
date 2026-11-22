@@ -10,6 +10,8 @@ ARG OTB_VERSION
 
 FROM ${BASE_IMAGE}:${BASE_IMAGE_TAG} AS files
 
+ARG QGIS_VERSION
+
 ARG OTB_VERSION
 
 ARG NB_UID=1000
@@ -19,14 +21,15 @@ RUN mkdir /files
 
 COPY scripts /files
 
-RUN if [ "$(uname -m)" = "x86_64" ]; then \
-    ## QGIS: Add custom environment variable
-    mkdir -p /files/var/backups/skel/.local/share/QGIS/QGIS4/profiles/default/QGIS; \
-    qgis4Ini="/files/var/backups/skel/.local/share/QGIS/QGIS4/profiles/default/QGIS/QGIS4.ini"; \
-    echo "\n[qgis]" >> ${qgis4Ini}; \
-    echo 'customEnvVars="append|PYTHONPATH=:/usr/lib/python3/dist-packages"' >> \
-      ${qgis4Ini}; \
-    echo "customEnvVarsUse=true\n" >> ${qgis4Ini}; \
+RUN mv /files/var/backups/skel/.local/share/QGIS/QGIS3 \
+    "/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}" \
+  ## QGIS: Add custom environment variable
+  && qgis4Ini="/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/QGIS/QGIS${QGIS_VERSION%%.*}.ini" \
+  && echo "\n[qgis]" >> ${qgis4Ini} \
+  && echo 'customEnvVars="append|PYTHONPATH=:/usr/lib/python3/dist-packages"' >> \
+    ${qgis4Ini} \
+  && echo "customEnvVarsUse=true\n" >> ${qgis4Ini} \
+  && if [ "$(uname -m)" = "x86_64" ]; then \
     if [ -n "${OTB_VERSION}" ]; then \
       ## QGIS: Set OTB application folder and OTB folder
       echo "\n[Processing]" >> ${qgis4Ini}; \
@@ -279,8 +282,8 @@ WORKDIR ${HOME}
 COPY --from=files /files /
 COPY --from=files /files/var/backups/skel ${HOME}
 
-RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS4/profiles/default/python/plugins \
-  && cd ${HOME}/.local/share/QGIS/QGIS4/profiles/default/python/plugins \
+RUN mkdir -p ${HOME}/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/python/plugins \
+  && cd ${HOME}/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/python/plugins \
   && qgis-plugin-manager init \
   && qgis-plugin-manager update \
   ## QGIS: Enable plugins
