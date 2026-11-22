@@ -24,19 +24,14 @@ COPY scripts /files
 
 RUN mv /files/var/backups/skel/.local/share/QGIS/QGIS3 \
     "/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}" \
-  ## QGIS: Add custom environment variable
-  && qgis4Ini="/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/QGIS/QGIS${QGIS_VERSION%%.*}.ini" \
-  && echo "\n[qgis]" >> ${qgis4Ini} \
-  && echo 'customEnvVars="append|PYTHONPATH=:/usr/lib/python3/dist-packages"' >> \
-    ${qgis4Ini} \
-  && echo "customEnvVarsUse=true\n" >> ${qgis4Ini} \
+  && qgisIni="/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/QGIS/QGIS${QGIS_VERSION%%.*}.ini" \
   && if [ "$(uname -m)" = "x86_64" ]; then \
     if [ -n "${OTB_VERSION}" ]; then \
       ## QGIS: Set OTB application folder and OTB folder
-      echo "\n[Processing]" >> ${qgis4Ini}; \
+      echo "\n[Processing]" >> ${qgisIni}; \
       echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
-        ${qgis4Ini}; \
-      echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgis4Ini}; \
+        ${qgisIni}; \
+      echo "Configuration\OTB_FOLDER=/usr/local\n" >> ${qgisIni}; \
     fi \
   fi \
   && chown -R ${NB_UID}:${NB_GID} /files/var/backups/skel \
