@@ -24,6 +24,8 @@ COPY scripts /files
 
 RUN mv /files/var/backups/skel/.local/share/QGIS/QGIS3 \
     "/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}" \
+  && mv "/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/QGIS/QGIS3.ini" \
+    "/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/QGIS/QGIS${QGIS_VERSION%%.*}.ini" \
   && qgisIni="/files/var/backups/skel/.local/share/QGIS/QGIS${QGIS_VERSION%%.*}/profiles/default/QGIS/QGIS${QGIS_VERSION%%.*}.ini" \
   && if [ "$(uname -m)" = "x86_64" ]; then \
     if [ -n "${OTB_VERSION}" ]; then \
