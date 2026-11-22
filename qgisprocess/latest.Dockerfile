@@ -19,6 +19,7 @@ ENV NB_GID=100
 
 RUN mkdir /files
 
+COPY conf/user /files
 COPY scripts /files
 
 RUN mv /files/var/backups/skel/.local/share/QGIS/QGIS3 \
