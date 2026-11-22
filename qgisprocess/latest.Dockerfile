@@ -17,13 +17,18 @@ ENV NB_GID=100
 
 RUN mkdir /files
 
-COPY conf/user /files
 COPY scripts /files
 
 RUN if [ "$(uname -m)" = "x86_64" ]; then \
-    ## QGIS: Set OTB application folder and OTB folder
+    ## QGIS: Add custom environment variable
+    mkdir -p /files/var/backups/skel/.local/share/QGIS/QGIS4/profiles/default/QGIS; \
     qgis4Ini="/files/var/backups/skel/.local/share/QGIS/QGIS4/profiles/default/QGIS/QGIS4.ini"; \
+    echo "\n[qgis]" >> ${qgis4Ini}; \
+    echo 'customEnvVars="append|PYTHONPATH=:/usr/lib/python3/dist-packages"' >> \
+      ${qgis4Ini}; \
+    echo "customEnvVarsUse=true\n" >> ${qgis4Ini}; \
     if [ -n "${OTB_VERSION}" ]; then \
+      ## QGIS: Set OTB application folder and OTB folder
       echo "\n[Processing]" >> ${qgis4Ini}; \
       echo "Configuration\OTB_APP_FOLDER=/usr/local/lib/otb/applications" >> \
         ${qgis4Ini}; \
